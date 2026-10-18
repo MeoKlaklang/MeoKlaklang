@@ -1,0 +1,485 @@
+
+/* =====================================
+   LOADING SCREEN
+===================================== */
+
+.loadingScreen {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --glow-color: rgba(172, 232, 199, 0.4);
+  --glow-color-soft: rgba(218, 238, 223, 0.2);
+
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  overflow: hidden;
+
+  background: #ffffff;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 0.85s ease,
+    visibility 0.85s ease;
+}
+
+.exiting {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* =====================================
+   MOUSE FOLLOWING COLOR
+===================================== */
+
+.loadingScreen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    440px circle at var(--mouse-x) var(--mouse-y),
+    var(--glow-color) 0%,
+    var(--glow-color-soft) 42%,
+    transparent 75%
+  );
+}
+
+/* FIREWORK BACKGROUND */
+
+.effects {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* =====================================
+   PLAYER LAYOUT
+===================================== */
+
+.player {
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: min(92vw, 510px);
+  height: 175px;
+}
+
+/* =====================================
+   ROUND PHOTO RECORD
+===================================== */
+
+.recordWrapper {
+  position: relative;
+
+  width: 165px;
+  height: 165px;
+
+  flex-shrink: 0;
+  z-index: 3;
+
+  margin-right: -22px;
+}
+
+.record {
+  position: relative;
+
+  width: 165px;
+  height: 165px;
+
+  overflow: hidden;
+  border-radius: 50%;
+
+  background: #171717;
+
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.23),
+    0 2px 6px rgba(0,0,0,0.12);
+
+  animation: recordSpin 6s linear infinite;
+}
+
+.recordImage {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center 43%;
+  border-radius: 50%;
+
+  user-select: none;
+  pointer-events: none;
+
+  animation: photoAppear 0.45s ease both;
+}
+
+.recordHole {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+
+  width: 13px;
+  height: 13px;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.24),
+    0 2px 5px rgba(0,0,0,0.2);
+}
+
+@keyframes recordSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes photoAppear {
+  from {
+    opacity: 0.3;
+    scale: 1.06;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* =====================================
+   PLAYER CARD
+===================================== */
+
+.playerCard {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  flex: 1;
+  min-width: 0;
+  height: 142px;
+
+  padding: 18px 22px 16px 45px;
+
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #f3f3f3;
+
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.1),
+    0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* =====================================
+   TITLE
+===================================== */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+  width: 100%;
+
+  margin-bottom: 18px;
+}
+
+.songInfo {
+  min-width: 0;
+}
+
+.songInfo h1 {
+  margin: 0 0 4px;
+
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+
+  color: #161616;
+}
+
+.songInfo p {
+  margin: 0;
+
+  font-size: 12px;
+  color: #737373;
+}
+
+.muteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+
+  padding: 0;
+  margin: -4px -5px 0 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+  color: #8b8b8b;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.muteButton:hover {
+  background: #eeeeee;
+  color: #111;
+  transform: scale(1.08);
+}
+
+/* =====================================
+   PROGRESS
+===================================== */
+
+.progressTrack {
+  width: 100%;
+  height: 5px;
+
+  overflow: hidden;
+  border-radius: 999px;
+
+  background: #d6d6d6;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+
+  background: #222222;
+
+  transition: width 0.1s linear;
+}
+
+/* =====================================
+   PLAYER CONTROLS
+===================================== */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  margin-top: 11px;
+}
+
+.controlButton {
+  width: 30px;
+  height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+  color: #111111;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.controlButton:hover {
+  background: #f1f1f1;
+  transform: scale(1.12);
+}
+
+.controlButton:active {
+  transform: scale(0.94);
+}
+
+.controlButton:focus-visible,
+.muteButton:focus-visible {
+  outline: 2px solid #222222;
+  outline-offset: 3px;
+}
+
+.nextButton {
+  width: 37px;
+  height: 37px;
+
+  background: #f7f7f7;
+
+  box-shadow:
+    0 0 0 1px #dadada,
+    0 2px 4px rgba(0,0,0,0.06);
+}
+
+.nextButton:hover {
+  background: #eaeaea;
+}
+
+.playButton {
+  width: 34px;
+  height: 34px;
+}
+
+/* =====================================
+   LOADING PERCENTAGE
+===================================== */
+
+.loadingPercentage {
+  position: relative;
+  z-index: 3;
+
+  margin-top: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+
+  color: #999999;
+}
+
+.pausedLabel {
+  color: #555555;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+}
+
+/* =====================================
+   PAUSED STATE
+===================================== */
+
+.paused .record,
+.paused .recordImage,
+.paused .effects * {
+  animation-play-state: paused !important;
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 600px) {
+  .player {
+    width: min(94vw, 410px);
+    height: 140px;
+  }
+
+  .recordWrapper,
+  .record {
+    width: 118px;
+    height: 118px;
+  }
+
+  .recordWrapper {
+    margin-right: -17px;
+  }
+
+  .playerCard {
+    height: 122px;
+    padding: 13px 13px 12px 30px;
+    border-radius: 17px;
+  }
+
+  .header {
+    margin-bottom: 13px;
+  }
+
+  .songInfo h1 {
+    font-size: 15px;
+  }
+
+  .songInfo p {
+    font-size: 11px;
+  }
+
+  .controls {
+    margin-top: 6px;
+  }
+
+  .recordHole {
+    width: 11px;
+    height: 11px;
+  }
+
+  .loadingPercentage {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 370px) {
+  .recordWrapper,
+  .record {
+    width: 94px;
+    height: 94px;
+  }
+
+  .playerCard {
+    padding-left: 23px;
+  }
+
+  .songInfo h1 {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record,
+  .recordImage {
+    animation: none;
+  }
+
+  .loadingScreen,
+  .progressFill {
+    transition: none;
+  }
+}

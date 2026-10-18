@@ -1,0 +1,398 @@
+/* =============================
+   CD POSITION
+============================= */
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 55%;
+
+  width: clamp(240px, 27vw, 420px);
+  aspect-ratio: 1;
+
+  opacity: var(--opacity);
+
+  transform:
+    translate(-50%, -50%)
+    translate3d(var(--x), var(--y), var(--z))
+    rotateY(-15deg)
+    rotateX(3deg);
+
+  transform-style: preserve-3d;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.active {
+  z-index: 1000 !important;
+  opacity: 1 !important;
+}
+
+/* =============================
+   EMPTY CD SLOT
+============================= */
+
+.slot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  transform: translate3d(8px, 5px, -24px);
+
+  border: 1px solid rgba(110, 120, 115, 0.25);
+  background: rgba(203, 209, 205, 0.18);
+
+  box-shadow:
+    6px 8px 18px rgba(0, 0, 0, 0.065),
+    inset 0 0 18px rgba(80, 95, 85, 0.05);
+}
+
+/* =============================
+   CD JEWEL CASE
+============================= */
+
+.case {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --shine-x: 50%;
+  --shine-y: 50%;
+
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  transform-style: preserve-3d;
+
+  transform: translate3d(0, 0, 0) rotateY(0deg);
+
+  box-shadow:
+    1px 1px 0 rgba(255, 255, 255, 0.95),
+    4px 3px 0 rgba(150, 160, 155, 0.25),
+    10px 14px 35px rgba(0, 0, 0, 0.11),
+    inset 0 0 10px rgba(255, 255, 255, 0.4);
+
+  transition:
+    transform 0.7s cubic-bezier(.16, 1, .3, 1),
+    box-shadow 0.7s ease;
+}
+
+/* =============================
+   COVER
+============================= */
+
+.cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--card-color);
+}
+
+/* preview afbeelding onderaan */
+.coverImage {
+  position: absolute;
+  inset: 0;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  opacity: 0.82;
+  filter: saturate(0.95) contrast(0.92);
+
+  pointer-events: none;
+  transform: scale(1.02);
+
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s ease,
+    filter 0.45s ease;
+}
+
+/* kleur blijft erboven */
+.coverTint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: var(--card-color);
+  mix-blend-mode: multiply;
+  opacity: 0.78;
+
+  transition: opacity 0.45s ease;
+}
+
+/* zachte extra lichtlaag voor meer design feeling */
+.coverSoftLight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255,255,255,0.15) 0%,
+      rgba(255,255,255,0.03) 30%,
+      rgba(0,0,0,0.05) 100%
+    );
+
+  mix-blend-mode: screen;
+  opacity: 0.75;
+
+  transition: opacity 0.45s ease;
+}
+
+/* =============================
+   PLASTIC SPINE
+============================= */
+
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 4;
+
+  width: 16px;
+  pointer-events: none;
+
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.95) 0%,
+    rgba(120,135,125,0.22) 16%,
+    rgba(255,255,255,0.65) 39%,
+    rgba(255,255,255,0.13) 70%,
+    rgba(90,100,95,0.2) 100%
+  );
+
+  border-right: 1px solid rgba(255,255,255,0.6);
+
+  box-shadow:
+    2px 0 4px rgba(0,0,0,0.1),
+    inset -1px 0 rgba(255,255,255,0.7);
+}
+
+/* =============================
+   PLASTIC SHINE
+============================= */
+
+.plastic {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,0.52) 0%,
+      rgba(255,255,255,0.08) 16%,
+      transparent 35%,
+      rgba(255,255,255,0.02) 58%,
+      rgba(255,255,255,0.25) 100%
+    ),
+    linear-gradient(
+      165deg,
+      rgba(255,255,255,0.25),
+      transparent 48%
+    );
+
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.35),
+    inset 0 0 12px rgba(255,255,255,0.2);
+}
+
+.plastic::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+
+  background: linear-gradient(
+    115deg,
+    transparent 33%,
+    rgba(255,255,255,0.05) 42%,
+    rgba(255,255,255,0.37) 47%,
+    rgba(255,255,255,0.06) 51%,
+    transparent 60%
+  );
+
+  transform: translateX(-20%);
+  transition: transform 0.8s ease;
+}
+
+/* =============================
+   MOUSE REFLECTION
+============================= */
+
+.reflection {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at var(--shine-x) var(--shine-y),
+    rgba(255,255,255,0.55),
+    rgba(255,255,255,0.12) 24%,
+    transparent 55%
+  );
+
+  opacity: 0.12;
+  transition: opacity 0.4s ease;
+}
+
+/* =============================
+   HOVER — PULL CD RIGHT
+============================= */
+
+.active .case,
+.case:focus-visible {
+  transform:
+    translate3d(125px, 0, 95px)
+    rotateX(var(--tilt-x))
+    rotateY(var(--tilt-y))
+    scale(1.02);
+
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.2),
+    5px 5px 0 rgba(145,155,150,0.18),
+    inset 0 0 15px rgba(255,255,255,0.4);
+}
+
+.active .reflection,
+.case:focus-visible .reflection {
+  opacity: 0.7;
+}
+
+.active .plastic::after,
+.case:focus-visible .plastic::after {
+  transform: translateX(25%);
+}
+
+/* afbeelding iets duidelijker, MAAR kleur blijft erop */
+.active .coverImage,
+.case:focus-visible .coverImage {
+  opacity: 0.92;
+  transform: scale(1.04);
+  filter: saturate(1) contrast(0.98);
+}
+
+/* kleur blijft zichtbaar */
+.active .coverTint,
+.case:focus-visible .coverTint {
+  opacity: 0.62;
+}
+
+.active .coverSoftLight,
+.case:focus-visible .coverSoftLight {
+  opacity: 0.9;
+}
+
+/* =============================
+   PROJECT INFO
+============================= */
+
+.info {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+
+  padding: 26px;
+  color: white;
+
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.68),
+    transparent 65%
+  );
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.active .info,
+.case:focus-visible .info {
+  opacity: 1;
+}
+
+.info span {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.info h2 {
+  margin: 10px 0 14px;
+  font-size: clamp(25px, 2.7vw, 40px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+
+.info p {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+/* =============================
+   MOBILE
+============================= */
+
+@media (max-width: 768px) {
+  .card {
+    left: 54%;
+    width: min(70vw, 320px);
+
+    transform:
+      translate(-50%, -50%)
+      translate3d(
+        calc(var(--x) * 0.55),
+        calc(var(--y) * 0.7),
+        var(--z)
+      )
+      rotateY(-12deg);
+  }
+
+  .active .case,
+  .case:focus-visible {
+    transform:
+      translate3d(45px, 0, 65px)
+      rotateX(var(--tilt-x))
+      rotateY(var(--tilt-y))
+      scale(1.02);
+  }
+
+  .info {
+    padding: 18px;
+  }
+
+  .info h2 {
+    font-size: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case,
+  .plastic::after,
+  .reflection,
+  .coverImage,
+  .coverTint,
+  .coverSoftLight {
+    transition: none;
+  }
+}

@@ -1,0 +1,682 @@
+
+/* ==========================================
+   OPENING CD — SCROLL EXPERIENCE
+========================================== */
+
+.experience {
+  --disc-size: clamp(
+    240px,
+    min(34vw, 56vh),
+    460px
+  );
+
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  perspective: 1800px;
+
+  opacity: var(--visibility);
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   TWO-PANEL JEWEL CASE
+========================================== */
+
+.caseSpread {
+  position: relative;
+
+  width: calc(var(--disc-size) * 2);
+  height: var(--disc-size);
+
+  flex-shrink: 0;
+
+  transform:
+    translateX(var(--horizontal-shift));
+
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ==========================================
+   RIGHT TRAY
+========================================== */
+
+.tray {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: var(--disc-size);
+  height: var(--disc-size);
+
+  overflow: hidden;
+
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+
+  background: #e7eee7;
+
+  box-shadow:
+    3px 5px 0 rgba(157, 171, 160, 0.28),
+    15px 22px 45px rgba(0, 0, 0, 0.13),
+    inset 0 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+.trayBackground {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.24) 0%,
+      transparent 65%
+    ),
+    linear-gradient(
+      135deg,
+      var(--project-color),
+      #e6eee8
+    );
+
+  opacity: 0.58;
+}
+
+/* ==========================================
+   ROUND CD INSIDE THE SQUARE CASE
+========================================== */
+
+.disc {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  width: 88%;
+  height: 88%;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  background: var(--project-color);
+
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.85),
+    0 3px 10px rgba(0, 0, 0, 0.18);
+
+  animation: discSpin 9s linear infinite;
+}
+
+@keyframes discSpin {
+  from {
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+  }
+}
+
+.discImage {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  border-radius: 50%;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.discTint {
+  position: absolute;
+  inset: 0;
+
+  border-radius: 50%;
+
+  background: var(--project-color);
+  mix-blend-mode: color;
+  opacity: 0.45;
+}
+
+.discRings {
+  position: absolute;
+  inset: 0;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      transparent 0 19%,
+      rgba(255,255,255,0.13) 20%,
+      transparent 21% 39%,
+      rgba(255,255,255,0.16) 40%,
+      transparent 41% 66%,
+      rgba(255,255,255,0.22) 67%,
+      transparent 68%
+    );
+
+  pointer-events: none;
+}
+
+.discHole {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 11%;
+  aspect-ratio: 1;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: #f5f5f1;
+
+  border: 4px solid rgba(255, 255, 255, 0.9);
+
+  box-shadow:
+    0 0 0 3px rgba(40, 70, 50, 0.18),
+    inset 0 1px 5px rgba(0, 0, 0, 0.16);
+}
+
+.trayEdge {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  box-shadow:
+    inset 0 0 0 8px rgba(255,255,255,0.2),
+    inset 0 0 15px rgba(255,255,255,0.26);
+}
+
+.trayReflection {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.44),
+    transparent 32%,
+    transparent 70%,
+    rgba(255,255,255,0.22)
+  );
+}
+
+/* ==========================================
+   OPENING COVER / LEFT HINGE
+========================================== */
+
+.coverPanel {
+  position: absolute;
+
+  top: 0;
+  right: 0;
+
+  width: var(--disc-size);
+  height: var(--disc-size);
+
+  transform-origin: left center;
+
+  transform:
+    rotateY(var(--cover-angle));
+
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Both sides occupy one cover */
+
+.frontSurface,
+.insideSurface {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  border: 3px solid rgba(255,255,255,0.86);
+  border-radius: 3px;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.3);
+}
+
+/* ==========================================
+   CLOSED FRONT COVER
+========================================== */
+
+.frontSurface {
+  background: var(--project-color);
+
+  box-shadow:
+    4px 8px 24px rgba(0,0,0,0.11),
+    inset 0 0 0 2px rgba(255,255,255,0.3);
+}
+
+.frontImage {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  opacity: 0.88;
+
+  filter:
+    contrast(1.03)
+    saturate(1.08);
+}
+
+.frontTint {
+  position: absolute;
+  inset: 0;
+
+  background: var(--project-color);
+
+  mix-blend-mode: multiply;
+  opacity: 0.68;
+}
+
+.frontGloss {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      125deg,
+      rgba(255,255,255,0.44),
+      transparent 28%,
+      transparent 66%,
+      rgba(255,255,255,0.2)
+    );
+
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.25);
+}
+
+.frontSpine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 15px;
+
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.88),
+    rgba(125,145,130,0.28),
+    rgba(255,255,255,0.45)
+  );
+
+  border-right: 1px solid rgba(255,255,255,0.5);
+}
+
+.frontText {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  padding: 25px;
+
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.55),
+    transparent 65%
+  );
+
+  color: white;
+}
+
+.frontText span {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.frontText h2 {
+  margin: 8px 0 0;
+
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+}
+
+/* ==========================================
+   INSIDE OF THE COVER — PROJECT MENU
+========================================== */
+
+.insideSurface {
+  transform: rotateY(180deg);
+
+  background: color-mix(
+    in srgb,
+    var(--project-color) 38%,
+    #ffffff
+  );
+
+  box-shadow:
+    -8px 14px 30px rgba(0,0,0,0.09),
+    inset 0 0 0 8px rgba(255,255,255,0.22);
+}
+
+.insideContent {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: clamp(14px, 2.3vw, 32px);
+
+  opacity: var(--details-opacity);
+  color: #264435;
+}
+
+.eyebrow {
+  font-size: clamp(7px, 0.75vw, 10px);
+  letter-spacing: 0.11em;
+  opacity: 0.65;
+}
+
+.projectTitle {
+  margin: 9px 0 4px;
+
+  font-size: clamp(20px, 2.5vw, 38px);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.055em;
+}
+
+.category {
+  margin: 0;
+
+  font-size: clamp(8px, 0.9vw, 11px);
+  opacity: 0.75;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+
+  margin: clamp(10px, 1.7vw, 22px) 0;
+
+  background: rgba(30, 70, 45, 0.22);
+}
+
+/* ==========================================
+   LEFT NAVIGATION
+========================================== */
+
+.projectNav {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.8vw, 10px);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.3vw, 17px);
+
+  width: 100%;
+  padding: 5px 0;
+
+  border: 0;
+  background: transparent;
+
+  color: rgba(25, 65, 40, 0.55);
+
+  text-align: left;
+  font: inherit;
+  font-size: clamp(10px, 1.05vw, 15px);
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navItem span:first-child {
+  font-size: 0.7em;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.navItem:hover {
+  color: #183f2b;
+  transform: translateX(3px);
+}
+
+.navItemActive {
+  color: #183f2b;
+  font-weight: 600;
+}
+
+.navItem:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   SELECTED CONTENT PREVIEW
+========================================== */
+
+.sectionPreview {
+  margin-top: auto;
+  padding-top: 10px;
+
+  border-top: 1px solid rgba(30,70,45,0.15);
+}
+
+.sectionPreview h3 {
+  margin: 0 0 7px;
+
+  font-size: clamp(11px, 1vw, 15px);
+  font-weight: 600;
+}
+
+.sectionPreview p {
+  margin: 0;
+
+  font-size: clamp(9px, 0.85vw, 12px);
+  line-height: 1.45;
+
+  color: rgba(30,60,40,0.75);
+}
+
+.insideReflection {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.3),
+    transparent 37%,
+    transparent 80%,
+    rgba(255,255,255,0.15)
+  );
+}
+
+/* ==========================================
+   JEWEL CASE HINGE
+========================================== */
+
+.hinge {
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 7px;
+  height: 100%;
+
+  transform: translateX(-50%);
+
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.75),
+    rgba(120,140,130,0.2),
+    rgba(255,255,255,0.85)
+  );
+
+  border-left: 1px solid rgba(255,255,255,0.6);
+  border-right: 1px solid rgba(120,140,130,0.18);
+
+  box-shadow: 1px 0 4px rgba(0,0,0,0.08);
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   NOW PLAYING CAPTION
+========================================== */
+
+.projectCaption {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  transform: translateX(-50%);
+
+  opacity: var(--details-opacity);
+
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.projectCaption span {
+  font-size: 9px;
+  letter-spacing: 0.13em;
+  color: #858a80;
+}
+
+.projectCaption strong {
+  font-size: 15px;
+  font-weight: 500;
+  color: #303a30;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 768px) {
+  .experience {
+    --disc-size: min(44vw, 36vh);
+  }
+
+  .insideContent {
+    padding: 12px;
+  }
+
+  .projectTitle {
+    font-size: clamp(14px, 3vw, 22px);
+  }
+
+  .separator {
+    margin: 9px 0;
+  }
+
+  .projectNav {
+    gap: 2px;
+  }
+
+  .navItem {
+    padding: 3px 0;
+    font-size: clamp(8px, 1.9vw, 12px);
+  }
+
+  .sectionPreview h3 {
+    font-size: 10px;
+  }
+
+  .sectionPreview p {
+    font-size: 8px;
+    line-height: 1.3;
+  }
+
+  .projectCaption {
+    bottom: 16%;
+  }
+}
+
+@media (max-width: 480px) {
+  .experience {
+    --disc-size: min(45vw, 35vh);
+  }
+
+  .insideContent {
+    padding: 9px;
+  }
+
+  .eyebrow {
+    font-size: 6px;
+  }
+
+  .projectTitle {
+    font-size: 15px;
+    margin-top: 5px;
+  }
+
+  .category {
+    font-size: 7px;
+  }
+
+  .separator {
+    margin: 6px 0;
+  }
+
+  .sectionPreview p {
+    font-size: 7px;
+  }
+
+  .projectCaption {
+    bottom: 22%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disc {
+    animation: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .navItem {
+    transition: none;
+  }
+}

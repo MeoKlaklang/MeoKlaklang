@@ -1,0 +1,112 @@
+
+/* =====================================
+   INTERACTIVE DIAGONAL GALLERY
+===================================== */
+
+.gallery {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+
+  --gallery-rotate-x: 0deg;
+  --gallery-rotate-y: 0deg;
+  --gallery-move-x: 0px;
+  --gallery-move-y: 0px;
+
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  overflow: hidden;
+
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+
+  background-color: #f5f5f1;
+
+  background-image:
+    linear-gradient(
+      rgba(55, 65, 55, 0.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(55, 65, 55, 0.03) 1px,
+      transparent 1px
+    );
+
+  background-size: 70px 70px;
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
+.locked {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* =====================================
+   CURSOR GLOW
+===================================== */
+
+.gallery::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  pointer-events: none;
+
+  background: radial-gradient(
+    480px circle at
+    var(--mouse-x) var(--mouse-y),
+    rgba(172, 218, 174, 0.3) 0%,
+    rgba(181, 232, 210, 0.15) 38%,
+    rgba(234, 239, 225, 0.06) 65%,
+    transparent 82%
+  );
+}
+
+/* =====================================
+   3D SCENE
+===================================== */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  perspective: 1350px;
+  perspective-origin: 56% 48%;
+
+  transform-style: preserve-3d;
+  pointer-events: none;
+
+  transform:
+    translate3d(
+      var(--gallery-move-x),
+      var(--gallery-move-y),
+      0
+    )
+    rotateX(var(--gallery-rotate-x))
+    rotateY(var(--gallery-rotate-y));
+
+  transition:
+    transform 0.7s cubic-bezier(.22, 1, .36, 1);
+}
+
+@media (max-width: 768px) {
+  .scene {
+    perspective: 1000px;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene {
+    transform: none;
+    transition: none;
+  }
+}
