@@ -142,3 +142,29 @@
     animation: none;
   }
 }
+
+
+/* =====================================
+   CD OPENING -> PROJECT ALBUM
+===================================== */
+
+.cdOpeningLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+}
+
+.albumLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+
+  transform-origin: center center;
+  will-change: opacity, transform;
+}
+
+/* Keep navbar above project interface */
+
+.navigation {
+  z-index: 30;
+}

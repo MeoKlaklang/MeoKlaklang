@@ -1,11 +1,20 @@
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import ProjectCard from "../ProjectCard/ProjectCard";
 import { projects } from "../../data/projects";
 
 import styles from "./DiagonalGallery.module.css";
+
+/* =====================================
+   SETTINGS
+===================================== */
 
 const AUTO_SPEED = 0.000012;
 const DRAG_SPEED = 0.005;
@@ -21,46 +30,73 @@ const smoothstep = (value) => {
   return t * t * (3 - 2 * t);
 };
 
+/* =====================================
+   GALLERY COMPONENT
+===================================== */
+
 export default function DiagonalGallery({
   scrollProgress = 0,
   selectedProjectId,
 }) {
   const navigate = useNavigate();
 
+  /* =====================================
+     STATE
+  ===================================== */
+
   const [position, setPosition] = useState(0);
   const [hoveredId, setHoveredId] = useState(null);
   const [dragging, setDragging] = useState(false);
 
+  /* =====================================
+     REFS
+  ===================================== */
+
   const positionRef = useRef(0);
   const targetRef = useRef(0);
+
   const draggingRef = useRef(false);
   const pointerRef = useRef(null);
   const didDragRef = useRef(false);
+
   const hoveredRef = useRef(false);
+
   const soundRef = useRef(null);
   const galleryRef = useRef(null);
 
   const scrollProgressRef = useRef(scrollProgress);
-  scrollProgressRef.current = scrollProgress;
 
-  // How far the selected CD moves toward center
+  /* =====================================
+     SCROLL PROGRESS
+     Updated outside render
+  ===================================== */
+
+  useEffect(() => {
+    scrollProgressRef.current = scrollProgress;
+  }, [scrollProgress]);
+
+  /* =====================================
+     SCROLL ANIMATION VALUES
+  ===================================== */
+
   const centering = smoothstep(
     scrollProgress / 0.27
   );
 
-  // Other CDs disappear before the jewel case opens
   const othersFade = 1 - smoothstep(
     (scrollProgress - 0.05) / 0.23
   );
 
-  // The original CD fades into the opening CD scene
   const selectedFade = 1 - smoothstep(
     (scrollProgress - 0.23) / 0.11
   );
 
   const galleryLocked = scrollProgress > 0.035;
 
-  // Hover sound
+  /* =====================================
+     HOVER SOUND
+  ===================================== */
+
   useEffect(() => {
     const sound = new Audio(
       "/sounds/cd-pop-instant.mp3"
@@ -68,6 +104,7 @@ export default function DiagonalGallery({
 
     sound.preload = "auto";
     sound.volume = 0.4;
+
     soundRef.current = sound;
 
     return () => {
@@ -78,14 +115,19 @@ export default function DiagonalGallery({
 
   function playSound() {
     const sound = soundRef.current;
+
     if (!sound) return;
 
     sound.pause();
     sound.currentTime = 0;
+
     sound.play().catch(() => {});
   }
 
-  // Continuous rack movement
+  /* =====================================
+     AUTOMATIC CD MOVEMENT
+  ===================================== */
+
   useEffect(() => {
     let frame;
     let lastTime = 0;
@@ -127,19 +169,28 @@ export default function DiagonalGallery({
 
     frame = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
-  // End dragging outside the gallery
+  /* =====================================
+     END DRAG OUTSIDE GALLERY
+  ===================================== */
+
   useEffect(() => {
     function endDrag() {
       draggingRef.current = false;
       pointerRef.current = null;
+
       setDragging(false);
     }
 
     window.addEventListener("pointerup", endDrag);
-    window.addEventListener("pointercancel", endDrag);
+    window.addEventListener(
+      "pointercancel",
+      endDrag
+    );
 
     return () => {
       window.removeEventListener("pointerup", endDrag);
@@ -150,23 +201,29 @@ export default function DiagonalGallery({
     };
   }, []);
 
-  // Disable hover while opening
+  /* =====================================
+     CLEAN UP REFS WHEN SCROLLING
+     No setState inside effect
+  ===================================== */
+
   useEffect(() => {
     if (!galleryLocked) return;
 
     hoveredRef.current = false;
     draggingRef.current = false;
     pointerRef.current = null;
-
-    setHoveredId(null);
-    setDragging(false);
   }, [galleryLocked]);
+
+  /* =====================================
+     DRAG START
+  ===================================== */
 
   function handlePointerDown(event) {
     if (galleryLocked || event.button !== 0) return;
 
     draggingRef.current = true;
     didDragRef.current = false;
+
     setDragging(true);
 
     pointerRef.current = {
@@ -177,6 +234,10 @@ export default function DiagonalGallery({
     };
   }
 
+  /* =====================================
+     MOUSE MOVEMENT + DRAG
+  ===================================== */
+
   function handlePointerMove(event) {
     const gallery = galleryRef.current;
 
@@ -185,6 +246,8 @@ export default function DiagonalGallery({
 
       const mouseX = event.clientX - rect.left;
       const mouseY = event.clientY - rect.top;
+
+      /* Background glow */
 
       gallery.style.setProperty(
         "--mouse-x",
@@ -196,11 +259,15 @@ export default function DiagonalGallery({
         `${mouseY}px`
       );
 
+      /* Normalized mouse position */
+
       const normalizedX =
         (mouseX / rect.width - 0.5) * 2;
 
       const normalizedY =
         (mouseY / rect.height - 0.5) * 2;
+
+      /* Parallax fades out while opening */
 
       const strength = 1 - centering;
 
@@ -224,6 +291,8 @@ export default function DiagonalGallery({
         `${normalizedY * 12 * strength}px`
       );
     }
+
+    /* Drag interaction */
 
     if (
       galleryLocked ||
@@ -256,23 +325,31 @@ export default function DiagonalGallery({
     pointer.y = event.clientY;
   }
 
+  /* =====================================
+     HOVER
+  ===================================== */
+
   function handleCardEnter(id, withSound = true) {
     if (galleryLocked || draggingRef.current) return;
 
     hoveredRef.current = true;
     setHoveredId(id);
 
-    if (withSound) playSound();
+    if (withSound) {
+      playSound();
+    }
   }
 
   function handleCardLeave(id) {
-    setHoveredId((current) => {
-      if (current !== id) return current;
+    if (hoveredId !== id) return;
 
-      hoveredRef.current = false;
-      return null;
-    });
+    hoveredRef.current = false;
+    setHoveredId(null);
   }
+
+  /* =====================================
+     OPEN PROJECT
+  ===================================== */
 
   function handleOpen(event, project) {
     if (didDragRef.current || galleryLocked) {
@@ -283,7 +360,10 @@ export default function DiagonalGallery({
     navigate(`/projects/${project.slug}`);
   }
 
-  // Scroll-driven CD positions
+  /* =====================================
+     3D CARD POSITIONS
+  ===================================== */
+
   function getCardStyle(index) {
     const count = projects.length;
     const project = projects[index];
@@ -300,6 +380,8 @@ export default function DiagonalGallery({
     const originalX = offset * 150;
     const originalY = -offset * 112;
     const originalZ = -depth * 135;
+
+    /* Move Het Mandje to center */
 
     const x = isSelected
       ? originalX * (1 - centering)
@@ -318,6 +400,8 @@ export default function DiagonalGallery({
       1 - depth * 0.09
     );
 
+    /* Fade other CDs away */
+
     const opacity = isSelected
       ? baseOpacity * selectedFade
       : baseOpacity * othersFade;
@@ -331,7 +415,7 @@ export default function DiagonalGallery({
 
       zIndex: isSelected
         ? 500
-        : hoveredId === project.id
+        : hoveredId === project.id && !galleryLocked
           ? 1000
           : Math.round(100 - depth * 10),
 
@@ -340,12 +424,20 @@ export default function DiagonalGallery({
     };
   }
 
+  /* =====================================
+     RENDER
+  ===================================== */
+
   return (
     <main
       ref={galleryRef}
       className={`${styles.gallery} ${
-        dragging ? styles.dragging : ""
-      } ${galleryLocked ? styles.locked : ""}`}
+        dragging && !galleryLocked
+          ? styles.dragging
+          : ""
+      } ${
+        galleryLocked ? styles.locked : ""
+      }`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
     >
