@@ -1,0 +1,445 @@
+
+.project {
+  --project-color: #c3a2eb;
+
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+
+  padding-left: var(
+    --content-left,
+    clamp(305px, 34vw, 520px)
+  );
+  padding-right: 5vw;
+
+  background: transparent;
+  color: #f5f1fa;
+  pointer-events: none;
+}
+
+.chapter {
+  position: relative;
+  min-height: 100dvh;
+  padding: 115px 0 140px;
+  scroll-margin-top: 0;
+}
+
+.chapterInner {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 25px;
+
+  color: var(--project-color);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+}
+
+.introTitle,
+.sectionTitle {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.065em;
+  color: #f5f1fa;
+}
+
+.introTitle {
+  max-width: 950px;
+  font-size: clamp(42px, 5.5vw, 84px);
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  max-width: 950px;
+  font-size: clamp(42px, 5.6vw, 86px);
+  margin-bottom: 24px;
+}
+
+.introDescription,
+.sectionDescription {
+  max-width: 670px;
+  margin: 0;
+
+  color: #bfb0cc;
+  font-size: clamp(14px, 1.35vw, 18px);
+  line-height: 1.85;
+}
+
+.sectionDescription {
+  margin-bottom: 65px;
+}
+
+.introDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 28px;
+
+  margin-top: 65px;
+  padding-top: 20px;
+
+  border-top: 1px solid
+    rgba(195, 162, 235, 0.2);
+}
+
+.introDetails span {
+  color: #aa9db8;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+}
+
+/* BRANDING */
+
+.brandingVisual,
+.brandingPoster {
+  margin: 0 0 95px;
+}
+
+.brandingVisual img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.brandingPoster img {
+  display: block;
+  width: min(100%, 720px);
+  height: auto;
+  margin: 0 auto;
+}
+
+.brandingVisual figcaption,
+.brandingPoster figcaption {
+  padding-top: 17px;
+  color: #a89ab5;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+}
+
+/* STICKERS */
+
+.stickerSection {
+  margin-top: 140px;
+}
+
+.stickerHeading {
+  margin: 0 0 18px;
+  font-size: clamp(36px, 4.7vw, 67px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.06em;
+}
+
+.stickerDescription {
+  margin: 0 0 45px;
+  color: #b9abca;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* LOGO */
+
+.logoShowcase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 560px;
+  margin: 65px 0 0;
+}
+
+.logoShowcase img {
+  display: block;
+  width: min(88%, 650px);
+  height: auto;
+  object-fit: contain;
+}
+
+.logoCaption {
+  margin-top: 20px;
+  text-align: center;
+  color: #a89ab7;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .project {
+    padding-left: var(--content-left, 250px);
+  }
+}
+
+@media (max-width: 650px) {
+  .project {
+    padding-left: var(--content-left, 112px);
+    padding-right: 14px;
+  }
+
+  .chapter {
+    padding: 95px 0 105px;
+  }
+
+  .introTitle,
+  .sectionTitle {
+    font-size: clamp(27px, 7vw, 43px);
+  }
+
+  .introDescription,
+  .sectionDescription {
+    font-size: 12px;
+  }
+
+  .sectionDescription {
+    margin-bottom: 40px;
+  }
+
+  .introDetails {
+    margin-top: 40px;
+  }
+
+  .brandingVisual,
+  .brandingPoster {
+    margin-bottom: 65px;
+  }
+
+  .stickerSection {
+    margin-top: 85px;
+  }
+
+  .stickerDescription {
+    font-size: 12px;
+  }
+
+  .logoShowcase {
+    min-height: 300px;
+  }
+
+  .logoShowcase img {
+    width: 100%;
+  }
+}
+
+
+/* =====================================
+   RAHU — LOGO APPLICATIONS
+===================================== */
+
+.logoShowcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  margin: 65px 0 0;
+}
+
+.logoShowcase img {
+  display: block;
+  width: min(88%, 650px);
+  height: auto;
+  object-fit: contain;
+}
+
+.logoApplications {
+  margin-top: 140px;
+  margin-bottom: 70px;
+}
+
+.logoApplicationsHeading {
+  margin-bottom: 45px;
+}
+
+.logoApplicationsHeading h3 {
+  margin: 0 0 16px;
+  font-size: clamp(32px, 4.4vw, 64px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.055em;
+  color: #f5f1fa;
+}
+
+.logoApplicationsHeading p {
+  max-width: 520px;
+  margin: 0;
+  color: #b9abca;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.logoMockupFigure {
+  width: 100%;
+  margin: 0;
+}
+
+.logoMockupFigure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+@media (max-width: 650px) {
+  .logoApplications {
+    margin-top: 85px;
+  }
+
+  .logoApplicationsHeading p {
+    font-size: 12px;
+  }
+}
+
+
+/* =====================================
+   RAHU — EDITORIAL SPLIT
+===================================== */
+
+.rahuIntro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(35px, 5vw, 95px);
+
+  min-height: 70vh;
+  margin-top: 25px;
+}
+
+.rahuStory {
+  min-width: 0;
+}
+
+.rahuStory .sectionTitle {
+  font-size: clamp(37px, 4.1vw, 64px);
+  line-height: 1.1;
+  margin-bottom: 45px;
+}
+
+.rahuLabel {
+  display: block;
+  margin-bottom: 20px;
+
+  color: var(--project-color);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.rahuDescription {
+  max-width: 470px;
+  margin: 0 0 20px;
+
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.9;
+  color: #c2b6cf;
+}
+
+/* COLOUR PALETTE */
+
+.rahuColors {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 35px;
+}
+
+.rahuColors span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.rahuFootnote {
+  display: block;
+  margin-top: 18px;
+
+  color: #95889f;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+/* ORIGINAL RAHU */
+
+.rahuIllustration {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rahuIllustration img {
+  display: block;
+  width: 100%;
+  max-width: 550px;
+  height: auto;
+  object-fit: contain;
+
+  transition: transform 0.7s cubic-bezier(
+    0.22, 1, 0.36, 1
+  );
+}
+
+.rahuIllustration:hover img {
+  transform: translateY(-10px) rotate(-2deg);
+}
+
+.rahuIllustration figcaption {
+  margin-top: 22px;
+  color: #9d8fad;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+@media (max-width: 900px) {
+  .rahuIntro {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .rahuIllustration img {
+    max-width: 450px;
+  }
+}
+
+@media (max-width: 650px) {
+  .rahuStory .sectionTitle {
+    font-size: clamp(29px, 7vw, 42px);
+    margin-bottom: 30px;
+  }
+
+  .rahuDescription {
+    font-size: 12px;
+  }
+
+  .rahuColors span {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rahuIllustration img {
+    transition: none;
+  }
+
+  .rahuIllustration:hover img {
+    transform: none;
+  }
+}
+
+.project {
+  background: transparent;
+}
+
+.chapter:last-child {
+  padding-bottom: 160px;
+}

@@ -1,0 +1,93 @@
+/* Project-colored ambience. This sits BEHIND both records and all content. */
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--transition, 1);
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Fallback when color-mix is not supported */
+  color: var(--ambient-color, #8db5a9);
+}
+
+.colorWash,
+.floatingMist,
+.cursorAura,
+.grooves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Static color depth: no hard spotlight, no white center. */
+.colorWash {
+  background:
+    radial-gradient(ellipse 55% 76% at 12% 30%,
+      color-mix(in srgb, var(--ambient-color) 20%, transparent), transparent 85%),
+    radial-gradient(ellipse 60% 70% at 92% 86%,
+      color-mix(in srgb, var(--ambient-color) 12%, transparent), transparent 88%),
+    linear-gradient(125deg,
+      color-mix(in srgb, var(--ambient-color) 7%, #141817),
+      #141817 70%);
+}
+
+/* Slow 'breathing' color mist; the layer moves, rather than flashing. */
+.floatingMist {
+  inset: -18%;
+  background:
+    radial-gradient(ellipse 29% 35% at 70% 23%,
+      color-mix(in srgb, var(--ambient-color) 22%, transparent), transparent 100%),
+    radial-gradient(ellipse 38% 42% at 21% 77%,
+      color-mix(in srgb, var(--ambient-color) 12%, transparent), transparent 100%);
+  filter: blur(36px);
+  animation: ambientDrift 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* The pointer merely nudges a soft project-colored aura. No white torch. */
+.cursorAura {
+  background: radial-gradient(
+    circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    color-mix(in srgb, var(--ambient-color) 16%, transparent) 0%,
+    color-mix(in srgb, var(--ambient-color) 6%, transparent) 36%,
+    transparent 100%
+  );
+}
+
+/* Almost invisible vinyl-like concentric lines behind the real disc. */
+.grooves {
+  inset: -38% auto -38% -37%;
+  width: 105%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at 49% 50%,
+    transparent 0 24px,
+    color-mix(in srgb, var(--ambient-color) 8%, transparent) 25px,
+    transparent 26px 34px
+  );
+  opacity: 0.25;
+  mask-image: radial-gradient(circle, transparent 10%, #000 42%, transparent 77%);
+  -webkit-mask-image: radial-gradient(circle, transparent 10%, #000 42%, transparent 77%);
+}
+
+@keyframes ambientDrift {
+  from { transform: translate3d(-1.5%, 1%, 0) scale(1); }
+  to   { transform: translate3d(3%, -2%, 0) scale(1.09); }
+}
+
+@media (max-width: 650px) {
+  .floatingMist { filter: blur(26px); }
+  .cursorAura { display: none; } /* touch devices have no cursor */
+  .grooves { opacity: 0.16; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatingMist { animation: none; will-change: auto; }
+}

@@ -5,8 +5,6 @@ import {
   useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
-
 import ProjectCard from "../ProjectCard/ProjectCard";
 import { projects } from "../../data/projects";
 
@@ -16,10 +14,7 @@ import styles from "./DiagonalGallery.module.css";
    SETTINGS
 ===================================== */
 
-// Higher = faster automatic movement
 const AUTO_SPEED = 0.000085;
-
-// Mouse drag sensitivity
 const DRAG_SPEED = 0.005;
 
 const clamp = (value, min = 0, max = 1) =>
@@ -40,9 +35,8 @@ const smoothstep = (value) => {
 export default function DiagonalGallery({
   scrollProgress = 0,
   selectedProjectId,
+  onProjectOpen,
 }) {
-  const navigate = useNavigate();
-
   const [position, setPosition] = useState(0);
   const [hoveredId, setHoveredId] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -114,6 +108,7 @@ export default function DiagonalGallery({
 
     sound.pause();
     sound.currentTime = 0;
+
     sound.play().catch(() => {});
   }
 
@@ -139,7 +134,6 @@ export default function DiagonalGallery({
       const locked =
         scrollProgressRef.current > 0.035;
 
-      // Keep refs clean when scrolling opens the CD
       if (locked) {
         hoveredRef.current = false;
         draggingRef.current = false;
@@ -155,7 +149,6 @@ export default function DiagonalGallery({
           delta * AUTO_SPEED;
       }
 
-      // Soft interpolation
       const ease =
         1 - Math.exp(-delta * 0.01);
 
@@ -187,11 +180,22 @@ export default function DiagonalGallery({
       setDragging(false);
     }
 
-    window.addEventListener("pointerup", endDrag);
-    window.addEventListener("pointercancel", endDrag);
+    window.addEventListener(
+      "pointerup",
+      endDrag
+    );
+
+    window.addEventListener(
+      "pointercancel",
+      endDrag
+    );
 
     return () => {
-      window.removeEventListener("pointerup", endDrag);
+      window.removeEventListener(
+        "pointerup",
+        endDrag
+      );
+
       window.removeEventListener(
         "pointercancel",
         endDrag
@@ -235,10 +239,14 @@ export default function DiagonalGallery({
       gallery &&
       event.pointerType === "mouse"
     ) {
-      const rect = gallery.getBoundingClientRect();
+      const rect =
+        gallery.getBoundingClientRect();
 
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
+      const mouseX =
+        event.clientX - rect.left;
+
+      const mouseY =
+        event.clientY - rect.top;
 
       gallery.style.setProperty(
         "--mouse-x",
@@ -279,7 +287,8 @@ export default function DiagonalGallery({
       );
     }
 
-    // Drag interaction
+    /* DRAG INTERACTION */
+
     if (
       galleryLocked ||
       !draggingRef.current ||
@@ -290,8 +299,11 @@ export default function DiagonalGallery({
 
     const pointer = pointerRef.current;
 
-    const dx = event.clientX - pointer.x;
-    const dy = event.clientY - pointer.y;
+    const dx =
+      event.clientX - pointer.x;
+
+    const dy =
+      event.clientY - pointer.y;
 
     const distance = Math.hypot(
       event.clientX - pointer.startX,
@@ -315,7 +327,10 @@ export default function DiagonalGallery({
      HOVER
   ===================================== */
 
-  function handleCardEnter(id, withSound = true) {
+  function handleCardEnter(
+    id,
+    withSound = true
+  ) {
     if (
       galleryLocked ||
       draggingRef.current
@@ -326,7 +341,9 @@ export default function DiagonalGallery({
     hoveredRef.current = true;
     setHoveredId(id);
 
-    if (withSound) playSound();
+    if (withSound) {
+      playSound();
+    }
   }
 
   function handleCardLeave(id) {
@@ -340,7 +357,7 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     OPEN PROJECT
+     OPEN SELECTED PROJECT
   ===================================== */
 
   function handleOpen(event, project) {
@@ -352,7 +369,9 @@ export default function DiagonalGallery({
       return;
     }
 
-    navigate(`/projects/${project.slug}`);
+    // Pass the selected CD to Home.jsx.
+    // Home decides which project section opens.
+    onProjectOpen?.(project);
   }
 
   /* =====================================
@@ -364,7 +383,10 @@ export default function DiagonalGallery({
     const project = projects[index];
 
     const offset =
-      wrap(index - position + count / 2, count) -
+      wrap(
+        index - position + count / 2,
+        count
+      ) -
       count / 2;
 
     const depth = Math.abs(offset);
@@ -397,7 +419,8 @@ export default function DiagonalGallery({
       ? baseOpacity * selectedFade
       : baseOpacity * othersFade;
 
-    // Different starting directions
+    /* INITIAL FLYING ANIMATION */
+
     const directions = [
       { x: -580, y: -280 },
       { x: 490, y: -420 },
@@ -418,10 +441,11 @@ export default function DiagonalGallery({
       "--opacity": opacity,
       "--card-color": project.color,
 
-      // Initial flying animation
       "--entry-x": `${direction.x}px`,
       "--entry-y": `${direction.y}px`,
-      "--entry-delay": `${0.12 + index * 0.13}s`,
+      "--entry-delay": `${
+        0.12 + index * 0.13
+      }s`,
 
       zIndex: isSelected
         ? 500
@@ -445,14 +469,21 @@ export default function DiagonalGallery({
       ref={galleryRef}
       className={[
         styles.gallery,
+
         dragging && !galleryLocked
           ? styles.dragging
           : "",
+
         galleryLocked
           ? styles.locked
           : "",
-        idle ? styles.idle : "",
-        hoveredId !== null && !galleryLocked
+
+        idle
+          ? styles.idle
+          : "",
+
+        hoveredId !== null &&
+        !galleryLocked
           ? styles.hasHover
           : "",
       ]

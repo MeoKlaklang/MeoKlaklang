@@ -12,16 +12,70 @@ import styles from "./Home.module.css";
 const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
 
+/*
+  PROJECT DESTINATIONS
+
+  For future projects, add the ID of their
+  first chapter here, or set project.targetId
+  in data/projects.js.
+*/
+const PROJECT_TARGETS = {
+  gistda: "gistda-intro",
+  "het-mandje": "project-research",
+};
+
+function getProjectTarget(project) {
+  const slug = String(
+    project?.slug || project?.title || ""
+  ).toLowerCase();
+
+  // Optional future configuration in projects.js
+  if (project?.targetId) {
+    return document.getElementById(project.targetId);
+  }
+
+  if (slug.includes("gistda")) {
+    return document.getElementById(
+      PROJECT_TARGETS.gistda
+    );
+  }
+
+  if (slug.includes("mandje")) {
+    return (
+      document.getElementById(
+        PROJECT_TARGETS["het-mandje"]
+      ) ||
+      document.getElementById("project-research") ||
+      document.getElementById(
+        `project-${project.slug}`
+      ) ||
+      document.getElementById("het-mandje")
+    );
+  }
+
+  return document.getElementById(
+    `project-${project.slug}`
+  );
+}
+
 export default function Home() {
   const sectionRef = useRef(null);
   const [progress, setProgress] = useState(0);
 
+  /*
+    Het Mandje remains the initial record for
+    the normal scroll-driven CD opening.
+  */
   const selectedProject =
     projects.find((project) =>
       String(project.slug || project.title)
         .toLowerCase()
         .includes("mandje")
     ) || projects[0];
+
+  /* =====================================
+     HOMEPAGE SCROLL PROGRESS
+  ===================================== */
 
   useEffect(() => {
     let frame = null;
@@ -55,15 +109,27 @@ export default function Home() {
 
     updateProgress();
 
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    });
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      { passive: true }
+    );
 
-    window.addEventListener("resize", handleScroll);
+    window.addEventListener(
+      "resize",
+      handleScroll
+    );
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+
+      window.removeEventListener(
+        "resize",
+        handleScroll
+      );
 
       if (frame !== null) {
         cancelAnimationFrame(frame);
@@ -71,14 +137,50 @@ export default function Home() {
     };
   }, []);
 
-  // The CD flies out of its jewel case
-  // near the end of the opening sequence.
+  /* =====================================
+     OPEN A PROJECT FROM THE GALLERY
+  ===================================== */
+
+  function handleProjectOpen(project) {
+    const target = getProjectTarget(project);
+
+    if (!target) {
+      console.warn(
+        "Project section not found:",
+        project.slug,
+        "Check the project's first chapter ID."
+      );
+      return;
+    }
+
+    /*
+      Jump directly to the project rather than
+      scrolling through the entire portfolio.
+
+      This also triggers the existing DarkProject
+      scroll listener to update the vinyl state.
+    */
+    const targetY =
+      window.scrollY +
+      target.getBoundingClientRect().top;
+
+    window.scrollTo({
+      top: Math.max(0, targetY),
+      behavior: "instant",
+    });
+  }
+
+  /* =====================================
+     CD OPENING
+  ===================================== */
+
   const departureProgress = clamp(
     (progress - 0.86) / 0.14
   );
 
   const openingInteractive =
-    progress >= 0.82 && progress < 0.86;
+    progress >= 0.82 &&
+    progress < 0.86;
 
   const introOpacity = clamp(
     1 - progress / 0.15
@@ -86,12 +188,17 @@ export default function Home() {
 
   return (
     <div className={styles.home}>
-      {/* LIGHT WORLD */}
+
+      {/* =====================================
+          LIGHT HOME WORLD
+      ===================================== */}
+
       <section
         ref={sectionRef}
         className={styles.scrollSection}
       >
         <div className={styles.stickyStage}>
+
           <div className={styles.navigation}>
             <Navbar />
           </div>
@@ -121,13 +228,16 @@ export default function Home() {
             </p>
           </div>
 
-          {/* EXISTING INTERACTIVE CD RACK */}
+          {/* INTERACTIVE PROJECT LIBRARY */}
+
           <DiagonalGallery
             scrollProgress={progress}
             selectedProjectId={selectedProject.id}
+            onProjectOpen={handleProjectOpen}
           />
 
           {/* OPENING JEWEL CASE */}
+
           <div
             className={styles.cdOpeningLayer}
             style={{
@@ -154,11 +264,16 @@ export default function Home() {
             SCROLL TO EXPLORE
             <span>↓</span>
           </div>
+
         </div>
       </section>
 
-      {/* DARK PROJECT WORLD */}
+      {/* =====================================
+          DARK PROJECT EXPERIENCE
+      ===================================== */}
+
       <DarkProject project={selectedProject} />
+
     </div>
   );
 }
