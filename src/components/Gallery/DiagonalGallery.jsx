@@ -16,7 +16,10 @@ import styles from "./DiagonalGallery.module.css";
    SETTINGS
 ===================================== */
 
-const AUTO_SPEED = 0.000012;
+// Higher = faster automatic movement
+const AUTO_SPEED = 0.000085;
+
+// Mouse drag sensitivity
 const DRAG_SPEED = 0.005;
 
 const clamp = (value, min = 0, max = 1) =>
@@ -31,7 +34,7 @@ const smoothstep = (value) => {
 };
 
 /* =====================================
-   GALLERY COMPONENT
+   GALLERY
 ===================================== */
 
 export default function DiagonalGallery({
@@ -40,17 +43,9 @@ export default function DiagonalGallery({
 }) {
   const navigate = useNavigate();
 
-  /* =====================================
-     STATE
-  ===================================== */
-
   const [position, setPosition] = useState(0);
   const [hoveredId, setHoveredId] = useState(null);
   const [dragging, setDragging] = useState(false);
-
-  /* =====================================
-     REFS
-  ===================================== */
 
   const positionRef = useRef(0);
   const targetRef = useRef(0);
@@ -66,17 +61,12 @@ export default function DiagonalGallery({
 
   const scrollProgressRef = useRef(scrollProgress);
 
-  /* =====================================
-     SCROLL PROGRESS
-     Updated outside render
-  ===================================== */
-
   useEffect(() => {
     scrollProgressRef.current = scrollProgress;
   }, [scrollProgress]);
 
   /* =====================================
-     SCROLL ANIMATION VALUES
+     SCROLL TRANSITION
   ===================================== */
 
   const centering = smoothstep(
@@ -93,8 +83,13 @@ export default function DiagonalGallery({
 
   const galleryLocked = scrollProgress > 0.035;
 
+  const idle =
+    !galleryLocked &&
+    !dragging &&
+    hoveredId === null;
+
   /* =====================================
-     HOVER SOUND
+     SOUND
   ===================================== */
 
   useEffect(() => {
@@ -103,7 +98,7 @@ export default function DiagonalGallery({
     );
 
     sound.preload = "auto";
-    sound.volume = 0.4;
+    sound.volume = 0.25;
 
     soundRef.current = sound;
 
@@ -115,12 +110,10 @@ export default function DiagonalGallery({
 
   function playSound() {
     const sound = soundRef.current;
-
     if (!sound) return;
 
     sound.pause();
     sound.currentTime = 0;
-
     sound.play().catch(() => {});
   }
 
@@ -146,15 +139,23 @@ export default function DiagonalGallery({
       const locked =
         scrollProgressRef.current > 0.035;
 
+      // Keep refs clean when scrolling opens the CD
+      if (locked) {
+        hoveredRef.current = false;
+        draggingRef.current = false;
+      }
+
       if (
         !locked &&
         !reducedMotion &&
         !hoveredRef.current &&
         !draggingRef.current
       ) {
-        targetRef.current += delta * AUTO_SPEED;
+        targetRef.current +=
+          delta * AUTO_SPEED;
       }
 
+      // Soft interpolation
       const ease =
         1 - Math.exp(-delta * 0.01);
 
@@ -175,7 +176,7 @@ export default function DiagonalGallery({
   }, []);
 
   /* =====================================
-     END DRAG OUTSIDE GALLERY
+     END DRAG
   ===================================== */
 
   useEffect(() => {
@@ -187,10 +188,7 @@ export default function DiagonalGallery({
     }
 
     window.addEventListener("pointerup", endDrag);
-    window.addEventListener(
-      "pointercancel",
-      endDrag
-    );
+    window.addEventListener("pointercancel", endDrag);
 
     return () => {
       window.removeEventListener("pointerup", endDrag);
@@ -202,24 +200,16 @@ export default function DiagonalGallery({
   }, []);
 
   /* =====================================
-     CLEAN UP REFS WHEN SCROLLING
-     No setState inside effect
-  ===================================== */
-
-  useEffect(() => {
-    if (!galleryLocked) return;
-
-    hoveredRef.current = false;
-    draggingRef.current = false;
-    pointerRef.current = null;
-  }, [galleryLocked]);
-
-  /* =====================================
-     DRAG START
+     MOUSE DOWN
   ===================================== */
 
   function handlePointerDown(event) {
-    if (galleryLocked || event.button !== 0) return;
+    if (
+      galleryLocked ||
+      event.button !== 0
+    ) {
+      return;
+    }
 
     draggingRef.current = true;
     didDragRef.current = false;
@@ -235,19 +225,20 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     MOUSE MOVEMENT + DRAG
+     CURSOR GLOW + PARALLAX + DRAG
   ===================================== */
 
   function handlePointerMove(event) {
     const gallery = galleryRef.current;
 
-    if (gallery && event.pointerType === "mouse") {
+    if (
+      gallery &&
+      event.pointerType === "mouse"
+    ) {
       const rect = gallery.getBoundingClientRect();
 
       const mouseX = event.clientX - rect.left;
       const mouseY = event.clientY - rect.top;
-
-      /* Background glow */
 
       gallery.style.setProperty(
         "--mouse-x",
@@ -259,15 +250,11 @@ export default function DiagonalGallery({
         `${mouseY}px`
       );
 
-      /* Normalized mouse position */
-
       const normalizedX =
         (mouseX / rect.width - 0.5) * 2;
 
       const normalizedY =
         (mouseY / rect.height - 0.5) * 2;
-
-      /* Parallax fades out while opening */
 
       const strength = 1 - centering;
 
@@ -292,8 +279,7 @@ export default function DiagonalGallery({
       );
     }
 
-    /* Drag interaction */
-
+    // Drag interaction
     if (
       galleryLocked ||
       !draggingRef.current ||
@@ -330,21 +316,27 @@ export default function DiagonalGallery({
   ===================================== */
 
   function handleCardEnter(id, withSound = true) {
-    if (galleryLocked || draggingRef.current) return;
+    if (
+      galleryLocked ||
+      draggingRef.current
+    ) {
+      return;
+    }
 
     hoveredRef.current = true;
     setHoveredId(id);
 
-    if (withSound) {
-      playSound();
-    }
+    if (withSound) playSound();
   }
 
   function handleCardLeave(id) {
-    if (hoveredId !== id) return;
+    if (hoveredRef.current) {
+      hoveredRef.current = false;
+    }
 
-    hoveredRef.current = false;
-    setHoveredId(null);
+    setHoveredId((current) =>
+      current === id ? null : current
+    );
   }
 
   /* =====================================
@@ -352,7 +344,10 @@ export default function DiagonalGallery({
   ===================================== */
 
   function handleOpen(event, project) {
-    if (didDragRef.current || galleryLocked) {
+    if (
+      didDragRef.current ||
+      galleryLocked
+    ) {
       event.preventDefault();
       return;
     }
@@ -361,7 +356,7 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     3D CARD POSITIONS
+     CARD POSITION
   ===================================== */
 
   function getCardStyle(index) {
@@ -381,8 +376,6 @@ export default function DiagonalGallery({
     const originalY = -offset * 112;
     const originalZ = -depth * 135;
 
-    /* Move Het Mandje to center */
-
     const x = isSelected
       ? originalX * (1 - centering)
       : originalX;
@@ -400,27 +393,46 @@ export default function DiagonalGallery({
       1 - depth * 0.09
     );
 
-    /* Fade other CDs away */
-
     const opacity = isSelected
       ? baseOpacity * selectedFade
       : baseOpacity * othersFade;
+
+    // Different starting directions
+    const directions = [
+      { x: -580, y: -280 },
+      { x: 490, y: -420 },
+      { x: -430, y: 450 },
+      { x: 620, y: 280 },
+      { x: 0, y: -650 },
+      { x: -520, y: 250 },
+    ];
+
+    const direction =
+      directions[index % directions.length];
 
     return {
       "--x": `${x}px`,
       "--y": `${y}px`,
       "--z": `${z}px`,
+
       "--opacity": opacity,
       "--card-color": project.color,
 
+      // Initial flying animation
+      "--entry-x": `${direction.x}px`,
+      "--entry-y": `${direction.y}px`,
+      "--entry-delay": `${0.12 + index * 0.13}s`,
+
       zIndex: isSelected
         ? 500
-        : hoveredId === project.id && !galleryLocked
+        : hoveredId === project.id &&
+            !galleryLocked
           ? 1000
           : Math.round(100 - depth * 10),
 
-      pointerEvents:
-        galleryLocked ? "none" : "auto",
+      pointerEvents: galleryLocked
+        ? "none"
+        : "auto",
     };
   }
 
@@ -431,13 +443,21 @@ export default function DiagonalGallery({
   return (
     <main
       ref={galleryRef}
-      className={`${styles.gallery} ${
+      className={[
+        styles.gallery,
         dragging && !galleryLocked
           ? styles.dragging
-          : ""
-      } ${
-        galleryLocked ? styles.locked : ""
-      }`}
+          : "",
+        galleryLocked
+          ? styles.locked
+          : "",
+        idle ? styles.idle : "",
+        hoveredId !== null && !galleryLocked
+          ? styles.hasHover
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
     >

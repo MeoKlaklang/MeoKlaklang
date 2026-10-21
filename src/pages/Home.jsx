@@ -4,35 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar/Navbar";
 import DiagonalGallery from "../components/Gallery/DiagonalGallery";
 import CDOpening from "../components/CDOpening/CDOpening";
-import ProjectAlbum from "../components/ProjectAlbum/ProjectAlbum";
+import DarkProject from "../components/DarkProject/DarkProject";
 
 import { projects } from "../data/projects";
 import styles from "./Home.module.css";
 
-/* =====================================
-   HELPERS
-===================================== */
-
 const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
 
-const smoothstep = (value) => {
-  const t = clamp(value);
-  return t * t * (3 - 2 * t);
-};
-
-/* =====================================
-   HOME COMPONENT
-===================================== */
-
 export default function Home() {
   const sectionRef = useRef(null);
-
   const [progress, setProgress] = useState(0);
-
-  /* =====================================
-     SELECT HET MANDJE
-  ===================================== */
 
   const selectedProject =
     projects.find((project) =>
@@ -40,10 +22,6 @@ export default function Home() {
         .toLowerCase()
         .includes("mandje")
     ) || projects[0];
-
-  /* =====================================
-     SCROLL PROGRESS
-  ===================================== */
 
   useEffect(() => {
     let frame = null;
@@ -64,11 +42,9 @@ export default function Home() {
         return;
       }
 
-      const nextProgress = clamp(
-        -rect.top / scrollDistance
+      setProgress(
+        clamp(-rect.top / scrollDistance)
       );
-
-      setProgress(nextProgress);
     }
 
     function handleScroll() {
@@ -86,15 +62,8 @@ export default function Home() {
     window.addEventListener("resize", handleScroll);
 
     return () => {
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-
-      window.removeEventListener(
-        "resize",
-        handleScroll
-      );
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
 
       if (frame !== null) {
         cancelAnimationFrame(frame);
@@ -102,41 +71,35 @@ export default function Home() {
     };
   }, []);
 
-  /* =====================================
-     SCROLL ANIMATION STATES
-  ===================================== */
-
-  const albumReveal = smoothstep(
-    (progress - 0.82) / 0.16
+  // The CD flies out of its jewel case
+  // near the end of the opening sequence.
+  const departureProgress = clamp(
+    (progress - 0.86) / 0.14
   );
 
-  const albumInteractive = progress >= 0.975;
+  const openingInteractive =
+    progress >= 0.82 && progress < 0.86;
 
-  /* =====================================
-     RENDER
-  ===================================== */
+  const introOpacity = clamp(
+    1 - progress / 0.15
+  );
 
   return (
     <div className={styles.home}>
+      {/* LIGHT WORLD */}
       <section
         ref={sectionRef}
         className={styles.scrollSection}
       >
         <div className={styles.stickyStage}>
-
-          {/* NAVBAR */}
           <div className={styles.navigation}>
             <Navbar />
           </div>
 
-          {/* INTRO TEXT */}
           <div
             className={styles.intro}
             style={{
-              opacity: clamp(
-                1 - progress / 0.14
-              ),
-
+              opacity: introOpacity,
               transform: `translateY(${
                 -progress * 120
               }px)`,
@@ -158,7 +121,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* INTERACTIVE CD GALLERY */}
+          {/* EXISTING INTERACTIVE CD RACK */}
           <DiagonalGallery
             scrollProgress={progress}
             selectedProjectId={selectedProject.id}
@@ -168,47 +131,18 @@ export default function Home() {
           <div
             className={styles.cdOpeningLayer}
             style={{
-              opacity: 1 - albumReveal,
-
-              // IMPORTANT:
-              // Let mouse events reach the gallery.
-              pointerEvents: "none",
+              pointerEvents: openingInteractive
+                ? "auto"
+                : "none",
             }}
-            aria-hidden={true}
-            inert
           >
             <CDOpening
               project={selectedProject}
               progress={progress}
+              departureProgress={departureProgress}
             />
           </div>
 
-          {/* PROJECT ALBUM LAYOUT */}
-          <div
-            className={styles.albumLayer}
-            style={{
-              opacity: albumReveal,
-
-              transform: `translateY(${
-                (1 - albumReveal) * 45
-              }px) scale(${
-                0.97 + albumReveal * 0.03
-              })`,
-
-              pointerEvents: albumInteractive
-                ? "auto"
-                : "none",
-            }}
-            aria-hidden={!albumInteractive}
-            inert={!albumInteractive}
-          >
-            <ProjectAlbum
-              project={selectedProject}
-              active={albumInteractive}
-            />
-          </div>
-
-          {/* SCROLL INDICATOR */}
           <div
             className={styles.scrollHint}
             style={{
@@ -220,9 +154,11 @@ export default function Home() {
             SCROLL TO EXPLORE
             <span>↓</span>
           </div>
-
         </div>
       </section>
+
+      {/* DARK PROJECT WORLD */}
+      <DarkProject project={selectedProject} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 
 /* =====================================
-   INTERACTIVE DIAGONAL GALLERY
+   INTERACTIVE CD GALLERY
 ===================================== */
 
 .gallery {
@@ -48,7 +48,7 @@
 }
 
 /* =====================================
-   CURSOR GLOW
+   MOUSE-FOLLOWING BACKGROUND
 ===================================== */
 
 .gallery::before {
@@ -60,17 +60,54 @@
   pointer-events: none;
 
   background: radial-gradient(
-    480px circle at
+    520px circle at
     var(--mouse-x) var(--mouse-y),
-    rgba(172, 218, 174, 0.3) 0%,
-    rgba(181, 232, 210, 0.15) 38%,
-    rgba(234, 239, 225, 0.06) 65%,
-    transparent 82%
+    rgba(172, 218, 174, 0.38) 0%,
+    rgba(181, 232, 210, 0.19) 38%,
+    rgba(234, 239, 225, 0.06) 68%,
+    transparent 85%
   );
 }
 
 /* =====================================
-   3D SCENE
+   EXTRA SOFT AMBIENT GLOW
+===================================== */
+
+.gallery::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 78% 65%,
+      rgba(185, 160, 255, 0.1),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 25% 22%,
+      rgba(96, 232, 211, 0.09),
+      transparent 37%
+    );
+
+  animation: ambientBreathe 8s ease-in-out infinite;
+}
+
+@keyframes ambientBreathe {
+  0%, 100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* =====================================
+   3D SCENE + PARALLAX
 ===================================== */
 
 .scene {
@@ -97,16 +134,114 @@
     transform 0.7s cubic-bezier(.22, 1, .36, 1);
 }
 
+/* =====================================
+   FLYING CD INTRO
+===================================== */
+
+/*
+  The translate property is animated
+  independently of ProjectCard's transform.
+
+  This keeps the original 3D position,
+  dragging and hover animation intact.
+*/
+
+.scene > * {
+  animation: cdFlyIn 1.65s
+    cubic-bezier(.16, 1, .3, 1)
+    both;
+
+  animation-delay: var(--entry-delay);
+}
+
+@keyframes cdFlyIn {
+  0% {
+    translate:
+      var(--entry-x)
+      var(--entry-y);
+
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  58% {
+    opacity: var(--opacity);
+    filter: blur(0);
+  }
+
+  100% {
+    translate: 0 0;
+    opacity: var(--opacity);
+    filter: blur(0);
+  }
+}
+
+/* =====================================
+   IDLE FLOATING MOVEMENT
+===================================== */
+
+/*
+  The entire rack slowly floats
+  while nobody is interacting.
+
+  It stops when dragging, hovering
+  or scrolling into the CD opening.
+*/
+
+.idle .scene {
+  animation: sceneFloat 7s
+    ease-in-out infinite alternate;
+}
+
+@keyframes sceneFloat {
+  from {
+    translate: 0 -6px;
+  }
+
+  to {
+    translate: 0 9px;
+  }
+}
+
+.dragging .scene,
+.hasHover .scene,
+.locked .scene {
+  animation: none;
+  translate: 0 0;
+}
+
+/* =====================================
+   MOBILE
+===================================== */
+
 @media (max-width: 768px) {
   .scene {
     perspective: 1000px;
     transform: none;
   }
+
+  .scene > * {
+    animation-duration: 1.2s;
+  }
 }
+
+/* =====================================
+   REDUCED MOTION
+===================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .scene {
     transform: none;
+    translate: none;
     transition: none;
+    animation: none !important;
+  }
+
+  .scene > * {
+    animation: none;
+  }
+
+  .gallery::after {
+    animation: none;
   }
 }

@@ -1,4 +1,8 @@
 
+/* =====================================
+   HOME
+===================================== */
+
 .home {
   position: relative;
   width: 100%;
@@ -6,7 +10,9 @@
   background: #f5f5f1;
 }
 
-/* Extra scroll distance drives the animation */
+/* =====================================
+   LIGHT SCROLL SECTION
+===================================== */
 
 .scrollSection {
   position: relative;
@@ -23,24 +29,34 @@
 
   overflow: hidden;
   isolation: isolate;
+
   background: #f5f5f1;
 }
 
-/* Navbar stays accessible */
+/* =====================================
+   NAVBAR
+===================================== */
 
 .navigation {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: 0 0 auto;
 
-  z-index: 20;
+  z-index: 30;
+  pointer-events: none;
 }
 
-/* Original homepage introduction */
+.navigation a,
+.navigation button {
+  pointer-events: auto;
+}
+
+/* =====================================
+   HOMEPAGE INTRODUCTION
+===================================== */
 
 .intro {
   position: absolute;
+
   top: 19%;
   left: clamp(24px, 7vw, 120px);
 
@@ -48,7 +64,9 @@
   max-width: 510px;
 
   pointer-events: none;
-  will-change: transform, opacity;
+  will-change: opacity, transform;
+
+  animation: introAppear 1.2s ease both;
 }
 
 .intro span {
@@ -58,6 +76,7 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.13em;
+
   color: #777b74;
 }
 
@@ -74,18 +93,46 @@
 
 .intro p {
   margin-top: 22px;
-
   max-width: 360px;
+
   font-size: 14px;
   line-height: 1.7;
+
   color: #777b74;
 }
 
+@keyframes introAppear {
+  from {
+    translate: 0 20px;
+  }
+
+  to {
+    translate: 0 0;
+  }
+}
+
+/* =====================================
+   OPENING CD LAYER
+===================================== */
+
+.cdOpeningLayer {
+  position: absolute;
+  inset: 0;
+
+  z-index: 10;
+}
+
+/* =====================================
+   SCROLL HINT
+===================================== */
+
 .scrollHint {
   position: absolute;
+
   bottom: 35px;
   left: 50%;
-  z-index: 6;
+
+  z-index: 12;
 
   display: flex;
   flex-direction: column;
@@ -116,6 +163,10 @@
   }
 }
 
+/* =====================================
+   MOBILE
+===================================== */
+
 @media (max-width: 768px) {
   .scrollSection {
     height: 360vh;
@@ -138,33 +189,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro,
   .scrollHint span {
     animation: none;
   }
-}
-
-
-/* =====================================
-   CD OPENING -> PROJECT ALBUM
-===================================== */
-
-.cdOpeningLayer {
-  position: absolute;
-  inset: 0;
-  z-index: 8;
-}
-
-.albumLayer {
-  position: absolute;
-  inset: 0;
-  z-index: 15;
-
-  transform-origin: center center;
-  will-change: opacity, transform;
-}
-
-/* Keep navbar above project interface */
-
-.navigation {
-  z-index: 30;
 }
