@@ -34,7 +34,7 @@ const clamp = (value, min = 0, max = 1) =>
 */
 
 const PROJECT_TARGETS = {
-  "het-mandje": "project-het-mandje",
+  "het-mandje": "project-research",
   "animal-festival": "project-animal-festival",
   petbridge: "project-petbridge",
   bozar: "project-bozar",
