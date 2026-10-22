@@ -79,7 +79,7 @@
 
   letter-spacing: 0.12em;
 
-  color: #b6d3b5;
+  color: #F5D76E;
 
 }
 
@@ -109,7 +109,7 @@
 
   line-height: 1.85;
 
-  color: #aebfb0;
+  color: #bcbfae;
 
 }
 
@@ -1203,29 +1203,7 @@
 
 }
 
-.bruzzImageLabel {
 
-  position: absolute;
-
-  top: 17px;
-
-  right: 17px;
-
-  padding: 10px 13px;
-
-  border-radius: 999px;
-
-  background: #f4f5ef;
-
-  color: #202c23;
-
-  font-size: 10px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.08em;
-
-}
 
 .bruzzFeatureFooter {
 
@@ -1993,7 +1971,7 @@
 
   text-shadow:
 
-    0 0 22px rgba(224, 145, 52, 0.18);
+    0 0 22px rgba(223, 235, 114, 0.18);
 
 }
 
@@ -2002,7 +1980,7 @@
 
     text-shadow:
 
-      0 0 30px rgba(224, 145, 52, 0.35);
+      0 0 30px rgba(224, 207, 52, 0.35);
 
   }
 }
@@ -2035,5 +2013,379 @@
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.06em;
-  color: #f2f4ed;
+  color: #dbec9b;
+}
+
+
+/* =====================================
+   MAGAZINE — YELLOW EDITORIAL STYLE
+===================================== */
+
+.magazineSection {
+  --project-color: #f5d76e;
+
+  width: 100%;
+  margin-top: 130px;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.magazineSection .eyebrow {
+  color: #f5d76e;
+}
+
+/* No glass card */
+
+.magazineCard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+
+  gap: clamp(28px, 4vw, 70px);
+  width: 100%;
+  margin-top: 55px;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  overflow: visible;
+}
+
+/* Magazine cover */
+
+.magazineCover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.magazineCover img {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  object-fit: contain;
+
+  border: none;
+  border-radius: 0;
+
+  box-shadow: none;
+  filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.16));
+}
+
+/* Magazine information */
+
+.magazineInfo {
+  min-width: 0;
+  padding: 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.magazineLabel {
+  color: #f5d76e;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.magazineInfo h3 {
+  margin: 22px 0;
+
+  color: #f5d76e;
+  font-size: clamp(28px, 3vw, 46px);
+  line-height: 1.15;
+}
+
+.magazineInfo p {
+  color: #bdb5a1;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Buttons */
+
+.magazineActions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.magazineRead,
+.magazineDownload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+  min-height: 45px;
+  padding: 12px 20px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.magazineRead {
+  color: #211e16;
+  background: #f5d76e;
+  border: 1px solid #f5d76e;
+}
+
+.magazineRead:hover {
+  background: #ffe69a;
+  transform: translateY(-2px);
+}
+
+.magazineDownload {
+  color: #f5d76e;
+  background: transparent;
+  border: 1px solid rgba(245, 215, 110, 0.45);
+}
+
+.magazineDownload:hover {
+  background: rgba(245, 215, 110, 0.1);
+  transform: translateY(-2px);
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 900px) {
+  .magazineCard {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .magazineCover img {
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 650px) {
+  .bruzzSection,
+  .magazineSection {
+    margin-top: 85px;
+  }
+
+  .bruzzFeatureFooter {
+    gap: 16px;
+  }
+
+  .bruzzFeatureArrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .magazineActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .magazineRead,
+  .magazineDownload {
+    width: 100%;
+  }
+}
+
+
+/* =====================================
+   BRUZZ — YELLOW EDITORIAL STYLE
+===================================== */
+
+.bruzzSection {
+  --project-color: #f5d76e;
+
+  width: 100%;
+  margin-top: 120px;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.bruzzSection .eyebrow {
+  color: #f5d76e;
+}
+
+.bruzzSection h3 {
+  color: #f5d76e;
+}
+
+.bruzzFeatureCard {
+  display: block;
+  width: 100%;
+  margin-top: 50px;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  text-decoration: none;
+  overflow: visible;
+}
+
+/* Image without glass background */
+
+.bruzzImageWrap {
+  position: relative;
+  width: 100%;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.bruzzImageWrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+
+  border-radius: 0;
+  box-shadow: none;
+
+  transition: transform 0.5s ease;
+}
+
+.bruzzFeatureCard:hover .bruzzImageWrap img {
+  transform: scale(1.02);
+}
+
+
+
+/* Information directly on dark background */
+
+.bruzzFeatureFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+
+  padding: 26px 0;
+
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(245, 215, 110, 0.2);
+
+  box-shadow: none;
+}
+
+.bruzzFeatureText > span {
+  color: #f5d76e;
+}
+
+.bruzzFeatureText strong {
+  display: block;
+  margin-top: 10px;
+
+  color: #f7f2e6;
+  font-size: clamp(20px, 2vw, 30px);
+}
+
+.bruzzFeatureText p {
+  color: #bdb5a1;
+  line-height: 1.7;
+}
+
+.bruzzFeatureArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+
+  color: #f5d76e;
+  background: transparent;
+  border: 1px solid rgba(245, 215, 110, 0.45);
+  border-radius: 50%;
+
+  font-size: 25px;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.bruzzFeatureCard:hover .bruzzFeatureArrow {
+  background: rgba(245, 215, 110, 0.1);
+  transform: translate(3px, -3px);
+}
+
+
+.bruzzImageLabel {
+  position: absolute;
+  top: auto;
+  right: auto;
+  bottom: 18px;
+  left: 18px;
+
+  inset: auto auto 18px 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: max-content;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  max-width: calc(100% - 36px);
+
+  padding: 9px 13px;
+  margin: 0;
+
+  color: #211e16;
+  background: #f5d76e;
+
+  border: none;
+  border-radius: 4px;
+  box-shadow: none;
+
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+
+  transform: none;
+  z-index: 2;
 }

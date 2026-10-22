@@ -1,0 +1,371 @@
+
+/* =====================================
+   SKILLS ARCHIVE
+===================================== */
+
+.archivePage {
+  --yellow: #f5d76e;
+  --pink: #f59ac2;
+  --green: #63d99b;
+  --blue: #70c9e8;
+  --purple: #c3a2eb;
+
+  position: relative;
+  z-index: 1;
+
+  width: min(100% - 100px, 1560px);
+  min-height: calc(100svh - 90px);
+
+  margin: 0 auto;
+
+  color: #f4f4ef;
+
+  animation: archiveEnter 500ms ease both;
+}
+
+/* =====================================
+   TOP
+===================================== */
+
+.archiveTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+
+  padding: 38px 0;
+
+  border-bottom: 1px solid rgba(255,255,255,0.13);
+
+  color: #999f99;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.backButton,
+.archiveFooter button {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #e8e9e3;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+
+  cursor: pointer;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.backButton span {
+  color: var(--blue);
+  font-size: 22px;
+
+  transition: transform 200ms ease;
+}
+
+.backButton:hover span {
+  transform: translateX(-5px);
+}
+
+.backButton:focus-visible,
+.archiveFooter button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 7px;
+}
+
+/* =====================================
+   HEADER
+===================================== */
+
+.archiveHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 40px;
+  padding: 85px 0 105px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 25px;
+
+  color: #9da29c;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.archiveHeading h1 {
+  margin: 0;
+
+  font-size: clamp(60px, 8vw, 135px);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: -0.085em;
+}
+
+.archiveHeading h1 span {
+  color: var(--purple);
+}
+
+.archiveStamp {
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: 150px;
+  height: 150px;
+
+  border: 1px solid rgba(245,215,110,0.45);
+  border-radius: 50%;
+
+  color: var(--yellow);
+
+  transform: rotate(-14deg);
+}
+
+.archiveStamp span:first-child {
+  font-size: 35px;
+  letter-spacing: -0.07em;
+}
+
+.archiveStamp span:nth-child(2) {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+}
+
+.archiveStamp span:last-child {
+  font-size: 11px;
+}
+
+/* =====================================
+   INFORMATION GRID
+===================================== */
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+
+  gap: clamp(40px, 7vw, 125px);
+}
+
+.infoColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+
+  min-width: 0;
+}
+
+/* =====================================
+   INFORMATION SECTIONS
+===================================== */
+
+.infoGroup {
+  --accent: var(--yellow);
+
+  padding-bottom: 42px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.13);
+}
+
+.infoGroup[data-accent="yellow"] {
+  --accent: var(--yellow);
+}
+
+.infoGroup[data-accent="pink"] {
+  --accent: var(--pink);
+}
+
+.infoGroup[data-accent="green"] {
+  --accent: var(--green);
+}
+
+.infoGroup[data-accent="blue"] {
+  --accent: var(--blue);
+}
+
+.infoGroup[data-accent="purple"] {
+  --accent: var(--purple);
+}
+
+.infoGroup h3 {
+  margin: 0 0 28px;
+
+  color: var(--accent);
+
+  font-size: clamp(27px, 2.7vw, 42px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+.infoGroup ul {
+  list-style: none;
+
+  margin: 0;
+  padding: 0;
+}
+
+.infoGroup li {
+  margin-bottom: 11px;
+
+  color: #c0c5bd;
+  font-size: 14px;
+  line-height: 1.65;
+
+  transition:
+    color 200ms ease,
+    transform 200ms ease;
+}
+
+.infoGroup li:hover {
+  color: #fff;
+  transform: translateX(4px);
+}
+
+/* =====================================
+   EDUCATION
+===================================== */
+
+.educationList {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.educationItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+
+  color: #bfc2bc;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.educationItem strong {
+  color: #f4f4ef;
+  font-weight: 500;
+}
+
+.educationItem small {
+  color: #8e948d;
+  font-size: 12px;
+}
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.archiveFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+
+  margin-top: 105px;
+  padding: 25px 0 45px;
+
+  border-top: 1px solid rgba(255,255,255,0.13);
+
+  color: #959b94;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+}
+
+.archiveFooter button:hover {
+  color: var(--pink);
+}
+
+/* =====================================
+   ANIMATION
+===================================== */
+
+@keyframes archiveEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 900px) {
+  .archivePage {
+    width: calc(100% - 70px);
+  }
+
+  .infoGrid {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 700px) {
+  .archivePage {
+    width: calc(100% - 40px);
+  }
+
+  .archiveTop {
+    padding: 30px 0;
+  }
+
+  .archiveTop > span {
+    font-size: 8px;
+  }
+
+  .archiveHeading {
+    padding: 70px 0 80px;
+  }
+
+  .archiveHeading h1 {
+    font-size: clamp(55px, 12vw, 100px);
+  }
+
+  .archiveStamp {
+    display: none;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+
+  .infoColumn {
+    gap: 45px;
+  }
+
+  .archiveFooter {
+    margin-top: 65px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archivePage {
+    animation: none;
+  }
+
+  .infoGroup li,
+  .backButton span {
+    transition: none;
+  }
+}

@@ -1,0 +1,240 @@
+.wrapper {
+  position: relative;
+  width: min(100%, 560px);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stack {
+  position: relative;
+  width: 100%;
+  height: 540px;
+}
+
+.polaroid {
+  position: absolute;
+  width: 240px;
+  background: #f6f4f1;
+  border-radius: 18px;
+  padding: 14px 14px 16px;
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.32),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transform-origin: center;
+  transition:
+    transform 420ms ease,
+    box-shadow 420ms ease,
+    filter 420ms ease;
+  will-change: transform;
+  overflow: hidden;
+}
+
+.polaroid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.32),
+      rgba(255, 255, 255, 0.02) 45%,
+      rgba(255, 255, 255, 0.16)
+    );
+  opacity: 0.45;
+}
+
+.imageWrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #ddd;
+}
+
+.imageWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 420ms ease;
+}
+
+.captionRow {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.caption {
+  font-size: 0.95rem;
+  text-transform: lowercase;
+  letter-spacing: 0.06em;
+  color: #1d1d1d;
+  font-weight: 600;
+}
+
+.number {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: rgba(20, 20, 20, 0.55);
+}
+
+.helperText {
+  margin-top: 22px;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- positions --- */
+
+.cardOne {
+  left: 10px;
+  top: 92px;
+  transform: rotate(-11deg);
+  z-index: 2;
+  animation: floatOne 7s ease-in-out infinite;
+}
+
+.cardTwo {
+  left: 160px;
+  top: 20px;
+  transform: rotate(2deg);
+  z-index: 4;
+  animation: floatTwo 7.8s ease-in-out infinite;
+}
+
+.cardThree {
+  right: 0;
+  top: 94px;
+  transform: rotate(11deg);
+  z-index: 3;
+  animation: floatThree 8.2s ease-in-out infinite;
+}
+
+/* --- hover interaction --- */
+
+.stack:hover .cardOne {
+  transform: translate(-18px, -12px) rotate(-16deg);
+}
+
+.stack:hover .cardTwo {
+  transform: translate(0, -18px) rotate(1deg) scale(1.03);
+}
+
+.stack:hover .cardThree {
+  transform: translate(18px, -10px) rotate(15deg);
+}
+
+.stack:hover .polaroid {
+  box-shadow:
+    0 36px 72px rgba(0, 0, 0, 0.4),
+    0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+.stack:hover .imageWrap img {
+  transform: scale(1.03);
+}
+
+/* --- floating animation --- */
+
+@keyframes floatOne {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+@keyframes floatTwo {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -14px;
+  }
+}
+
+@keyframes floatThree {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+/* --- responsive --- */
+
+@media (max-width: 1100px) {
+  .stack {
+    height: 490px;
+  }
+
+  .polaroid {
+    width: 210px;
+  }
+
+  .cardOne {
+    left: 0;
+    top: 100px;
+  }
+
+  .cardTwo {
+    left: 130px;
+    top: 16px;
+  }
+
+  .cardThree {
+    right: 0;
+    top: 96px;
+  }
+}
+
+@media (max-width: 760px) {
+  .wrapper {
+    width: 100%;
+  }
+
+  .stack {
+    height: auto;
+    min-height: 0;
+    display: grid;
+    gap: 20px;
+  }
+
+  .polaroid {
+    position: relative;
+    width: min(100%, 320px);
+    margin-inline: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    animation: none;
+  }
+
+  .cardOne,
+  .cardTwo,
+  .cardThree {
+    transform: none;
+  }
+
+  .stack:hover .cardOne,
+  .stack:hover .cardTwo,
+  .stack:hover .cardThree {
+    transform: translateY(-4px);
+  }
+}

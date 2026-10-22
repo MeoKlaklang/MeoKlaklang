@@ -1,0 +1,436 @@
+
+/* =====================================
+   BOZAR / ARTMATCH
+   WARM YELLOW THEME
+===================================== */
+
+.project {
+  --project-color: #70C9E8;
+  --bozar-yellow: #70C9E8;
+
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  color: #70C9E8;
+  background: transparent;
+}
+
+/* =====================================
+   CHAPTER LAYOUT
+===================================== */
+
+.chapter {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 130px 0 155px;
+  scroll-margin-top: 24px;
+
+  background: transparent;
+}
+
+.chapterInner {
+  box-sizing: border-box;
+
+  width: 100%;
+  min-width: 0;
+
+  /* Space for the vinyl on the left */
+  padding-left: clamp(340px, 32vw, 580px);
+  padding-right: clamp(28px, 5vw, 100px);
+}
+
+/* =====================================
+   LABELS / HEADINGS
+===================================== */
+
+.eyebrow {
+  display: block;
+  margin-bottom: 38px;
+
+  color: var(--bozar-yellow);
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.introTitle,
+.sectionTitle {
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 0 0 38px;
+
+  font-weight: 500;
+  line-height: 1.07;
+  letter-spacing: -0.055em;
+}
+
+.introTitle {
+  font-size: clamp(42px, 5vw, 86px);
+}
+
+.sectionTitle {
+  font-size: clamp(38px, 4.6vw, 78px);
+}
+
+/* =====================================
+   DESCRIPTIONS
+===================================== */
+
+.introDescription,
+.sectionDescription {
+  max-width: 650px;
+  margin: 0;
+
+  color: #a4e5db;
+
+  font-size: clamp(15px, 1.2vw, 18px);
+  line-height: 1.85;
+}
+
+/* =====================================
+   PROJECT DETAIL PILLS
+===================================== */
+
+.projectDetails {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px 14px;
+  margin-top: 48px;
+}
+
+.projectDetails span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+  padding: 10px 17px;
+
+  border: 1px solid rgba(110, 207, 245, 0.25);
+  border-radius: 999px;
+
+  background: rgba(245, 215, 110, 0.07);
+
+  color: #71dbdf;
+
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.projectDetails span:hover {
+  background: rgba(109, 184, 194, 0.13);
+  border-color: rgba(110, 245, 234, 0.5);
+}
+
+/* =====================================
+   INTRO DECORATION
+===================================== */
+
+.introDecoration {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+  width: 100%;
+
+  margin-top: 110px;
+
+  color: rgba(148, 234, 240, 0.6);
+
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.introLine {
+  flex: 1;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(245, 215, 110, 0.45),
+    rgba(245, 215, 110, 0)
+  );
+}
+
+/* =====================================
+   SHARED MOCKUP STYLING
+   No cards or glass backgrounds
+===================================== */
+
+.appShowcase,
+.kioskShowcase,
+.ticketShowcase {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  margin: 85px 0 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+
+  text-align: center;
+}
+
+.appShowcase img,
+.kioskShowcase img,
+.ticketShowcase img {
+  display: block;
+
+  height: auto;
+  max-width: none;
+
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  object-fit: contain;
+}
+
+.appShowcase figcaption,
+.kioskShowcase figcaption,
+.ticketShowcase figcaption {
+  margin-top: 30px;
+
+  color: #7eb2b9;
+
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* =====================================
+   02 — APP
+===================================== */
+
+/* Dynamic floating iPhone mockups */
+
+.appShowcase img {
+  width: 115%;
+
+  filter: drop-shadow(
+    0 28px 45px rgba(0, 0, 0, 0.12)
+  );
+}
+
+/* =====================================
+   03 — KIOSK
+===================================== */
+
+/* Tall mockup, kept within the right column */
+
+.kioskShowcase img {
+  width: 85%;
+
+  max-height: 950px;
+  object-fit: contain;
+
+  filter: drop-shadow(
+    0 28px 40px rgba(0, 0, 0, 0.1)
+  );
+}
+
+/* =====================================
+   04 — TICKET
+===================================== */
+
+/* Horizontal printed ticket mockup */
+
+.ticketShowcase img {
+  width: 112%;
+
+  filter: drop-shadow(
+    0 25px 38px rgba(0, 0, 0, 0.12)
+  );
+}
+
+/* =====================================
+   FEATURE TEXT
+===================================== */
+
+.featureRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  width: 100%;
+  margin-top: 60px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid rgba(245, 215, 110, 0.18);
+}
+
+.featureRow span {
+  color: #7eb9b6;
+
+  font-size: 10px;
+  letter-spacing: 0.13em;
+}
+
+/* =====================================
+   END OF PROJECT
+===================================== */
+
+.projectEnding {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+  margin-top: 130px;
+
+  color: #7eb9b4;
+
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.endingLine {
+  flex: 1;
+  height: 1px;
+
+  background: rgba(245, 215, 110, 0.25);
+}
+
+/* =====================================
+   LAPTOP
+===================================== */
+
+@media (max-width: 1200px) {
+  .chapterInner {
+    padding-left: 330px;
+    padding-right: 36px;
+  }
+
+  .introTitle {
+    font-size: clamp(40px, 5vw, 72px);
+  }
+
+  .sectionTitle {
+    font-size: clamp(36px, 4.6vw, 66px);
+  }
+}
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+  .chapter {
+    padding: 100px 0 120px;
+  }
+
+  .chapterInner {
+    padding-left: 260px;
+    padding-right: 25px;
+  }
+
+  .introTitle,
+  .sectionTitle {
+    font-size: clamp(34px, 5vw, 52px);
+  }
+
+  .appShowcase img,
+  .ticketShowcase img {
+    width: 100%;
+  }
+
+  .kioskShowcase img {
+    width: 95%;
+  }
+}
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 650px) {
+  .chapter {
+    padding: 85px 0 100px;
+  }
+
+  .chapterInner {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .eyebrow {
+    margin-bottom: 26px;
+  }
+
+  .introTitle {
+    font-size: clamp(36px, 9vw, 54px);
+  }
+
+  .sectionTitle {
+    font-size: clamp(33px, 8vw, 48px);
+  }
+
+  .introDescription,
+  .sectionDescription {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .projectDetails {
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .projectDetails span {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 9px;
+  }
+
+  .introDecoration {
+    margin-top: 65px;
+  }
+
+  .appShowcase,
+  .kioskShowcase,
+  .ticketShowcase {
+    margin-top: 55px;
+  }
+
+  .appShowcase img,
+  .kioskShowcase img,
+  .ticketShowcase img {
+    width: 100%;
+    max-height: none;
+  }
+
+  .featureRow {
+    margin-top: 40px;
+  }
+
+  .projectEnding {
+    margin-top: 85px;
+  }
+}

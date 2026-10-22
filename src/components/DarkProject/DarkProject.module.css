@@ -778,3 +778,84 @@
 .world::after {
   background-color: #141817;
 }
+
+
+/* =====================================
+   NEXT PROJECT — SUBTLE SHORTCUT
+===================================== */
+
+.nextProjectShortcut {
+  position: absolute;
+  z-index: 8;
+
+  left: clamp(22px, 7vw, 110px);
+  bottom: clamp(18px, 4vh, 44px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+
+  padding: 8px 0;
+
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+
+  cursor: pointer;
+  text-align: left;
+  pointer-events: auto;
+
+  opacity: 0.75;
+
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.nextProjectShortcut:hover,
+.nextProjectShortcut:focus-visible {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.nextProjectShortcut:focus-visible {
+  outline: 2px solid var(--next-project-color);
+  outline-offset: 6px;
+}
+
+.nextProjectShortcutLabel {
+  color: rgba(235, 236, 231, 0.55);
+
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+
+.nextProjectShortcutName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--next-project-color, #fff);
+
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.nextProjectShortcutName span {
+  transition: transform 200ms ease;
+}
+
+.nextProjectShortcut:hover
+.nextProjectShortcutName span {
+  transform: translate(3px, -3px);
+}
+
+@media (max-width: 650px) {
+  .nextProjectShortcut {
+    left: 20px;
+    bottom: 24px;
+  }
+}

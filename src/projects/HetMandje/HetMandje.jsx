@@ -170,7 +170,7 @@ export default function HetMandje({ chaptersRef, revealedWords }) {
 
                             <div className={styles.heroImage}>
 
-                                <img src={`${BASE}/sleutelbeeldcompress.png`} alt="Cat resting in a basket — Het Mandje" />
+                                <img src={`${BASE}/Sleutelbeeldcompress.png`} alt="Cat resting in a basket — Het Mandje" />
 
                             </div>
 

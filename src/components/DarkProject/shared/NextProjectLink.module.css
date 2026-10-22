@@ -1,0 +1,69 @@
+
+.nextLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  width: max-content;
+  max-width: 240px;
+
+  padding: 10px 12px;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  text-align: center;
+  cursor: pointer;
+
+  opacity: 0.7;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.nextLink:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.label {
+  color: rgba(240, 240, 235, 0.48);
+
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+}
+
+.projectName {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: var(--next-accent, #fff);
+
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.projectName svg {
+  width: 14px;
+  height: 14px;
+
+  transition: transform 0.3s ease;
+}
+
+.nextLink:hover .projectName svg {
+  transform: translateX(4px);
+}
+
+.nextLink:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--next-accent, #fff);
+  outline-offset: 4px;
+  border-radius: 4px;
+}

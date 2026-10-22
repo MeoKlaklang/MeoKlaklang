@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
+
 import {
   BrowserRouter,
   Routes,
@@ -15,7 +16,7 @@ import {
 // Pages
 import Home from "./pages/Home";
 import About from "./pages/About";
-import ProjectDetail from "./pages/ProjectDetail";
+import Projects from "./pages/Projects";
 
 // Components
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
@@ -25,28 +26,39 @@ import SoundButton from "./components/SoundButton/SoundButton";
 const LOADING_DURATION = 6500;
 const FADE_DURATION = 850;
 
-// ====================================
-// WEBSITE ROUTES
-// ====================================
+/* ====================================
+   WEBSITE ROUTES
+==================================== */
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-
-      <Route path="/about" element={<About />} />
-
+      {/* Homepage with interactive CD gallery */}
       <Route
-        path="/projects/:slug"
-        element={<ProjectDetail />}
+        path="/"
+        element={<Home />}
       />
+
+      {/* Projects overview — all five projects */}
+      <Route
+        path="/projects"
+        element={<Projects />}
+      />
+
+      {/* About Me */}
+      <Route
+        path="/about"
+        element={<About />}
+      />
+
+
     </Routes>
   );
 }
 
-// ====================================
-// MAIN APP CONTENT
-// ====================================
+/* ====================================
+   MAIN APP CONTENT
+==================================== */
 
 function AppContent() {
   const [progress, setProgress] = useState(0);
@@ -61,9 +73,9 @@ function AppContent() {
     resumePlayback,
   } = useAudio();
 
-  // ====================================
-  // PAUSE / RESUME LOADING
-  // ====================================
+  /* ====================================
+     PAUSE / RESUME LOADING
+  ==================================== */
 
   function togglePause() {
     if (exiting || finished) return;
@@ -77,9 +89,9 @@ function AppContent() {
     }
   }
 
-  // ====================================
-  // LOADING PROGRESS
-  // ====================================
+  /* ====================================
+     LOADING PROGRESS
+  ==================================== */
 
   useEffect(() => {
     if (paused || exiting || finished) return;
@@ -122,9 +134,9 @@ function AppContent() {
     };
   }, [paused, exiting, finished]);
 
-  // ====================================
-  // FADE OUT AFTER LOADING
-  // ====================================
+  /* ====================================
+     FADE OUT AFTER LOADING
+  ==================================== */
 
   useEffect(() => {
     if (!exiting) return;
@@ -136,9 +148,9 @@ function AppContent() {
     return () => clearTimeout(timer);
   }, [exiting]);
 
-  // ====================================
-  // LOADING SCREEN
-  // ====================================
+  /* ====================================
+     LOADING SCREEN
+  ==================================== */
 
   if (!finished) {
     return (
@@ -151,9 +163,9 @@ function AppContent() {
     );
   }
 
-  // ====================================
-  // PORTFOLIO + GLOBAL SOUND BUTTON
-  // ====================================
+  /* ====================================
+     PORTFOLIO + GLOBAL SOUND BUTTON
+  ==================================== */
 
   return (
     <>
@@ -165,9 +177,9 @@ function AppContent() {
   );
 }
 
-// ====================================
-// APP PROVIDERS
-// ====================================
+/* ====================================
+   APP PROVIDERS
+==================================== */
 
 export default function App() {
   return (

@@ -1,0 +1,679 @@
+
+/* =====================================
+   ANIMAL FESTIVAL — PINK THEME
+===================================== */
+
+.project {
+  --project-color: #f59ac2;
+  --festival-accent: #f59ac2;
+
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  color: #f8f1f5;
+  background: transparent;
+}
+
+/* =====================================
+   CHAPTER LAYOUT
+===================================== */
+
+.chapter {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  padding: 130px 0 155px;
+  scroll-margin-top: 24px;
+
+  background: transparent;
+}
+
+/*
+  Same content offset as PetBridge.
+  Leave enough space for the vinyl
+  record on the left.
+*/
+
+.chapterInner {
+  box-sizing: border-box;
+
+  width: 100%;
+  min-width: 0;
+
+  padding-left: clamp(340px, 32vw, 580px);
+  padding-right: clamp(28px, 5vw, 100px);
+}
+
+/* =====================================
+   EYEBROW
+===================================== */
+
+.eyebrow {
+  display: block;
+  margin-bottom: 38px;
+
+  color: var(--festival-accent);
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* =====================================
+   TYPOGRAPHY
+===================================== */
+
+.introTitle,
+.sectionTitle {
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 0 0 38px;
+
+  font-weight: 500;
+  line-height: 1.07;
+  letter-spacing: -0.055em;
+
+  overflow-wrap: normal;
+}
+
+.introTitle {
+  font-size: clamp(42px, 5vw, 86px);
+}
+
+.sectionTitle {
+  font-size: clamp(38px, 4.6vw, 78px);
+}
+
+.introDescription,
+.sectionDescription {
+  max-width: 650px;
+  margin: 0;
+
+  color: #c9b8c1;
+
+  font-size: clamp(15px, 1.2vw, 18px);
+  line-height: 1.85;
+}
+
+/* =====================================
+   INTRO — KEEP THE ROUNDED TAGS
+===================================== */
+
+.projectDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+
+  margin-top: 48px;
+}
+
+.projectDetails span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+  padding: 10px 17px;
+
+  border: 1px solid rgba(245, 154, 194, 0.2);
+  border-radius: 999px;
+  background: rgba(245, 154, 194, 0.055);
+
+  color: #f5e6ee;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.introDecoration {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  width: 100%;
+  margin-top: 110px;
+
+  color: rgba(235, 193, 211, 0.64);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.introLine {
+  flex: 1;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(245, 154, 194, 0.45),
+    rgba(245, 154, 194, 0)
+  );
+}
+
+/* =====================================
+   WIREFRAMES — NO GLASS CARDS
+===================================== */
+
+.wireframeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  align-items: start;
+  justify-items: center;
+
+  gap: clamp(24px, 4vw, 70px);
+  width: 100%;
+
+  margin-top: 85px;
+}
+
+.wireframeItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.wireframeImage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.wireframeImage img {
+  display: block;
+
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 720px;
+
+  object-fit: contain;
+
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  transition: transform 0.6s
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wireframeItem:hover .wireframeImage img {
+  transform: translateY(-8px);
+}
+
+.wireframeItem figcaption {
+  align-self: center;
+  margin-top: 28px;
+
+  color: #bd9eaf;
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-align: center;
+}
+
+/* =====================================
+   FINAL — THREE IPHONE MOCKUPS
+===================================== */
+
+.finalShowcase {
+  position: relative;
+
+  width: 100%;
+  margin: 85px 0 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+}
+
+.finalShowcase img {
+  display: block;
+
+  width: 115%;
+  max-width: none;
+  height: auto;
+
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+
+  object-fit: contain;
+
+  border: none;
+  border-radius: 0;
+  background: transparent;
+
+  filter: drop-shadow(
+    0 28px 40px rgba(0, 0, 0, 0.13)
+  );
+}
+
+.finalShowcase figcaption {
+  margin-top: 28px;
+
+  color: #bd9eaf;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+/* =====================================
+   VERTICAL MOBILE DEMO
+===================================== */
+
+.demoArea {
+  position: relative;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  margin-top: 80px;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  pointer-events: auto;
+}
+
+.autoPlayPlayer {
+  position: relative;
+  z-index: 11;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  width: min(100%, 370px);
+  margin: 0 auto;
+
+  pointer-events: auto;
+}
+
+.demoVideo {
+  display: block;
+
+  width: 100%;
+  height: auto;
+  max-height: 75vh;
+
+  object-fit: contain;
+
+  background: transparent;
+  border: none;
+  border-radius: 14px;
+}
+
+/* =====================================
+   PLAY / PAUSE + SEEK BAR
+===================================== */
+
+.videoControls {
+  position: relative;
+  z-index: 12;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  width: 100%;
+
+  pointer-events: auto;
+}
+
+.videoToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  background: transparent;
+  border: 1px solid rgba(245, 154, 194, 0.5);
+  border-radius: 50%;
+
+  color: var(--festival-accent);
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.videoToggle:hover {
+  background: rgba(245, 154, 194, 0.12);
+  transform: scale(1.08);
+}
+
+.videoToggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.videoToggle:focus-visible,
+.videoProgress:focus-visible {
+  outline: 2px solid var(--festival-accent);
+  outline-offset: 4px;
+}
+
+/* SEEK BAR */
+
+.videoProgress {
+  position: relative;
+  z-index: 12;
+
+  flex: 1;
+  min-width: 0;
+  height: 6px;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  border: none;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    to right,
+    #f59ac2 0%,
+    #f59ac2 var(--video-progress),
+    rgba(245, 154, 194, 0.2) var(--video-progress),
+    rgba(245, 154, 194, 0.2) 100%
+  );
+
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.videoProgress::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid #291f28;
+  border-radius: 50%;
+
+  background: var(--festival-accent);
+  cursor: grab;
+}
+
+.videoProgress::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+
+  border: 2px solid #291f28;
+  border-radius: 50%;
+
+  background: var(--festival-accent);
+  cursor: grab;
+}
+
+.videoError {
+  margin: 8px 0 0;
+  color: #ffd5df;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* =====================================
+   DEMO PLACEHOLDER
+===================================== */
+
+.demoPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  width: 100%;
+  min-height: 350px;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.demoPlayIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 72px;
+  height: 72px;
+  margin-bottom: 12px;
+
+  color: #291f28;
+  background: var(--festival-accent);
+
+  border-radius: 50%;
+  box-shadow: 0 0 42px rgba(245, 154, 194, 0.2);
+}
+
+.demoPlaceholder > span {
+  color: #f5b5d0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.demoPlaceholder p {
+  margin: 0;
+
+  color: #ba97aa;
+  font-size: 14px;
+}
+
+/* =====================================
+   PROJECT ENDING
+===================================== */
+
+.projectEnding {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  margin-top: 130px;
+
+  color: #bb9aac;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.endingLine {
+  flex: 1;
+  height: 1px;
+
+  background: rgba(245, 154, 194, 0.25);
+}
+
+/* =====================================
+   RESPONSIVE — LAPTOP
+===================================== */
+
+@media (max-width: 1200px) {
+  .chapterInner {
+    padding-left: 330px;
+    padding-right: 36px;
+  }
+
+  .introTitle {
+    font-size: clamp(40px, 5vw, 72px);
+  }
+
+  .sectionTitle {
+    font-size: clamp(36px, 4.6vw, 66px);
+  }
+
+  .wireframeGrid {
+    gap: 25px;
+  }
+}
+
+/* =====================================
+   RESPONSIVE — TABLET
+===================================== */
+
+@media (max-width: 900px) {
+  .chapter {
+    padding: 100px 0 120px;
+  }
+
+  .chapterInner {
+    padding-left: 260px;
+    padding-right: 25px;
+  }
+
+  .introTitle,
+  .sectionTitle {
+    font-size: clamp(34px, 5vw, 52px);
+  }
+
+  .wireframeGrid {
+    grid-template-columns: 1fr;
+    gap: 55px;
+  }
+
+  .wireframeImage img {
+    max-height: 650px;
+  }
+
+  .finalShowcase img {
+    width: 100%;
+  }
+}
+
+/* =====================================
+   RESPONSIVE — MOBILE
+===================================== */
+
+@media (max-width: 650px) {
+  .chapter {
+    padding: 85px 0 100px;
+  }
+
+  .chapterInner {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .eyebrow {
+    margin-bottom: 26px;
+  }
+
+  .introTitle {
+    font-size: clamp(36px, 9vw, 54px);
+  }
+
+  .sectionTitle {
+    font-size: clamp(33px, 8vw, 48px);
+  }
+
+  .introDescription,
+  .sectionDescription {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .projectDetails {
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .projectDetails span {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 9px;
+  }
+
+  .introDecoration {
+    margin-top: 65px;
+  }
+
+  .wireframeGrid {
+    margin-top: 60px;
+    gap: 55px;
+  }
+
+  .wireframeImage img {
+    max-height: 530px;
+  }
+
+  .wireframeItem figcaption {
+    margin-top: 18px;
+  }
+
+  .finalShowcase {
+    margin-top: 55px;
+  }
+
+  .finalShowcase img {
+    width: 100%;
+  }
+
+  .demoArea {
+    margin-top: 50px;
+  }
+
+  .autoPlayPlayer {
+    width: min(100%, 300px);
+  }
+
+  .demoVideo {
+    max-height: 68vh;
+  }
+
+  .demoPlaceholder {
+    min-height: 260px;
+  }
+
+  .projectEnding {
+    margin-top: 85px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wireframeImage img {
+    transition: none;
+  }
+
+  .wireframeItem:hover .wireframeImage img {
+    transform: none;
+  }
+}
