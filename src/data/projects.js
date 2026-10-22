@@ -63,7 +63,7 @@ export const projects = [
   slug: "about",
   category: "The person behind the projects",
   year: "2026",
-  image: "/images/projects/loading-meo.jpg",
+  image: "/images/about/me-2.jpg",
   color: "#DCCFF5",
   description:
     "A little more about me, my story, creativity and the things that inspire me.",

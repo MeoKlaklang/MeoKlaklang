@@ -6,9 +6,9 @@ import styles from "./LoadingScreen.module.css";
 
 // Add more photos here whenever you want
 const PHOTOS = [
-  "/images/loading-meo.jpg",
+  "/images/about/me-2.jpg",
   "/images/loading/meo-1.jpg",
-  "/images/loading/meo-2.jpg",
+  "/images/about/me-3.jpg",
   "/images/loading/meo-3.jpg",
 ];
 

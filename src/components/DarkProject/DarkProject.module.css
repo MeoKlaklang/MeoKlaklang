@@ -1,484 +1,119 @@
-/* Shared project experience: background, disc, navigation, layout, typography. */
+
+/* ============================================
+   DARK PROJECT — SHARED EXPERIENCE
+============================================ */
+
 .world {
-
   --disc-size: clamp(420px, 49vw, 720px);
-
   --content-left: clamp(305px, 34vw, 520px);
-
   --dark: #141817;
 
   position: relative;
-
-  width: 100%;
-
   isolation: isolate;
 
+  width: 100%;
   background: var(--dark);
-
   color: #f4f5f2;
-
 }
 
+/* ============================================
+   STICKY WORLD
+============================================ */
+
 .stickyWorld {
-
   position: sticky;
-
   top: 0;
-
   z-index: 1;
 
   width: 100%;
-
   height: 100dvh;
 
   overflow: hidden;
-
-  background: color-mix(in srgb, var(--dark) var(--reveal), #f5f5f1);
-
   isolation: isolate;
 
-}
-
-.vinylEntrance {
-
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 3;
-
-  pointer-events: none;
-
-  will-change: transform, opacity;
-
-}
-
-.vinylShell {
-
-  position: absolute;
-
-  top: 50%;
-
-  left: calc(var(--disc-size) * -0.60);
-
-  width: var(--disc-size);
-
-  height: var(--disc-size);
-
-  translate: 0 -50%;
-
-  pointer-events: none;
-
-}
-
-.vinyl {
-
-  position: absolute;
-
-  inset: 0;
-
-  border-radius: 50%;
-
-  border: 2px solid rgba(200, 220, 205, 0.25);
-
-  background: radial-gradient(
-
-    circle,
-
-    #343b36 0%,
-
-    #222824 35%,
-
-    #151917 76%,
-
-    #0e1110 100%
-
-  );
-
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.035),
-
-    10px 16px 50px rgba(0, 0, 0, 0.28),
-
-    inset 0 0 35px rgba(255, 255, 255, 0.04);
-
-  transform: rotate(var(--disc-rotation));
-
-  transition: transform 0.1s linear;
-
-  cursor: grab;
-
-  touch-action: pan-y;
-
-  user-select: none;
-
-  pointer-events: auto;
-
-}
-
-.vinyl:active {
-
-  cursor: grabbing;
-
-}
-
-.vinylGrooves {
-
-  position: absolute;
-
-  inset: 0;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-
-  background: repeating-radial-gradient(
-
-    circle,
-
-    transparent 0,
-
-    transparent 6px,
-
-    rgba(255, 255, 255, 0.065) 7px,
-
-    transparent 8px
-
-  );
-
-  mask-image: radial-gradient(
-
-    circle,
-
-    transparent 0 21%,
-
-    black 23% 95%,
-
-    transparent 100%
-
-  );
-
-  -webkit-mask-image: radial-gradient(
-
-    circle,
-
-    transparent 0 21%,
-
-    black 23% 95%,
-
-    transparent 100%
-
-  );
-
-}
-
-.vinylLabel {
-
-  position: absolute;
-
-  top: 50%;
-
-  left: 50%;
-
-  width: 54%;
-
-  aspect-ratio: 1;
-
-  transform: translate(-50%, -50%);
-
-  overflow: hidden;
-
-  border-radius: 50%;
-
-  background: var(--project-color);
-
-  border: 2px solid rgba(255, 255, 255, 0.26);
-
-}
-
-.vinylLabel img {
-
-  display: block;
-
-  width: 100%;
-
-  height: 100%;
-
-  object-fit: cover;
-
-  pointer-events: none;
-
-}
-
-.vinylHole {
-
-  position: absolute;
-
-  top: 50%;
-
-  left: 50%;
-
-  width: 8%;
-
-  aspect-ratio: 1;
-
-  transform: translate(-50%, -50%);
-
-  border-radius: 50%;
-
-  background: #eeeeeb;
-
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.24);
-
-}
-
-.chapterMarkers {
-
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 5;
-
-  pointer-events: none;
-
-}
-
-.progressRing {
-
-  position: absolute;
-
-  inset: 0;
-
-  width: 100%;
-
-  height: 100%;
-
-  overflow: visible;
-
-  pointer-events: none;
-
-}
-
-.progressTrack {
-
-  fill: none;
-
-  stroke: color-mix(
-
+  background: color-mix(
     in srgb,
-
-    var(--project-color) 23%,
-
-    transparent
-
+    var(--dark) var(--reveal),
+    #f5f5f1
   );
-
-  stroke-width: 0.35;
-
 }
 
-.progressFill {
+/* ============================================
+   DESKTOP VINYL LAYERS
+============================================ */
 
-  fill: none;
-
-  stroke: var(--project-color);
-
-  stroke-width: 0.7;
-
-  stroke-linecap: round;
-
-  filter: drop-shadow(
-
-    0 0 2px
-
-    color-mix(
-
-      in srgb,
-
-      var(--project-color) 35%,
-
-      transparent
-
-    )
-
-  );
-
-  transition: stroke-dasharray 0.09s linear;
-
-}
-
-.markerActive .markerDot {
-
-  background: var(--project-color);
-
-  box-shadow:
-
-    0 0 0 4px var(--dark),
-
-    0 0 8px
-
-    color-mix(
-
-      in srgb,
-
-      var(--project-color) 35%,
-
-      transparent
-
-    );
-
-}
-
-.markerActive .markerText {
-
-  color: var(--project-color);
-
-  font-weight: 600;
-
-}
-
-.marker {
-
+.desktopVinylLayer,
+.desktopTransitionLayer {
   position: absolute;
-
-  left: var(--marker-x);
-
-  top: var(--marker-y);
-
-  display: inline-flex;
-
-  align-items: center;
-
-  gap: 11px;
-
-  padding: 8px 9px 8px 0;
-
-  transform: translateY(-50%);
-
-  border: none;
-
-  background: transparent;
-
-  color: #839487;
-
-  font: inherit;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-
-  pointer-events: auto;
-
-  transition: color 0.3s ease;
-
-}
-
-.marker:hover {
-
-  color: #e0eee1;
-
-}
-
-.markerDot {
-
-  width: 7px;
-
-  height: 7px;
-
-  flex-shrink: 0;
-
-  border-radius: 50%;
-
-  background: #6c8071;
-
-  box-shadow: 0 0 0 4px var(--dark);
-
-}
-
-.markerText {
-
-  font-size: 12px;
-
-  font-weight: 400;
-
-  letter-spacing: 0.025em;
-
-  color: inherit;
-
-}
-
-.markerActive {
-
-  color: #eaf4eb;
-
-}
-
-.markerActive .markerDot {
-
-  background: var(--project-color);
-
-  box-shadow: 0 0 0 4px var(--dark),
-
-    0 0 12px var(--project-color);
-
-}
-
-.markerActive .markerText {
-
-  font-weight: 600;
-
-  color: var(--project-color);
-
-}
-
-.projectIdentity {
-
-  position: absolute;
-
-  right: 105px;
-
-  bottom: 42px;
-
-  z-index: 4;
-
-  font-size: 10px;
-
-  font-weight: 500;
-
-  letter-spacing: 0.12em;
-
-  text-transform: uppercase;
-
-  color: #a6b9ab;
+  inset: 0;
 
   pointer-events: none;
-
 }
+
+.recordOld,
+.gistdaVinylWrap,
+.transitionVinylWrap {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+  transition: opacity 0.12s linear;
+}
+
+.recordOld {
+  z-index: 3;
+  will-change: opacity, transform;
+}
+
+.gistdaVinylWrap {
+  z-index: 5;
+}
+
+.transitionVinylWrap {
+  z-index: 4;
+}
+
+/* ============================================
+   PROJECT CONTENT
+============================================ */
+
+.projectSection {
+  position: relative;
+}
+
+.firstProjectPosition {
+  position: relative;
+}
+
+.nextProjectPosition {
+  position: relative;
+  z-index: 2;
+
+  pointer-events: none;
+}
+
+/* Used inside individual project components */
 
 .scrollContent {
-
   position: relative;
-
   z-index: 2;
 
   margin-top: -100dvh;
-
   pointer-events: none;
-
 }
 
 .transitionSpace {
-
   height: 100dvh;
-
 }
 
-.chapter {
+/* ============================================
+   CHAPTER LAYOUT
+============================================ */
 
+.chapter {
   position: relative;
 
   display: flex;
-
   align-items: flex-start;
 
   min-height: 100dvh;
@@ -486,303 +121,255 @@
   padding: 110px 5vw 110px 0;
 
   scroll-margin-top: 0;
-
   pointer-events: none;
-
 }
 
 .chapterContent {
-
   width: min(
-
     calc(100% - var(--content-left) - 5vw),
-
     1080px
-
   );
 
   margin-left: var(--content-left);
 
   pointer-events: auto;
-
 }
 
-.eyebrow {
+/* ============================================
+   CHAPTER TYPOGRAPHY
+============================================ */
 
+.eyebrow {
   display: block;
 
   margin-bottom: 20px;
 
-  font-size: 10px;
-
-  font-weight: 600;
-
-  letter-spacing: 0.16em;
-
   color: var(--project-color);
 
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
 }
 
 .chapterHeading {
-
   max-width: 850px;
-
   margin-bottom: 40px;
-
 }
 
 .chapterHeading h2 {
-
   margin: 0 0 22px;
-
-  font-size: clamp(34px, 4.8vw, 74px);
-
-  font-weight: 500;
-
-  line-height: 1.07;
-
-  letter-spacing: -0.06em;
 
   color: #f3f5f1;
 
+  font-size: clamp(34px, 4.8vw, 74px);
+  font-weight: 500;
+  line-height: 1.07;
+  letter-spacing: -0.06em;
 }
 
 .chapterHeading p,
-
 .supportText {
-
   max-width: 620px;
-
   margin: 0;
-
-  font-size: clamp(14px, 1.2vw, 17px);
-
-  line-height: 1.8;
 
   color: #aebcb0;
 
+  font-size: clamp(14px, 1.2vw, 17px);
+  line-height: 1.8;
 }
 
+/* ============================================
+   SPOTIFY-STYLE LYRIC HIGHLIGHT
+============================================ */
+
 .scrollHighlight {
-
   white-space: pre-line;
-
 }
 
 .lyricWord {
-
   color: inherit;
-
   opacity: 0.26;
 
   transition:
-
     color 0.25s ease,
-
     opacity 0.25s ease,
-
     text-shadow 0.25s ease;
-
 }
 
 .lyricWordActive {
-
   color: var(--project-color);
-
   opacity: 1;
 
   text-shadow:
-
     0 0 10px
-
     color-mix(
-
       in srgb,
-
       var(--project-color) 12%,
-
       transparent
-
     );
-
 }
 
-.world button:focus-visible,
+/* ============================================
+   RECORD HANDOFF BETWEEN PROJECTS
+   DESKTOP ONLY
+============================================ */
 
-.world a:focus-visible {
+.recordTransitionZone {
+  position: relative;
+  z-index: 2;
 
-  outline: 2px solid var(--project-color);
-
-  outline-offset: 4px;
-
+  min-height: 175dvh;
+  pointer-events: none;
 }
 
-@media  (max-width: 1000px) {
-.world {
+.recordTransitionPrompt {
+  position: relative;
 
-    --disc-size: clamp(360px, 52vw, 550px);
+  width: min(
+    650px,
+    calc(100% - var(--content-left) - 5vw)
+  );
 
-    --content-left: clamp(245px, 32vw, 350px);
+  margin-left: var(--content-left);
+  padding-top: 22dvh;
 
-  }
-
-.chapterHeading h2 {
-
-    font-size: clamp(30px, 5vw, 58px);
-
-  }
+  pointer-events: none;
 }
 
-@media  (max-width: 650px) {
-.world {
+.recordTransitionPrompt > span:first-child {
+  color: var(--next-color);
 
-    --disc-size: 310px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
 
-    --content-left: 112px;
+.recordTransitionPrompt h2 {
+  margin: 25px 0;
 
-  }
+  font-size: clamp(33px, 4.5vw, 70px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.06em;
+}
 
-.vinylShell {
+.recordTransitionPrompt p {
+  color: #a5b9a9;
 
-    left: calc(var(--disc-size) * -0.72);
+  font-size: 15px;
+  line-height: 1.8;
+}
 
-  }
+.recordScrollArrow {
+  display: block;
 
-.marker {
+  margin-top: 30px;
 
-    gap: 6px;
+  color: var(--next-color);
+  font-size: 30px;
+}
 
-  }
+/* ============================================
+   CLOSE BUTTON
+============================================ */
 
-.markerText {
+.projectClose {
+  position: absolute;
 
-    font-size: 10px;
+  top: 30px;
+  right: 32px;
 
-  }
+  z-index: 20;
 
-.markerDot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    width: 5px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
 
-    height: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
 
-  }
+  background: rgba(34, 42, 36, 0.85);
+  color: #f1f5f0;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(-12px);
+
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    background 0.3s ease,
+    border-color 0.3s ease,
+    visibility 0.4s;
+}
+
+.projectCloseVisible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform: translateY(0);
+}
+
+.projectCloseVisible:hover {
+  background: var(--project-color);
+  border-color: var(--project-color);
+  color: #141817;
+
+  transform: rotate(90deg);
+}
+
+/* ============================================
+   NOW PLAYING
+============================================ */
 
 .projectIdentity {
-
-    right: 78px;
-
-    bottom: 31px;
-
-    font-size: 8px;
-
-  }
-
-.chapter {
-
-    padding: 95px 14px 90px 0;
-
-  }
-
-.chapterContent {
-
-    width: calc(
-
-        100% - var(--content-left) - 14px
-
-      );
-
-  }
-
-.chapterHeading h2 {
-
-    font-size: 31px;
-
-  }
-}
-
-@media  (prefers-reduced-motion: reduce) {
-.progressFill,
-
-    .lyricWord {
-
-    transition: none;
-
-  }
-
-.vinyl,
-
-    .progressFill,
-
-    .marker,
-
-    .lyricWord,
-
-    .impactBar,
-
-    .shelterFigure img {
-
-    transition: none;
-
-  }
-}
-
-/* Record handoff: bottom-of-project scroll transition */
-.recordOld {position:absolute; inset:0; z-index:3; will-change:opacity,transform;}
-.recordTransitionZone {position:relative;z-index:2;min-height:175dvh;pointer-events:none;}
-.recordTransitionPrompt {position:relative;margin-left:var(--content-left);width:min(650px,calc(100% - var(--content-left) - 5vw));padding-top:22dvh;pointer-events:none;}
-.recordTransitionPrompt>span:first-child {font-size:10px;letter-spacing:.16em;color:var(--next-color);font-weight:600;}
-.recordTransitionPrompt h2 {margin:25px 0;font-size:clamp(33px,4.5vw,70px);line-height:1.1;letter-spacing:-.06em;font-weight:500;}
-.recordTransitionPrompt p{color:#a5b9a9;line-height:1.8;font-size:15px;}
-.recordScrollArrow{display:block;margin-top:30px;color:var(--next-color);font-size:30px;}
-.nextProjectPosition{position:relative;z-index:2;pointer-events:none;}
-.projectIdentityCurrent,.projectIdentityNext {position:absolute;right:0;bottom:0;white-space:nowrap;transition:opacity .08s linear;}
-.projectIdentity{min-width:260px;height:20px;}
-.projectClose {position:absolute;top:30px;right:32px;z-index:20;display:flex;align-items:center;justify-content:center;width:52px;height:52px;padding:0;border:1px solid #ffffff29;border-radius:50%;background:#222a24d9;color:#f1f5f0;cursor:pointer;backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-12px);transition:opacity .4s ease,transform .4s ease,background .3s ease,border-color .3s ease,visibility .4s;}
-.projectCloseVisible{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);}
-.projectCloseVisible:hover{background:var(--project-color);border-color:var(--project-color);color:#141817;transform:rotate(90deg);}
-.projectClose:focus-visible{outline:2px solid var(--project-color);outline-offset:4px;}
-@media(max-width:650px){.projectClose{top:18px;right:18px;width:44px;height:44px}.recordTransitionPrompt{width:calc(100% - var(--content-left) - 16px);padding-top:16dvh}.projectIdentity{min-width:190px}}
-@media(prefers-reduced-motion:reduce){.projectClose{transition:none}.projectCloseVisible:hover{transform:none}}
-
-/* Tease the next project on the existing vinyl before the swap. */
-.recordOldCued .vinyl { box-shadow:0 0 60px color-mix(in srgb,var(--next-color) 35%,transparent),0 0 110px color-mix(in srgb,var(--next-color) 12%,transparent),10px 16px 50px #0006; animation:recordCueSpin 9s linear infinite; }
-.recordOldCued .vinyl:focus-visible{outline:3px solid var(--next-color);outline-offset:5px;}
-@keyframes recordCueSpin {from{transform:rotate(var(--disc-rotation))}to{transform:rotate(calc(var(--disc-rotation) + 360deg))}}
-@media(prefers-reduced-motion:reduce){.recordOldCued .vinyl{animation:none}}
-
-
-/* GISTDA vinyl appears in exactly the same position as the previous record.
-   Shared VinylNavigation handles rotation, chapter markers and progress line. */
-.transitionVinylWrap,
-.gistdaVinylWrap {
   position: absolute;
-  inset: 0;
+
+  right: 105px;
+  bottom: 42px;
+
   z-index: 4;
-  transition: opacity 0.12s linear;
-}
-.gistdaVinylWrap { z-index: 5; }
-.gistdaVinylWrap .vinylEntrance { pointer-events: none; }
-.gistdaVinylWrap .chapterMarkers { pointer-events: none; }
-@media (prefers-reduced-motion: reduce) {
-  .transitionVinylWrap,
-  .gistdaVinylWrap { transition: none; }
-}
 
-/* GISTDA — keep background dark at project end */
+  min-width: 260px;
+  height: 20px;
 
-.world {
-  background-color: #141817;
+  color: #a6b9ab;
+
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  pointer-events: none;
 }
 
-.world::after {
-  background-color: #141817;
+.projectIdentityCurrent,
+.projectIdentityNext {
+  position: absolute;
+
+  right: 0;
+  bottom: 0;
+
+  white-space: nowrap;
+
+  transition: opacity 0.08s linear;
 }
 
-
-/* =====================================
-   NEXT PROJECT — SUBTLE SHORTCUT
-===================================== */
+/* ============================================
+   NEXT PROJECT SHORTCUT
+============================================ */
 
 .nextProjectShortcut {
   position: absolute;
@@ -794,16 +381,17 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
   gap: 6px;
 
   padding: 8px 0;
 
-  background: transparent;
   border: 0;
+  background: transparent;
   box-shadow: none;
 
-  cursor: pointer;
   text-align: left;
+  cursor: pointer;
   pointer-events: auto;
 
   opacity: 0.75;
@@ -819,11 +407,6 @@
   transform: translateY(-2px);
 }
 
-.nextProjectShortcut:focus-visible {
-  outline: 2px solid var(--next-project-color);
-  outline-offset: 6px;
-}
-
 .nextProjectShortcutLabel {
   color: rgba(235, 236, 231, 0.55);
 
@@ -835,6 +418,7 @@
 .nextProjectShortcutName {
   display: flex;
   align-items: center;
+
   gap: 10px;
 
   color: var(--next-project-color, #fff);
@@ -853,9 +437,253 @@
   transform: translate(3px, -3px);
 }
 
-@media (max-width: 650px) {
+/* ============================================
+   ACCESSIBILITY
+============================================ */
+
+.world button:focus-visible,
+.world a:focus-visible {
+  outline: 2px solid var(--project-color);
+  outline-offset: 4px;
+}
+
+/* ============================================
+   TABLET
+============================================ */
+
+@media (max-width: 1000px) {
+  .world {
+    --disc-size: clamp(360px, 52vw, 550px);
+    --content-left: clamp(245px, 32vw, 350px);
+  }
+
+  .chapterHeading h2 {
+    font-size: clamp(30px, 5vw, 58px);
+  }
+}
+
+/* ============================================
+   MOBILE — SHARED PROJECT LAYOUT
+============================================ */
+
+@media (max-width: 767px) {
+  .world {
+    --disc-size: clamp(300px, 92vw, 370px);
+    --content-left: 0px;
+
+    overflow-x: clip;
+  }
+
+  /*
+    Keep ambient background sticky.
+    Mobile vinyl is rendered separately
+    using MobileProjectDock.
+  */
+
+  .stickyWorld {
+    position: sticky;
+    top: 0;
+
+    width: 100%;
+    height: 100dvh;
+
+    z-index: 1;
+    overflow: hidden;
+
+    pointer-events: none;
+  }
+
+  /*
+    No desktop vinyl stacks on mobile.
+  */
+
+  .desktopVinylLayer,
+  .desktopTransitionLayer,
+  .recordOld,
+  .gistdaVinylWrap,
+  .transitionVinylWrap {
+    display: none;
+  }
+
+  /*
+    No desktop record transition
+    between mobile projects.
+  */
+
+  .recordTransitionZone,
+  .nextProjectShortcut,
+  .projectIdentity {
+    display: none;
+  }
+
+  /*
+    Content takes up full mobile width.
+  */
+
+  .projectSection {
+    width: 100%;
+  }
+
+  .chapter {
+    width: 100%;
+    min-height: 100dvh;
+
+    padding: 85px 20px 220px;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    scroll-margin-top: 0;
+  }
+
+  .chapterContent {
+    width: 100%;
+    max-width: 620px;
+    min-width: 0;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    padding: 0;
+
+    box-sizing: border-box;
+  }
+
+  .chapterHeading {
+    max-width: 100%;
+    margin-bottom: 28px;
+  }
+
+  .chapterHeading h2 {
+    font-size: clamp(27px, 7vw, 42px);
+    line-height: 1.12;
+  }
+
+  .chapterHeading p,
+  .supportText {
+    max-width: 100%;
+
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  /*
+    Keep images and video responsive.
+  */
+
+  .chapterContent img,
+  .chapterContent video {
+    max-width: 100%;
+  }
+
+  /*
+    Close button stays in the sticky layer.
+  */
+
+  .projectClose {
+    top: 18px;
+    right: 18px;
+
+    width: 43px;
+    height: 43px;
+  }
+
+  .projectCloseVisible {
+    pointer-events: auto;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE
+============================================ */
+
+@media (max-width: 380px) {
+  .chapter {
+    padding: 80px 16px 210px;
+  }
+
+  .chapterHeading h2 {
+    font-size: 27px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .lyricWord,
+  .recordOld,
+  .gistdaVinylWrap,
+  .transitionVinylWrap,
+  .projectClose,
   .nextProjectShortcut {
-    left: 20px;
-    bottom: 24px;
+    transition: none;
+  }
+
+  .projectCloseVisible:hover {
+    transform: none;
+  }
+}
+
+
+/* =====================================
+   MOBILE CLOSE BUTTON
+===================================== */
+
+.mobileClose {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .desktopClose {
+    display: none;
+  }
+
+  .mobileClose {
+    position: fixed;
+
+    top: calc(env(safe-area-inset-top, 0px) + 18px);
+    right: 18px;
+
+    z-index: 6000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+    padding: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+
+    background: rgba(34, 42, 36, 0.94);
+    color: #f1f5f0;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    cursor: pointer;
+    pointer-events: auto;
+
+    transition:
+      background 250ms ease,
+      transform 250ms ease;
+  }
+
+  .mobileClose:hover {
+    background: var(--project-color, #c3a2eb);
+    color: #141817;
+    transform: rotate(90deg);
+  }
+
+  .mobileClose:focus-visible {
+    outline: 2px solid
+      var(--project-color, #c3a2eb);
+    outline-offset: 4px;
   }
 }

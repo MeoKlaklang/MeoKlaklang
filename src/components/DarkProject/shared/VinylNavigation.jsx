@@ -1,19 +1,18 @@
 
+import styles from "./VinylNavigation.module.css";
+
 /* =====================================
-   VINYL NAVIGATION
+   VINYL GEOMETRY
 ===================================== */
 
-const MARKER_ANGLES = [-55, -18, 18, 55];
+const DESKTOP_ANGLES = [-55, -18, 18, 55];
+const MOBILE_ANGLES = [-145, -110, -70, -35];
 
-const RADIUS = 47;
 const CENTER = 50;
+const RADIUS = 46;
 
 const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
-
-/* =====================================
-   MARKER POSITION
-===================================== */
 
 function getPoint(angle) {
   const radians = (angle * Math.PI) / 180;
@@ -33,50 +32,167 @@ function markerPosition(angle) {
   };
 }
 
-/* =====================================
-   PROGRESS ARC
-===================================== */
-
-/*
-  The SVG arc is calculated from the same
-  marker angles used by the buttons.
-
-  This ensures that the progress line
-  passes exactly through the markers.
-*/
-
 function createArcPath(startAngle, endAngle) {
   const start = getPoint(startAngle);
   const end = getPoint(endAngle);
 
   const difference = endAngle - startAngle;
-
-  const largeArcFlag =
-    Math.abs(difference) > 180 ? 1 : 0;
-
-  const sweepFlag = difference >= 0 ? 1 : 0;
+  const largeArc = Math.abs(difference) > 180 ? 1 : 0;
+  const sweep = difference >= 0 ? 1 : 0;
 
   return `
     M ${start.x} ${start.y}
     A ${RADIUS} ${RADIUS}
-      0 ${largeArcFlag} ${sweepFlag}
-      ${end.x} ${end.y}
+    0 ${largeArc} ${sweep}
+    ${end.x} ${end.y}
   `;
 }
 
-const ARC_PATH = createArcPath(
-  MARKER_ANGLES[0],
-  MARKER_ANGLES[MARKER_ANGLES.length - 1]
+const DESKTOP_ARC = createArcPath(
+  DESKTOP_ANGLES[0],
+  DESKTOP_ANGLES[3]
+);
+
+const MOBILE_ARC = createArcPath(
+  MOBILE_ANGLES[0],
+  MOBILE_ANGLES[3]
 );
 
 /* =====================================
-   VINYL NAVIGATION COMPONENT
+   CHAPTER PROGRESS
+===================================== */
+
+function calculateArcProgress(progress, count) {
+  const safeProgress = clamp(progress);
+
+  if (count <= 1) {
+    return safeProgress;
+  }
+
+  const chapterProgress = safeProgress * count;
+
+  const currentSegment = Math.min(
+    count - 1,
+    Math.floor(chapterProgress)
+  );
+
+  const fraction = clamp(
+    chapterProgress - currentSegment
+  );
+
+  const currentMarker = currentSegment;
+  const nextMarker = Math.min(
+    currentMarker + 1,
+    count - 1
+  );
+
+  let result =
+    (currentMarker +
+      (nextMarker - currentMarker) * fraction) /
+    (count - 1);
+
+  if (safeProgress >= 0.999) {
+    result = 1;
+  }
+
+  return clamp(result);
+}
+
+/* =====================================
+   CHAPTER MARKERS
+===================================== */
+
+function ChapterMarkers({
+  project,
+  chapters,
+  angles,
+  arcPath,
+  progress,
+  activeChapter,
+  goToChapter,
+  mobile = false,
+  transition,
+}) {
+  return (
+    <nav
+      className={`${styles.chapterMarkers} ${
+        mobile
+          ? styles.mobileMarkers
+          : styles.desktopMarkers
+      }`}
+      aria-label={`${project?.title} chapters`}
+      aria-hidden={!mobile ? undefined : undefined}
+      style={{
+        opacity: clamp((transition - 0.6) / 0.4),
+        pointerEvents:
+          transition > 0.9 ? "auto" : "none",
+      }}
+    >
+      <svg
+        className={styles.progressRing}
+        viewBox="0 0 100 100"
+        aria-hidden="true"
+      >
+        <path
+          className={styles.progressTrack}
+          d={arcPath}
+          pathLength="100"
+        />
+
+        <path
+          className={styles.progressFill}
+          d={arcPath}
+          pathLength="100"
+          style={{
+            strokeDasharray: `${
+              clamp(progress) * 100
+            } 100`,
+          }}
+        />
+      </svg>
+
+      {chapters.map((chapter, index) => {
+        const active = activeChapter === index;
+
+        return (
+          <button
+            key={`${index}-${chapter}`}
+            type="button"
+            className={`${styles.marker} ${
+              active ? styles.markerActive : ""
+            }`}
+            style={markerPosition(
+              angles[index] ?? angles[angles.length - 1]
+            )}
+            aria-current={active ? "step" : undefined}
+            aria-label={`Go to ${chapter} chapter`}
+            onPointerDown={(event) => {
+              event.stopPropagation();
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              goToChapter?.(index);
+            }}
+          >
+            <span className={styles.markerDot} />
+
+            <span className={styles.markerText}>
+              {chapter}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/* =====================================
+   VINYL NAVIGATION
 ===================================== */
 
 export default function VinylNavigation({
   project,
   chapters = [],
-  styles,
   transition = 1,
   rotation = 0,
   progress = 0,
@@ -88,61 +204,10 @@ export default function VinylNavigation({
   canPlayNext = false,
   onPlayNext,
 }) {
-  const safeProgress = clamp(progress);
-
-  /*
-    DarkProject divides progress into
-    four chapter segments.
-
-    Our arc has three intervals between
-    four markers.
-
-    Convert chapter progress to arc
-    position so chapter boundaries align
-    with their corresponding dots.
-  */
-
-  const chapterCount = Math.max(1, chapters.length);
-
-  const chapterProgress = safeProgress * chapterCount;
-
-  const currentSegment = Math.min(
-    chapterCount - 1,
-    Math.floor(chapterProgress)
+  const arcProgress = calculateArcProgress(
+    progress,
+    chapters.length
   );
-
-  const segmentFraction = clamp(
-    chapterProgress - currentSegment
-  );
-
-  let arcProgress = 0;
-
-  if (chapterCount > 1) {
-    const markerIndex = Math.min(
-      currentSegment,
-      chapterCount - 1
-    );
-
-    const nextMarkerIndex = Math.min(
-      markerIndex + 1,
-      chapterCount - 1
-    );
-
-    const markerPositionValue =
-      markerIndex +
-      (nextMarkerIndex - markerIndex) *
-        segmentFraction;
-
-    arcProgress =
-      markerPositionValue / (chapterCount - 1);
-  } else {
-    arcProgress = safeProgress;
-  }
-
-  // Finish the line at the end of the record.
-  if (safeProgress >= 0.999) {
-    arcProgress = 1;
-  }
 
   function handleRecordClick() {
     if (canPlayNext) {
@@ -167,17 +232,15 @@ export default function VinylNavigation({
       className={styles.vinylEntrance}
       style={{
         opacity: clamp(transition * 3),
-
         transform: `
           translateX(${(1 - transition) * 125}vw)
           scale(${0.78 + transition * 0.22})
         `,
+        "--vinyl-rotation": `${rotation}deg`,
       }}
     >
       <div className={styles.vinylShell}>
-        {/* =====================================
-            VINYL DISC
-        ===================================== */}
+        {/* VINYL RECORD */}
 
         <div
           className={styles.vinyl}
@@ -201,7 +264,7 @@ export default function VinylNavigation({
               <img
                 src={project.image}
                 alt=""
-                draggable="false"
+                draggable={false}
               />
             )}
 
@@ -209,104 +272,32 @@ export default function VinylNavigation({
           </div>
         </div>
 
-        {/* =====================================
-            CHAPTER NAVIGATION
-        ===================================== */}
+        {/* DESKTOP: RIGHT SIDE ARC */}
 
-        <nav
-          className={styles.chapterMarkers}
-          aria-label={`${project?.title} chapters`}
-          style={{
-            opacity: clamp(
-              (transition - 0.6) / 0.4
-            ),
+        <ChapterMarkers
+          project={project}
+          chapters={chapters}
+          angles={DESKTOP_ANGLES}
+          arcPath={DESKTOP_ARC}
+          progress={arcProgress}
+          activeChapter={activeChapter}
+          goToChapter={goToChapter}
+          transition={transition}
+        />
 
-            pointerEvents:
-              transition > 0.9
-                ? "auto"
-                : "none",
-          }}
-        >
-          {/* =====================================
-              PROGRESS RING
-          ===================================== */}
+        {/* MOBILE: TOP HALF ARC */}
 
-          <svg
-            className={styles.progressRing}
-            viewBox="0 0 100 100"
-            aria-hidden="true"
-          >
-            {/* Background arc */}
-
-            <path
-              className={styles.progressTrack}
-              d={ARC_PATH}
-              pathLength="100"
-            />
-
-            {/* Active progress arc */}
-
-            <path
-              className={styles.progressFill}
-              d={ARC_PATH}
-              pathLength="100"
-              style={{
-                strokeDasharray: `${
-                  clamp(arcProgress) * 100
-                } 100`,
-              }}
-            />
-          </svg>
-
-          {/* =====================================
-              CHAPTER MARKERS
-          ===================================== */}
-
-          {chapters.map((chapter, index) => {
-            const angle =
-              MARKER_ANGLES[index] ?? 0;
-
-            const isActive =
-              activeChapter === index;
-
-            return (
-              <button
-                key={`${index}-${chapter}`}
-                type="button"
-                className={`
-                  ${styles.marker}
-                  ${
-                    isActive
-                      ? styles.markerActive
-                      : ""
-                  }
-                `}
-                style={markerPosition(angle)}
-                aria-current={
-                  isActive ? "step" : undefined
-                }
-                aria-label={`Go to ${chapter} chapter`}
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                }}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  goToChapter?.(index);
-                }}
-              >
-                <span
-                  className={styles.markerDot}
-                />
-
-                <span
-                  className={styles.markerText}
-                >
-                  {chapter}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
+        <ChapterMarkers
+          project={project}
+          chapters={chapters}
+          angles={MOBILE_ANGLES}
+          arcPath={MOBILE_ARC}
+          progress={arcProgress}
+          activeChapter={activeChapter}
+          goToChapter={goToChapter}
+          transition={transition}
+          mobile
+        />
       </div>
     </div>
   );

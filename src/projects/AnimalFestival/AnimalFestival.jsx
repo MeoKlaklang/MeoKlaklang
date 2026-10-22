@@ -9,7 +9,7 @@ const BASE = "/images/animalfestival";
 
 // Change to the MP4 path once your video is ready.
 // Temporary demo — replace later with Animal Festival video
-const DEMO_VIDEO = "/images/petbridge/petbridge-demo-web.mp4";
+const DEMO_VIDEO = "/images/animalfestival/animal-demo.mp4";
 const WIREFRAMES = [
 	{
 		src: `${BASE}/wireframe-01.png`,

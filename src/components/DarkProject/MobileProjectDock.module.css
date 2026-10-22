@@ -1,0 +1,36 @@
+
+/* =========================================
+   MOBILE PROJECT VINYL OVERLAY
+========================================= */
+
+.mobileDock {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobileDock {
+    position: fixed;
+    inset: 0;
+
+    z-index: 4500;
+
+    display: block;
+
+    width: 100%;
+    height: 100dvh;
+
+    pointer-events: none;
+
+    /*
+      The dock is attached to document.body,
+      not inside the sticky project world.
+    */
+    isolation: isolate;
+
+    /*
+      The vinyl determines which small
+      areas are actually interactive.
+    */
+    background: transparent;
+  }
+}

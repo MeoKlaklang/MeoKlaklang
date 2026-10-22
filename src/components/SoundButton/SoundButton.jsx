@@ -1,16 +1,25 @@
 
+import { useLocation } from "react-router-dom";
 import { useAudio } from "../../context/AudioContext";
+
 import styles from "./SoundButton.module.css";
 
 export default function SoundButton() {
   const { muted, isPlaying, toggleSound } = useAudio();
+  const location = useLocation();
 
   const soundOn = isPlaying && !muted;
+
+  const isDarkPage =
+    location.pathname === "/about" ||
+    location.pathname === "/projects";
 
   return (
     <button
       type="button"
-      className={styles.soundButton}
+      className={`${styles.soundButton} ${
+        isDarkPage ? styles.darkButton : ""
+      }`}
       onClick={toggleSound}
       aria-label={
         soundOn
@@ -21,7 +30,6 @@ export default function SoundButton() {
       title={soundOn ? "Mute music" : "Play music"}
     >
       {soundOn ? (
-        // Sound ON
         <svg
           width="21"
           height="21"
@@ -38,7 +46,6 @@ export default function SoundButton() {
           <path d="M18 6a9 9 0 0 1 0 12" />
         </svg>
       ) : (
-        // Sound OFF
         <svg
           width="21"
           height="21"
