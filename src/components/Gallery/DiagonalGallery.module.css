@@ -245,3 +245,64 @@
     animation: none;
   }
 }
+
+
+/* ============================================
+   MOBILE — TOUCH FRIENDLY CD GALLERY
+============================================ */
+
+@media (max-width: 767px) {
+  .gallery {
+    /*
+      Horizontal finger gestures belong
+      to the CD gallery.
+
+      Vertical gestures must still allow
+      normal page scrolling.
+    */
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-x: contain;
+  }
+
+  .scene {
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /*
+    Remove desktop hover-related
+    cursor behavior on touch devices.
+  */
+
+  .mobileGallery {
+    cursor: default;
+  }
+
+  .mobileGallery.dragging {
+    cursor: default;
+  }
+}
+
+/* ============================================
+   TOUCH DEVICES
+============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .gallery,
+  .scene {
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileGallery {
+    scroll-behavior: auto;
+  }
+}

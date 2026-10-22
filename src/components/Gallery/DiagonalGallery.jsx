@@ -15,7 +15,11 @@ import styles from "./DiagonalGallery.module.css";
 ===================================== */
 
 const AUTO_SPEED = 0.000085;
-const DRAG_SPEED = 0.005;
+const DESKTOP_DRAG_SPEED = 0.005;
+const MOBILE_DRAG_SPEED = 0.008;
+
+const SWIPE_THRESHOLD = 8;
+const SNAP_DELAY = 0;
 
 const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
@@ -40,6 +44,7 @@ export default function DiagonalGallery({
   const [position, setPosition] = useState(0);
   const [hoveredId, setHoveredId] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const positionRef = useRef(0);
   const targetRef = useRef(0);
@@ -49,11 +54,57 @@ export default function DiagonalGallery({
   const didDragRef = useRef(false);
 
   const hoveredRef = useRef(false);
-
   const soundRef = useRef(null);
   const galleryRef = useRef(null);
 
+  const isMobileRef = useRef(false);
   const scrollProgressRef = useRef(scrollProgress);
+
+  const snapTimerRef = useRef(null);
+
+  /* =====================================
+     RESPONSIVE DETECTION
+  ===================================== */
+
+  useEffect(() => {
+    const media = window.matchMedia(
+      "(max-width: 767px)"
+    );
+
+    function updateMobile() {
+      const mobile = media.matches;
+
+      isMobileRef.current = mobile;
+      setIsMobile(mobile);
+
+      pointerRef.current = null;
+      draggingRef.current = false;
+      hoveredRef.current = false;
+
+      setDragging(false);
+      setHoveredId(null);
+
+      if (mobile) {
+        targetRef.current = Math.round(
+          targetRef.current
+        );
+      }
+    }
+
+    updateMobile();
+
+    media.addEventListener(
+      "change",
+      updateMobile
+    );
+
+    return () => {
+      media.removeEventListener(
+        "change",
+        updateMobile
+      );
+    };
+  }, []);
 
   useEffect(() => {
     scrollProgressRef.current = scrollProgress;
@@ -81,6 +132,18 @@ export default function DiagonalGallery({
     !galleryLocked &&
     !dragging &&
     hoveredId === null;
+
+  /* =====================================
+     MOBILE ACTIVE CD
+  ===================================== */
+
+  const mobileIndex = wrap(
+    Math.round(position),
+    projects.length
+  );
+
+  const mobileSelectedProject =
+    projects[mobileIndex];
 
   /* =====================================
      SOUND
@@ -113,7 +176,7 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     AUTOMATIC CD MOVEMENT
+     AUTOMATIC MOVEMENT + SMOOTH SNAP
   ===================================== */
 
   useEffect(() => {
@@ -139,26 +202,50 @@ export default function DiagonalGallery({
         draggingRef.current = false;
       }
 
+      /*
+        Desktop keeps its original
+        automatic gentle movement.
+
+        Mobile stays snapped to a CD
+        so visitors can browse precisely.
+      */
+
       if (
         !locked &&
         !reducedMotion &&
         !hoveredRef.current &&
-        !draggingRef.current
+        !draggingRef.current &&
+        !isMobileRef.current
       ) {
         targetRef.current +=
           delta * AUTO_SPEED;
       }
 
-      const ease =
-        1 - Math.exp(-delta * 0.01);
+      /*
+        Responsive easing:
+        slightly faster during dragging,
+        smoother when snapping.
+      */
+
+      const speed = draggingRef.current
+        ? 0.022
+        : isMobileRef.current
+          ? 0.012
+          : 0.01;
+
+      const ease = reducedMotion
+        ? 1
+        : 1 - Math.exp(-delta * speed);
 
       positionRef.current +=
-        (targetRef.current - positionRef.current) *
-        ease;
+        (targetRef.current -
+          positionRef.current) * ease;
 
       setPosition(positionRef.current);
 
-      frame = requestAnimationFrame(animate);
+      frame = requestAnimationFrame(
+        animate
+      );
     }
 
     frame = requestAnimationFrame(animate);
@@ -169,63 +256,130 @@ export default function DiagonalGallery({
   }, []);
 
   /* =====================================
-     END DRAG
+     SNAP TO CLOSEST MOBILE CD
   ===================================== */
 
-  useEffect(() => {
-    function endDrag() {
-      draggingRef.current = false;
-      pointerRef.current = null;
+  function snapToClosest() {
+    if (!isMobileRef.current) return;
 
-      setDragging(false);
+    targetRef.current = Math.round(
+      targetRef.current
+    );
+  }
+
+  /* =====================================
+     CLEAN UP DRAG
+  ===================================== */
+
+  function finishDrag(cancelled = false) {
+    const pointer = pointerRef.current;
+
+    if (!pointer) return;
+
+    const wasHorizontal =
+      pointer.axis === "horizontal";
+
+    const wasDragging =
+      didDragRef.current;
+
+    pointerRef.current = null;
+    draggingRef.current = false;
+
+    setDragging(false);
+
+    if (isMobileRef.current) {
+      if (
+        !cancelled &&
+        wasHorizontal &&
+        wasDragging
+      ) {
+        snapToClosest();
+
+        if (projects.length > 0) {
+          playSound();
+        }
+      } else {
+        targetRef.current = Math.round(
+          targetRef.current
+        );
+      }
+    }
+  }
+
+  useEffect(() => {
+    function handleWindowPointerUp() {
+      finishDrag(false);
+    }
+
+    function handleWindowPointerCancel() {
+      finishDrag(true);
     }
 
     window.addEventListener(
       "pointerup",
-      endDrag
+      handleWindowPointerUp
     );
 
     window.addEventListener(
       "pointercancel",
-      endDrag
+      handleWindowPointerCancel
     );
 
     return () => {
       window.removeEventListener(
         "pointerup",
-        endDrag
+        handleWindowPointerUp
       );
 
       window.removeEventListener(
         "pointercancel",
-        endDrag
+        handleWindowPointerCancel
       );
+
+      if (snapTimerRef.current) {
+        clearTimeout(snapTimerRef.current);
+      }
     };
-  }, []);
+  });
 
   /* =====================================
-     MOUSE DOWN
+     POINTER DOWN
   ===================================== */
 
   function handlePointerDown(event) {
     if (
       galleryLocked ||
-      event.button !== 0
+      (event.pointerType === "mouse" &&
+        event.button !== 0)
     ) {
       return;
     }
 
-    draggingRef.current = true;
     didDragRef.current = false;
 
-    setDragging(true);
-
     pointerRef.current = {
+      pointerId: event.pointerId,
+      pointerType: event.pointerType,
+
       x: event.clientX,
       y: event.clientY,
+
       startX: event.clientX,
       startY: event.clientY,
+
+      axis: null,
     };
+
+    /*
+      Desktop starts dragging immediately.
+      Mobile waits to determine whether
+      the gesture is horizontal or vertical.
+    */
+
+    if (!isMobileRef.current) {
+      draggingRef.current = true;
+      setDragging(true);
+    }
   }
 
   /* =====================================
@@ -234,6 +388,8 @@ export default function DiagonalGallery({
 
   function handlePointerMove(event) {
     const gallery = galleryRef.current;
+
+    /* DESKTOP PARALLAX */
 
     if (
       gallery &&
@@ -268,36 +424,110 @@ export default function DiagonalGallery({
 
       gallery.style.setProperty(
         "--gallery-rotate-y",
-        `${normalizedX * 5 * strength}deg`
+        `${
+          normalizedX * 5 * strength
+        }deg`
       );
 
       gallery.style.setProperty(
         "--gallery-rotate-x",
-        `${-normalizedY * 4 * strength}deg`
+        `${
+          -normalizedY * 4 * strength
+        }deg`
       );
 
       gallery.style.setProperty(
         "--gallery-move-x",
-        `${normalizedX * 15 * strength}px`
+        `${
+          normalizedX * 15 * strength
+        }px`
       );
 
       gallery.style.setProperty(
         "--gallery-move-y",
-        `${normalizedY * 12 * strength}px`
+        `${
+          normalizedY * 12 * strength
+        }px`
       );
     }
 
     /* DRAG INTERACTION */
 
+    const pointer = pointerRef.current;
+
     if (
       galleryLocked ||
-      !draggingRef.current ||
-      !pointerRef.current
+      !pointer ||
+      event.pointerId !== pointer.pointerId
     ) {
       return;
     }
 
-    const pointer = pointerRef.current;
+    const totalDx =
+      event.clientX - pointer.startX;
+
+    const totalDy =
+      event.clientY - pointer.startY;
+
+    const distance = Math.hypot(
+      totalDx,
+      totalDy
+    );
+
+    if (isMobileRef.current) {
+      /*
+        Distinguish horizontal swipes
+        from vertical page scrolling.
+      */
+
+      if (pointer.axis === null) {
+        if (distance < SWIPE_THRESHOLD) {
+          return;
+        }
+
+        if (
+          Math.abs(totalDy) >
+          Math.abs(totalDx)
+        ) {
+          pointer.axis = "vertical";
+
+          draggingRef.current = false;
+          setDragging(false);
+
+          return;
+        }
+
+        pointer.axis = "horizontal";
+
+        draggingRef.current = true;
+        didDragRef.current = true;
+
+        setDragging(true);
+      }
+
+      /*
+        Allow normal vertical scrolling.
+      */
+
+      if (pointer.axis === "vertical") {
+        return;
+      }
+
+      const dx =
+        event.clientX - pointer.x;
+
+      targetRef.current +=
+        -dx * MOBILE_DRAG_SPEED;
+
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+
+      return;
+    }
+
+    /* DESKTOP DRAG */
+
+    if (!draggingRef.current) return;
 
     const dx =
       event.clientX - pointer.x;
@@ -305,18 +535,13 @@ export default function DiagonalGallery({
     const dy =
       event.clientY - pointer.y;
 
-    const distance = Math.hypot(
-      event.clientX - pointer.startX,
-      event.clientY - pointer.startY
-    );
-
     if (distance > 7) {
       didDragRef.current = true;
     }
 
     if (didDragRef.current) {
       targetRef.current +=
-        (-dx + dy) * DRAG_SPEED;
+        (-dx + dy) * DESKTOP_DRAG_SPEED;
     }
 
     pointer.x = event.clientX;
@@ -324,7 +549,7 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     HOVER
+     HOVER — DESKTOP ONLY
   ===================================== */
 
   function handleCardEnter(
@@ -332,6 +557,7 @@ export default function DiagonalGallery({
     withSound = true
   ) {
     if (
+      isMobileRef.current ||
       galleryLocked ||
       draggingRef.current
     ) {
@@ -347,9 +573,9 @@ export default function DiagonalGallery({
   }
 
   function handleCardLeave(id) {
-    if (hoveredRef.current) {
-      hoveredRef.current = false;
-    }
+    if (isMobileRef.current) return;
+
+    hoveredRef.current = false;
 
     setHoveredId((current) =>
       current === id ? null : current
@@ -357,7 +583,7 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     OPEN SELECTED PROJECT
+     OPEN PROJECT
   ===================================== */
 
   function handleOpen(event, project) {
@@ -365,12 +591,18 @@ export default function DiagonalGallery({
       didDragRef.current ||
       galleryLocked
     ) {
-      event.preventDefault();
+      event?.preventDefault?.();
       return;
     }
 
-    // Pass the selected CD to Home.jsx.
-    // Home decides which project section opens.
+    /*
+      On mobile:
+      tap to open project.
+
+      On desktop:
+      preserve original click behavior.
+    */
+
     onProjectOpen?.(project);
   }
 
@@ -382,6 +614,15 @@ export default function DiagonalGallery({
     const count = projects.length;
     const project = projects[index];
 
+    /*
+      Desktop:
+      default selectedProjectId still
+      controls the homepage CD opening.
+
+      Mobile:
+      closest card gets visual focus.
+    */
+
     const offset =
       wrap(
         index - position + count / 2,
@@ -391,22 +632,38 @@ export default function DiagonalGallery({
 
     const depth = Math.abs(offset);
 
-    const isSelected =
+    const isOpeningSelected =
       project.id === selectedProjectId;
 
-    const originalX = offset * 150;
-    const originalY = -offset * 112;
-    const originalZ = -depth * 135;
+    const isMobileCentered =
+      isMobile &&
+      project.id ===
+        mobileSelectedProject?.id;
 
-    const x = isSelected
+    /* MOBILE COMPACT DIAGONAL LAYOUT */
+
+    const spacingX = isMobile ? 100 : 150;
+    const spacingY = isMobile ? 48 : 112;
+    const spacingZ = isMobile ? 90 : 135;
+
+    const originalX =
+      offset * spacingX;
+
+    const originalY =
+      -offset * spacingY;
+
+    const originalZ =
+      -depth * spacingZ;
+
+    const x = isOpeningSelected
       ? originalX * (1 - centering)
       : originalX;
 
-    const y = isSelected
+    const y = isOpeningSelected
       ? originalY * (1 - centering)
       : originalY;
 
-    const z = isSelected
+    const z = isOpeningSelected
       ? originalZ * (1 - centering)
       : originalZ;
 
@@ -415,11 +672,9 @@ export default function DiagonalGallery({
       1 - depth * 0.09
     );
 
-    const opacity = isSelected
+    const opacity = isOpeningSelected
       ? baseOpacity * selectedFade
       : baseOpacity * othersFade;
-
-    /* INITIAL FLYING ANIMATION */
 
     const directions = [
       { x: -580, y: -280 },
@@ -432,6 +687,12 @@ export default function DiagonalGallery({
 
     const direction =
       directions[index % directions.length];
+
+    const focusScale =
+      isMobileCentered &&
+      !galleryLocked
+        ? 1.07
+        : 1;
 
     return {
       "--x": `${x}px`,
@@ -447,12 +708,28 @@ export default function DiagonalGallery({
         0.12 + index * 0.13
       }s`,
 
-      zIndex: isSelected
-        ? 500
-        : hoveredId === project.id &&
-            !galleryLocked
+      /*
+        Optional CSS scale variable.
+        Does not overwrite the existing
+        ProjectCard transforms.
+      */
+
+      "--mobile-focus-scale": focusScale,
+
+      zIndex: isMobile
+        ? isMobileCentered
           ? 1000
-          : Math.round(100 - depth * 10),
+          : Math.round(
+              100 - depth * 10
+            )
+        : isOpeningSelected
+          ? 500
+          : hoveredId === project.id &&
+              !galleryLocked
+            ? 1000
+            : Math.round(
+                100 - depth * 10
+              ),
 
       pointerEvents: galleryLocked
         ? "none"
@@ -486,6 +763,10 @@ export default function DiagonalGallery({
         !galleryLocked
           ? styles.hasHover
           : "",
+
+        isMobile
+          ? styles.mobileGallery
+          : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -493,20 +774,31 @@ export default function DiagonalGallery({
       onPointerMove={handlePointerMove}
     >
       <div className={styles.scene}>
-        {projects.map((project, index) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            positionStyle={getCardStyle(index)}
-            active={
-              !galleryLocked &&
-              hoveredId === project.id
-            }
-            onEnter={handleCardEnter}
-            onLeave={handleCardLeave}
-            onOpen={handleOpen}
-          />
-        ))}
+        {projects.map((project, index) => {
+          const mobileActive =
+            isMobile &&
+            project.id ===
+              mobileSelectedProject?.id;
+
+          return (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              positionStyle={
+                getCardStyle(index)
+              }
+              active={
+                !galleryLocked &&
+                (isMobile
+                  ? mobileActive
+                  : hoveredId === project.id)
+              }
+              onEnter={handleCardEnter}
+              onLeave={handleCardLeave}
+              onOpen={handleOpen}
+            />
+          );
+        })}
       </div>
     </main>
   );
