@@ -142,6 +142,25 @@ export default function HetMandje({ chaptersRef, revealedWords }) {
 						<ScrollHighlight id="research-title" as="h2" className={styles.heroTitle} revealedWords={revealedWords} text={"Every animal deserves\na safe place."} styles={styles} />
 
 						<ScrollHighlight id="research-question" className={styles.heroQuestion} revealedWords={revealedWords} text="But what happens when animal shelters run out of space?" styles={styles} />
+
+						{/* PROJECT TAGS */}
+
+						<div className={styles.projectTags} aria-label="Project categories">
+							{["FINAL PROJECT", "FULL-STACK", "REACT", "UX/UI DESIGN"].map((tag) => (
+								<span key={tag} className={styles.projectTag}>
+									{tag}
+								</span>
+							))}
+						</div>
+
+						{/* PROJECT DIVIDER */}
+
+						<div className={styles.projectDivider}>
+
+							<span className={styles.dividerLine} aria-hidden="true" />
+
+							<span className={styles.dividerYear}>2026</span>
+						</div>
 					</header>
 
 					<section ref={statsRef} className={styles.researchBlock}>

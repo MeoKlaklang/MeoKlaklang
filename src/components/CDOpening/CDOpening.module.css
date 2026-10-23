@@ -1,14 +1,12 @@
 
-/* =====================================
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,600&display=swap");
+
+/* ============================================
    CD OPENING EXPERIENCE
-===================================== */
+============================================ */
 
 .experience {
-  --disc-size: clamp(
-    240px,
-    min(34vw, 56vh),
-    460px
-  );
+  --disc-size: clamp(240px, min(34vw, 56vh), 460px);
 
   position: absolute;
   inset: 0;
@@ -25,9 +23,9 @@
   pointer-events: none;
 }
 
-/* =====================================
+/* ============================================
    OPEN JEWEL CASE
-===================================== */
+============================================ */
 
 .caseSpread {
   position: relative;
@@ -37,25 +35,26 @@
 
   flex-shrink: 0;
 
-  transform:
-    translateX(var(--horizontal-shift));
-
+  transform: translateX(var(--horizontal-shift));
   transform-style: preserve-3d;
+
+  transition: transform 280ms
+    cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* =====================================
+/* ============================================
    RIGHT TRAY
-===================================== */
+============================================ */
 
 .tray {
   position: absolute;
+
   top: 0;
   right: 0;
 
   width: var(--disc-size);
   height: var(--disc-size);
 
-  /* Allow CD to fly outside the tray */
   overflow: visible;
 
   border: 3px solid rgba(255, 255, 255, 0.9);
@@ -64,9 +63,9 @@
   background: #e7eee7;
 
   box-shadow:
-    3px 5px 0 rgba(157,171,160,0.28),
-    15px 22px 45px rgba(0,0,0,0.13),
-    inset 0 0 0 5px rgba(255,255,255,0.2);
+    3px 5px 0 rgba(157, 171, 160, 0.28),
+    15px 22px 45px rgba(0, 0, 0, 0.13),
+    inset 0 0 0 5px rgba(255, 255, 255, 0.2);
 }
 
 .trayBackground {
@@ -76,7 +75,7 @@
   background:
     radial-gradient(
       circle at 50% 50%,
-      rgba(255,255,255,0.24),
+      rgba(255, 255, 255, 0.24),
       transparent 65%
     ),
     linear-gradient(
@@ -88,9 +87,9 @@
   opacity: 0.58;
 }
 
-/* =====================================
+/* ============================================
    CD FLIGHT
-===================================== */
+============================================ */
 
 .discFlight {
   position: absolute;
@@ -98,17 +97,22 @@
   z-index: 5;
 
   transform: translateX(var(--flight-x));
-  will-change: transform;
 
+  transition: transform 440ms
+    cubic-bezier(0.22, 1, 0.36, 1);
+
+  will-change: transform;
   pointer-events: none;
 }
 
-/* =====================================
+/* ============================================
    ROUND DISC
-===================================== */
+   NO PROJECT-COLOUR TINT
+============================================ */
 
 .disc {
   position: absolute;
+
   top: 50%;
   left: 50%;
 
@@ -118,11 +122,11 @@
   border-radius: 50%;
   overflow: hidden;
 
-  background: var(--project-color);
+  background: #151917;
 
   box-shadow:
-    0 0 0 2px rgba(255,255,255,0.85),
-    0 3px 10px rgba(0,0,0,0.18);
+    0 0 0 2px rgba(255, 255, 255, 0.85),
+    0 3px 10px rgba(0, 0, 0, 0.18);
 
   animation: discSpin 9s linear infinite;
 }
@@ -146,25 +150,16 @@
   inset: 0;
 
   display: block;
+
   width: 100%;
   height: 100%;
 
   object-fit: cover;
   border-radius: 50%;
 
+  opacity: 1;
+  filter: none;
   pointer-events: none;
-}
-
-.discTint {
-  position: absolute;
-  inset: 0;
-
-  border-radius: 50%;
-
-  background: var(--project-color);
-  mix-blend-mode: color;
-
-  opacity: 0.45;
 }
 
 .discRings {
@@ -176,17 +171,18 @@
   background: radial-gradient(
     circle,
     transparent 0 19%,
-    rgba(255,255,255,0.13) 20%,
+    rgba(255, 255, 255, 0.13) 20%,
     transparent 21% 39%,
-    rgba(255,255,255,0.16) 40%,
+    rgba(255, 255, 255, 0.16) 40%,
     transparent 41% 66%,
-    rgba(255,255,255,0.22) 67%,
+    rgba(255, 255, 255, 0.22) 67%,
     transparent 68%
   );
 }
 
 .discHole {
   position: absolute;
+
   top: 50%;
   left: 50%;
 
@@ -198,16 +194,16 @@
   border-radius: 50%;
 
   background: #f5f5f1;
-  border: 4px solid rgba(255,255,255,0.9);
+  border: 4px solid rgba(255, 255, 255, 0.9);
 
   box-shadow:
-    0 0 0 3px rgba(40,70,50,0.18),
-    inset 0 1px 5px rgba(0,0,0,0.16);
+    0 0 0 3px rgba(40, 70, 50, 0.18),
+    inset 0 1px 5px rgba(0, 0, 0, 0.16);
 }
 
-/* =====================================
-   PLASTIC TRAY EDGES
-===================================== */
+/* ============================================
+   PLASTIC TRAY DETAILS
+============================================ */
 
 .trayEdge {
   position: absolute;
@@ -216,8 +212,8 @@
   pointer-events: none;
 
   box-shadow:
-    inset 0 0 0 8px rgba(255,255,255,0.2),
-    inset 0 0 15px rgba(255,255,255,0.26);
+    inset 0 0 0 8px rgba(255, 255, 255, 0.2),
+    inset 0 0 15px rgba(255, 255, 255, 0.26);
 }
 
 .trayReflection {
@@ -228,19 +224,20 @@
 
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,0.44),
+    rgba(255, 255, 255, 0.44),
     transparent 32%,
     transparent 70%,
-    rgba(255,255,255,0.22)
+    rgba(255, 255, 255, 0.22)
   );
 }
 
-/* =====================================
-   OPENING FRONT COVER
-===================================== */
+/* ============================================
+   HINGED FRONT COVER
+============================================ */
 
 .coverPanel {
   position: absolute;
+
   top: 0;
   right: 0;
 
@@ -248,9 +245,13 @@
   height: var(--disc-size);
 
   transform-origin: left center;
-
   transform: rotateY(var(--cover-angle));
   transform-style: preserve-3d;
+
+  transition: transform 300ms
+    cubic-bezier(0.22, 1, 0.36, 1);
+
+  will-change: transform;
 }
 
 .frontSurface,
@@ -260,26 +261,27 @@
 
   overflow: hidden;
 
-  border: 3px solid rgba(255,255,255,0.86);
+  border: 3px solid rgba(255, 255, 255, 0.86);
   border-radius: 3px;
 
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 
   box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,0.3);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
-/* =====================================
-   OUTSIDE COVER
-===================================== */
+/* ============================================
+   OUTSIDE OF COVER
+   PROJECT COLOUR IS KEPT
+============================================ */
 
 .frontSurface {
   background: var(--project-color);
 
   box-shadow:
-    4px 8px 24px rgba(0,0,0,0.11),
-    inset 0 0 0 2px rgba(255,255,255,0.3);
+    4px 8px 24px rgba(0, 0, 0, 0.11),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 .frontImage {
@@ -290,6 +292,7 @@
   height: 100%;
 
   object-fit: cover;
+
   opacity: 0.88;
 
   filter:
@@ -302,8 +305,8 @@
   inset: 0;
 
   background: var(--project-color);
-  mix-blend-mode: multiply;
 
+  mix-blend-mode: multiply;
   opacity: 0.68;
 }
 
@@ -313,18 +316,19 @@
 
   background: linear-gradient(
     125deg,
-    rgba(255,255,255,0.44),
+    rgba(255, 255, 255, 0.44),
     transparent 28%,
     transparent 66%,
-    rgba(255,255,255,0.2)
+    rgba(255, 255, 255, 0.2)
   );
 
   box-shadow:
-    inset 0 0 0 2px rgba(255,255,255,0.25);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.25);
 }
 
 .frontSpine {
   position: absolute;
+
   top: 0;
   bottom: 0;
   left: 0;
@@ -333,12 +337,13 @@
 
   background: linear-gradient(
     to right,
-    rgba(255,255,255,0.88),
-    rgba(125,145,130,0.28),
-    rgba(255,255,255,0.45)
+    rgba(255, 255, 255, 0.88),
+    rgba(125, 145, 130, 0.28),
+    rgba(255, 255, 255, 0.45)
   );
 
-  border-right: 1px solid rgba(255,255,255,0.5);
+  border-right:
+    1px solid rgba(255, 255, 255, 0.5);
 }
 
 .frontText {
@@ -351,11 +356,11 @@
 
   padding: 25px;
 
-  color: #ffffff;
+  color: white;
 
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.55),
+    rgba(0, 0, 0, 0.55),
     transparent 65%
   );
 }
@@ -373,9 +378,9 @@
   letter-spacing: -0.05em;
 }
 
-/* =====================================
+/* ============================================
    INSIDE COVER
-===================================== */
+============================================ */
 
 .insideSurface {
   transform: rotateY(180deg);
@@ -383,12 +388,12 @@
   background: color-mix(
     in srgb,
     var(--project-color) 38%,
-    #ffffff
+    #fff
   );
 
   box-shadow:
-    -8px 14px 30px rgba(0,0,0,0.09),
-    inset 0 0 0 8px rgba(255,255,255,0.22);
+    -8px 14px 30px rgba(0, 0, 0, 0.09),
+    inset 0 0 0 8px rgba(255, 255, 255, 0.22);
 }
 
 .insideContent {
@@ -401,6 +406,7 @@
   padding: clamp(14px, 2.3vw, 32px);
 
   opacity: var(--details-opacity);
+
   color: #264435;
 }
 
@@ -410,29 +416,89 @@
   opacity: 0.65;
 }
 
+/* ============================================
+   NEW EDITORIAL HEADLINE
+============================================ */
+
 .introHeadline {
   margin: auto 0 16px;
-
   max-width: 100%;
+
+  font-family: "Fraunces", Georgia, serif;
 
   font-size: clamp(20px, 2.6vw, 40px);
   font-weight: 600;
+  font-style: italic;
+  font-optical-sizing: auto;
+
   line-height: 1.13;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.045em;
 
   color: #264435;
+  overflow-wrap: break-word;
 }
 
-.introDescription {
-  margin: 0;
+/* ============================================
+   TYPEWRITER CURSOR
+============================================ */
 
+.typingCursor {
+  display: inline-block;
+  margin-left: 2px;
+
+  font-family: Arial, sans-serif;
+  font-size: 0.9em;
+  font-weight: 300;
+  font-style: normal;
+
+  color: #bf745c;
+
+  animation: cdCursorBlink 700ms
+    steps(1, end) infinite;
+}
+
+@keyframes cdCursorBlink {
+  0%, 49% {
+    opacity: 1;
+  }
+
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   DESCRIPTION AFTER TYPING
+============================================ */
+
+.introDescription {
   max-width: 380px;
+  margin: 0;
 
   font-size: clamp(10px, 1.05vw, 15px);
   line-height: 1.5;
 
-  color: rgba(38,68,53,0.78);
+  color: rgba(38, 68, 53, 0.78);
+
+  transition:
+    opacity 650ms ease,
+    transform 650ms
+    cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+.descriptionHidden {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.descriptionVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   SCROLL HINT
+============================================ */
 
 .insideHint {
   display: block;
@@ -445,6 +511,15 @@
   letter-spacing: 0.12em;
 
   color: #456c52;
+
+  transition:
+    opacity 650ms ease 200ms,
+    transform 650ms ease 200ms;
+}
+
+.hintVisible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .insideReflection {
@@ -455,19 +530,20 @@
 
   background: linear-gradient(
     120deg,
-    rgba(255,255,255,0.3),
+    rgba(255, 255, 255, 0.3),
     transparent 37%,
     transparent 80%,
-    rgba(255,255,255,0.15)
+    rgba(255, 255, 255, 0.15)
   );
 }
 
-/* =====================================
+/* ============================================
    PLASTIC HINGE
-===================================== */
+============================================ */
 
 .hinge {
   position: absolute;
+
   top: 0;
   left: 50%;
 
@@ -478,21 +554,25 @@
 
   background: linear-gradient(
     to right,
-    rgba(255,255,255,0.75),
-    rgba(120,140,130,0.2),
-    rgba(255,255,255,0.85)
+    rgba(255, 255, 255, 0.75),
+    rgba(120, 140, 130, 0.2),
+    rgba(255, 255, 255, 0.85)
   );
 
-  border-left: 1px solid rgba(255,255,255,0.6);
-  border-right: 1px solid rgba(120,140,130,0.18);
+  border-left:
+    1px solid rgba(255, 255, 255, 0.6);
 
-  box-shadow: 1px 0 4px rgba(0,0,0,0.08);
+  border-right:
+    1px solid rgba(120, 140, 130, 0.18);
+
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.08);
+
   pointer-events: none;
 }
 
-/* =====================================
-   CAPTION
-===================================== */
+/* ============================================
+   CAPTION BELOW CASE
+============================================ */
 
 .projectCaption {
   position: absolute;
@@ -525,9 +605,9 @@
   color: #303a30;
 }
 
-/* =====================================
+/* ============================================
    TABLET
-===================================== */
+============================================ */
 
 @media (max-width: 768px) {
   .experience {
@@ -557,9 +637,9 @@
   }
 }
 
-/* =====================================
+/* ============================================
    MOBILE
-===================================== */
+============================================ */
 
 @media (max-width: 480px) {
   .experience {
@@ -592,13 +672,25 @@
   }
 }
 
-/* =====================================
+/* ============================================
    REDUCED MOTION
-===================================== */
+============================================ */
 
 @media (prefers-reduced-motion: reduce) {
   .disc {
     animation: none;
     transform: translate(-50%, -50%);
+  }
+
+  .caseSpread,
+  .coverPanel,
+  .discFlight,
+  .introDescription,
+  .insideHint {
+    transition: none;
+  }
+
+  .typingCursor {
+    animation: none;
   }
 }
