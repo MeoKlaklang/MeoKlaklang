@@ -139,9 +139,9 @@ export default function HetMandje({ chaptersRef, revealedWords }) {
 							<img src={`${BASE}/Sleutelbeeldcompress.png`} alt="Cat resting in a basket — Het Mandje" />
 						</div>
 
-						<ScrollHighlight id="research-title" as="h2" className={styles.heroTitle} revealedWords={revealedWords} text={"Every animal deserves\na safe place."} styles={styles} />
+						<ScrollHighlight id="research-title" as="h2" className={styles.heroTitle} revealedWords={revealedWords} text={"Because every animal deserves a safe place,"} styles={styles} />
 
-						<ScrollHighlight id="research-question" className={styles.heroQuestion} revealedWords={revealedWords} text="But what happens when animal shelters run out of space?" styles={styles} />
+						<ScrollHighlight id="research-question" className={styles.heroQuestion} revealedWords={revealedWords} text="even on their journey to a new home." styles={styles} />
 
 						{/* PROJECT TAGS */}
 
@@ -247,7 +247,7 @@ export default function HetMandje({ chaptersRef, revealedWords }) {
 							id="reality-description"
 							className={styles.supportText}
 							revealedWords={revealedWords}
-							text="Overcrowding was not just something I encountered through desk research. During my internship at Dierenbescherming Mechelen, I experienced the challenges of animal care and limited capacity first-hand."
+							text="While many platforms focus on helping people adopt animals, fostering is often overlooked. Many people are unaware that they can offer dogs and cats a temporary home and make a meaningful difference in their lives. With Het Mandje, I wanted to bring more attention to foster care, lower the barriers to getting involved, and make it easier for people to take that first step."
 							styles={styles}
 						/>
 					</section>
