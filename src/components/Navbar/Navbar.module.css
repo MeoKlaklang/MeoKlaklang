@@ -6,17 +6,25 @@
 .navbar {
   --nav-bg: #e9e9e8;
   --nav-text: #222326;
+
   --nav-hover-bg: #ded7ec;
+
   --nav-active-bg: #d8c9eb;
   --nav-active-text: #30243f;
+
   --nav-border: rgba(0, 0, 0, 0.06);
   --nav-accent: #8362ae;
+
+  --mobile-active-color: #ead7ff;
+  --mobile-active-bg: rgba(195, 162, 235, 0.15);
+  --mobile-arrow-color: #c3a2eb;
 
   position: relative;
   z-index: 100;
 
   display: flex;
   align-items: center;
+
   gap: 5px;
 
   width: fit-content;
@@ -24,7 +32,7 @@
 
   margin: 10px 14px;
 
-  font-family: "DM Sans", "Arial", sans-serif;
+  font-family: "DM Sans", Arial, sans-serif;
 }
 
 .navbar *,
@@ -34,27 +42,83 @@
 }
 
 /* =====================================
-   LIGHT / DARK THEMES
+   LIGHT THEME — HOME
 ===================================== */
 
 .light {
   --nav-bg: #ecebea;
   --nav-text: #252428;
+
   --nav-hover-bg: #ddd3ec;
+
   --nav-active-bg: #d8c9eb;
   --nav-active-text: #30243f;
+
   --nav-border: rgba(0, 0, 0, 0.06);
   --nav-accent: #76549c;
 }
 
+/* =====================================
+   DARK THEME — ABOUT
+===================================== */
+
 .dark {
   --nav-bg: #26232d;
   --nav-text: #f0ebf4;
+
   --nav-hover-bg: #393145;
+
   --nav-active-bg: #49395c;
   --nav-active-text: #f9f3ff;
+
   --nav-border: rgba(223, 205, 245, 0.14);
   --nav-accent: #c3a2eb;
+
+  --mobile-active-color: #ead7ff;
+  --mobile-active-bg: rgba(195, 162, 235, 0.15);
+  --mobile-arrow-color: #c3a2eb;
+}
+
+/* =====================================
+   PROJECTS THEME — DARK GREEN
+===================================== */
+
+.navbar.projectsTheme {
+  --nav-bg: #252c28;
+  --nav-text: #e7f0e9;
+
+  --nav-hover-bg: #35443a;
+
+  --nav-active-bg: #344e3e;
+  --nav-active-text: #e1fae9;
+
+  --nav-border: rgba(181, 222, 194, 0.15);
+  --nav-accent: #a8d6b7;
+
+  --mobile-active-color: #c4efd0;
+  --mobile-active-bg: rgba(150, 215, 169, 0.15);
+  --mobile-arrow-color: #a8d6b7;
+}
+
+/* =====================================
+   CONTACT THEME — DARK BLUE
+===================================== */
+
+.navbar.contactTheme {
+  --nav-bg: #252b34;
+  --nav-text: #eff7fb;
+
+  --nav-hover-bg: #324450;
+
+  --nav-active-bg: #294653;
+  --nav-active-text: #ebfaff;
+
+  --nav-border: rgba(112, 201, 232, 0.16);
+  --nav-accent: #70c9e8;
+
+  --mobile-active-color: #bceafa;
+  --mobile-active-bg: rgba(112, 201, 232, 0.12);
+  --mobile-arrow-color: #70c9e8;
 }
 
 /* =====================================
@@ -96,7 +160,7 @@
 }
 
 /* =====================================
-   DESKTOP LINKS
+   DESKTOP NAVIGATION
 ===================================== */
 
 .desktopNav {
@@ -139,15 +203,25 @@
     transform 250ms ease;
 }
 
+/* =====================================
+   DESKTOP HOVER
+===================================== */
+
 .navbar .navLink:hover {
   background: var(--nav-hover-bg);
   color: var(--nav-text);
+
   transform: translateY(-2px);
 }
+
+/* =====================================
+   ACTIVE DESKTOP LINK
+===================================== */
 
 .navbar .navLink.active {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
+
   border-color: var(--nav-accent);
 }
 
@@ -155,24 +229,25 @@
   content: "";
 
   position: absolute;
+
   left: 22%;
   right: 22%;
   bottom: 6px;
 
   height: 2px;
-
   border-radius: 5px;
+
   background: var(--nav-accent);
 }
-
-/* Active hover stays readable */
 
 .navbar .navLink.active:hover {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
 }
 
-/* Focus accessibility */
+/* =====================================
+   FOCUS ACCESSIBILITY
+===================================== */
 
 .navbar a:focus-visible,
 .navbar button:focus-visible {
@@ -181,25 +256,7 @@
 }
 
 /* =====================================
-   CONTACT ACCENT ON DARK PAGE
-===================================== */
-
-/*
-  About uses purple,
-  Contact uses soft blue.
-
-  :has() is supported in modern Chrome,
-  Safari and Firefox.
-*/
-
-.dark:has(.navLink[aria-current="page"]:last-child) {
-  --nav-accent: #70c9e8;
-  --nav-active-bg: #294653;
-  --nav-active-text: #ebfaff;
-}
-
-/* =====================================
-   MOBILE MENU TOGGLE
+   MOBILE MENU BUTTON
 ===================================== */
 
 .menuToggle {
@@ -212,8 +269,8 @@
 
   flex-shrink: 0;
 
-  border-radius: 7px;
   border: 1px solid var(--nav-border);
+  border-radius: 7px;
 
   background: var(--nav-bg);
 
@@ -222,6 +279,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
   gap: 6px;
 }
 
@@ -241,11 +299,15 @@
 }
 
 .menuToggleOpen span:first-child {
-  transform: translateY(4px) rotate(45deg);
+  transform:
+    translateY(4px)
+    rotate(45deg);
 }
 
 .menuToggleOpen span:last-child {
-  transform: translateY(-4px) rotate(-45deg);
+  transform:
+    translateY(-4px)
+    rotate(-45deg);
 }
 
 /* =====================================
@@ -264,13 +326,16 @@
 
   padding: 12px;
 
-  border: 1px solid rgba(205, 187, 225, 0.2);
+  border: 1px solid
+    rgba(205, 187, 225, 0.2);
+
   border-radius: 12px;
 
   background: #202027;
 
   box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.35);
+    0 20px 50px
+    rgba(0, 0, 0, 0.35);
 
   flex-direction: column;
 
@@ -288,12 +353,42 @@
 .mobileNavOpen {
   opacity: 1;
   visibility: visible;
+
   transform: translateY(0);
 }
 
+/* =====================================
+   PROJECTS MOBILE MENU
+===================================== */
+
+.navbar.projectsTheme .mobileNav {
+  background: #1d2821;
+
+  border-color:
+    rgba(168, 214, 183, 0.2);
+}
+
+/* =====================================
+   CONTACT MOBILE MENU
+===================================== */
+
+.navbar.contactTheme .mobileNav {
+  background: #1d2730;
+
+  border-color:
+    rgba(112, 201, 232, 0.2);
+}
+
+/* =====================================
+   MOBILE NAVIGATION LINKS
+===================================== */
+
 .navbar .mobileLink {
   display: grid;
-  grid-template-columns: 28px 1fr 25px;
+
+  grid-template-columns:
+    28px 1fr 25px;
+
   align-items: center;
   gap: 12px;
 
@@ -302,7 +397,9 @@
 
   padding: 10px 14px;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.07);
+
   border-radius: 5px;
 
   color: #f0edf4;
@@ -319,42 +416,66 @@
     color 250ms ease;
 }
 
+/* =====================================
+   MOBILE LINK HOVER
+===================================== */
+
 .navbar .mobileLink:hover {
-  color: #e2cef5;
-  background: rgba(195, 162, 235, 0.09);
+  color: var(--mobile-active-color);
+
+  background:
+    var(--mobile-active-bg);
 }
 
+/* =====================================
+   MOBILE ACTIVE LINK
+===================================== */
+
 .navbar .mobileLink.mobileActive {
-  color: #ead7ff;
-  background: rgba(195, 162, 235, 0.15);
+  color: var(--mobile-active-color);
+
+  background:
+    var(--mobile-active-bg);
 }
+
+/* =====================================
+   MOBILE LINK DETAILS
+===================================== */
 
 .mobileNumber {
   font-family: "DM Sans", sans-serif;
+
   font-size: 10px;
-  color: #a59bab;
   letter-spacing: 0.1em;
+
+  color: #a59bab;
 }
 
 .mobileArrow {
   justify-self: end;
+
   font-size: 20px;
-  color: #c3a2eb;
+
+  color: var(--mobile-arrow-color);
 }
 
-/* Contact blue active */
-
-.navbar .mobileLink:last-of-type.mobileActive {
-  color: #bceafa;
-  background: rgba(112, 201, 232, 0.12);
+.navbar.projectsTheme .mobileNumber {
+  color: #95ab9c;
 }
 
-/* Footer */
+.navbar.contactTheme .mobileNumber {
+  color: #93aebb;
+}
+
+/* =====================================
+   MOBILE FOOTER
+===================================== */
 
 .mobileFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 15px;
 
   padding: 22px 14px 9px;
@@ -365,8 +486,16 @@
   letter-spacing: 0.12em;
 }
 
+.navbar.projectsTheme .mobileFooter {
+  color: #8ba494;
+}
+
+.navbar.contactTheme .mobileFooter {
+  color: #8ba9b8;
+}
+
 /* =====================================
-   RESPONSIVE — TABLET
+   TABLET
 ===================================== */
 
 @media (max-width: 850px) {
@@ -396,7 +525,7 @@
 }
 
 /* =====================================
-   RESPONSIVE — MOBILE
+   MOBILE
 ===================================== */
 
 @media (max-width: 480px) {
@@ -409,6 +538,7 @@
 
   .navbar .logo {
     min-height: 44px;
+
     padding: 0 16px;
 
     font-size: 11px;
@@ -434,5 +564,32 @@
   .menuToggle span,
   .mobileNav {
     transition: none;
+  }
+}
+
+/* =====================================
+   NAVBAR — CONSISTENT SPACING
+===================================== */
+
+.navbar {
+  margin: 10px 14px;
+  overflow: visible;
+}
+
+.desktopNav {
+  overflow: visible;
+}
+
+.navbar .navLink {
+  transform: translateY(0);
+}
+
+.navbar .navLink:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    margin: 8px 10px;
   }
 }

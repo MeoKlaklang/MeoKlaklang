@@ -1,17 +1,49 @@
+
 import styles from "./AmbientBackground.module.css";
 
-/**
- * Decorative, non-interactive backdrop. The two fully separate color layers
- * crossfade during the existing Record Transition, without changing its logic.
- */
-export default function AmbientBackground({ currentColor, nextColor, progress = 0 }) {
-  const amount = Math.max(0, Math.min(1, progress));
+export default function AmbientBackground({
+  currentColor,
+  nextColor,
+  progress = 0,
+  cursorOnly = false,
+}) {
+  const amount = Math.max(
+    0,
+    Math.min(1, progress)
+  );
 
+  // Reuse the EXACT cursor highlight
+  // without the full project background.
+  if (cursorOnly) {
+    return (
+      <div
+        className={`${styles.ambient} ${styles.cursorOnly}`}
+        aria-hidden="true"
+      >
+        <div
+          className={styles.scene}
+          style={{
+            "--ambient-color": currentColor,
+          }}
+        >
+          <div className={styles.cursorAura} />
+        </div>
+      </div>
+    );
+  }
+
+  // Original project background — unchanged.
   return (
-    <div className={styles.ambient} aria-hidden="true">
+    <div
+      className={styles.ambient}
+      aria-hidden="true"
+    >
       <div
         className={`${styles.scene} ${styles.current}`}
-        style={{ "--ambient-color": currentColor, opacity: 1 - amount }}
+        style={{
+          "--ambient-color": currentColor,
+          opacity: 1 - amount,
+        }}
       >
         <div className={styles.colorWash} />
         <div className={styles.floatingMist} />
@@ -21,7 +53,10 @@ export default function AmbientBackground({ currentColor, nextColor, progress = 
 
       <div
         className={`${styles.scene} ${styles.next}`}
-        style={{ "--ambient-color": nextColor, opacity: amount }}
+        style={{
+          "--ambient-color": nextColor,
+          opacity: amount,
+        }}
       >
         <div className={styles.colorWash} />
         <div className={styles.floatingMist} />

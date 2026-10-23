@@ -14,11 +14,17 @@ const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
 
 function getPoint(angle) {
-  const radians = (angle * Math.PI) / 180;
+  const radians =
+    (angle * Math.PI) / 180;
 
   return {
-    x: CENTER + Math.cos(radians) * RADIUS,
-    y: CENTER + Math.sin(radians) * RADIUS,
+    x:
+      CENTER +
+      Math.cos(radians) * RADIUS,
+
+    y:
+      CENTER +
+      Math.sin(radians) * RADIUS,
   };
 }
 
@@ -31,7 +37,10 @@ function markerPosition(angle) {
   };
 }
 
-function createArcPath(startAngle, endAngle) {
+function createArcPath(
+  startAngle,
+  endAngle
+) {
   const start = getPoint(startAngle);
   const end = getPoint(endAngle);
 
@@ -45,7 +54,9 @@ function createArcPath(startAngle, endAngle) {
 
 const PROGRESS_PATH = createArcPath(
   MARKER_ANGLES[0],
-  MARKER_ANGLES[MARKER_ANGLES.length - 1]
+  MARKER_ANGLES[
+    MARKER_ANGLES.length - 1
+  ]
 );
 
 /* =====================================
@@ -55,22 +66,39 @@ const PROGRESS_PATH = createArcPath(
 export default function AboutVinyl({
   chapters = [],
   activeChapter = 0,
+  progress,
   onChapterChange,
 }) {
   const count = chapters.length;
 
-  const progress =
+  const chapterProgress =
     count > 1
-      ? clamp(activeChapter / (count - 1))
+      ? clamp(
+          activeChapter / (count - 1)
+        )
       : 0;
 
-  const rotation = activeChapter * 48;
+  /*
+    Use continuous scroll progress when
+    provided by About.jsx.
+
+    Keep old behaviour as fallback.
+  */
+
+  const currentProgress =
+    typeof progress === "number"
+      ? clamp(progress)
+      : chapterProgress;
+
+  const rotation =
+    currentProgress * 96;
 
   function goToChapter(index) {
-    const safeIndex = clamp(
-      index,
+    if (count === 0) return;
+
+    const safeIndex = Math.max(
       0,
-      count - 1
+      Math.min(index, count - 1)
     );
 
     onChapterChange?.(safeIndex);
@@ -78,32 +106,40 @@ export default function AboutVinyl({
 
   return (
     <div className={styles.vinylDock}>
-      {/* RECORD */}
+      {/* =====================================
+          RECORD
+      ===================================== */}
 
       <div
         className={styles.record}
         aria-hidden="true"
       >
-        {/* Slowly rotating grooves */}
-
         <div
           className={styles.recordSurface}
           style={{
-            "--chapter-rotation": `${rotation}deg`,
+            "--chapter-rotation":
+              `${rotation}deg`,
           }}
         >
-          <div className={styles.recordGrooves} />
-          <div className={styles.recordReflection} />
+          <div
+            className={styles.recordGrooves}
+          />
+
+          <div
+            className={styles.recordReflection}
+          />
         </div>
 
-        {/* Center label */}
+        {/* CENTER LABEL */}
 
         <div className={styles.recordLabel}>
           <span className={styles.labelTop}>
             MEØ
           </span>
 
-          <span className={styles.recordHole} />
+          <span
+            className={styles.recordHole}
+          />
 
           <span className={styles.labelBottom}>
             SIDE B
@@ -111,7 +147,9 @@ export default function AboutVinyl({
         </div>
       </div>
 
-      {/* PROGRESS + CHAPTER MARKERS */}
+      {/* =====================================
+          NAVIGATION + PROGRESS
+      ===================================== */}
 
       <nav
         className={styles.navigation}
@@ -134,11 +172,13 @@ export default function AboutVinyl({
             pathLength="100"
             style={{
               strokeDasharray: `${
-                progress * 100
+                currentProgress * 100
               } 100`,
             }}
           />
         </svg>
+
+        {/* CHAPTER MARKERS */}
 
         {chapters.map((chapter, index) => {
           const isActive =
@@ -159,26 +199,38 @@ export default function AboutVinyl({
                 isCompleted
                   ? styles.markerCompleted
                   : "",
-              ].join(" ")}
+              ]
+                .filter(Boolean)
+                .join(" ")}
               style={{
                 ...markerPosition(
-                  MARKER_ANGLES[index] ?? -90
+                  MARKER_ANGLES[index] ??
+                    -90
                 ),
-                "--marker-color": chapter.color,
+                "--marker-color":
+                  chapter.color,
               }}
               onClick={() =>
                 goToChapter(index)
               }
               aria-current={
-                isActive ? "step" : undefined
+                isActive
+                  ? "step"
+                  : undefined
               }
-              aria-label={`Show ${chapter.title}`}
+              aria-label={
+                `Scroll to ${chapter.title}`
+              }
             >
-              <span className={styles.markerName}>
+              <span
+                className={styles.markerName}
+              >
                 {chapter.title}
               </span>
 
-              <span className={styles.markerDot}>
+              <span
+                className={styles.markerDot}
+              >
                 <span />
               </span>
             </button>

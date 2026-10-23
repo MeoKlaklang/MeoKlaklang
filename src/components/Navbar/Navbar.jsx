@@ -1,6 +1,11 @@
 
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  useLocation,
+} from "react-router-dom";
+
 import styles from "./Navbar.module.css";
 
 export default function Navbar({
@@ -10,25 +15,58 @@ export default function Navbar({
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const isDark = variant === "dark";
-  const isAboutPage = location.pathname === "/about";
+  /* =====================================
+     PAGE DETECTION
+  ===================================== */
 
-  // Separate About and Contact active states
+  const isProjectsPage =
+    location.pathname === "/projects";
+
+  const isAboutPage =
+    location.pathname === "/about";
+
   const requestedChapter =
-    location.state?.chapter || activeAboutChapter;
+    location.state?.chapter ||
+    activeAboutChapter;
 
   const isAboutActive =
-    isAboutPage && requestedChapter !== "contact";
+    isAboutPage &&
+    requestedChapter !== "contact";
 
   const isContactActive =
-    isAboutPage && requestedChapter === "contact";
+    isAboutPage &&
+    requestedChapter === "contact";
 
-  // Close mobile menu after navigation
+  /* =====================================
+     NAVBAR THEME
+  ===================================== */
+
+  const isDark =
+    variant === "dark" ||
+    isProjectsPage ||
+    isAboutPage;
+
+  const navbarClassName = [
+    styles.navbar,
+    isDark ? styles.dark : styles.light,
+    isProjectsPage ? styles.projectsTheme : "",
+    isContactActive ? styles.contactTheme : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  /* =====================================
+     CLOSE MOBILE MENU ON NAVIGATION
+  ===================================== */
+
   useEffect(() => {
     setMenuOpen(false);
   }, [location.key]);
 
-  // Allow Escape to close the menu
+  /* =====================================
+     ESCAPE CLOSES MOBILE MENU
+  ===================================== */
+
   useEffect(() => {
     if (!menuOpen) return;
 
@@ -38,7 +76,10 @@ export default function Navbar({
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
       window.removeEventListener(
@@ -52,12 +93,14 @@ export default function Navbar({
     setMenuOpen(false);
   }
 
+  /* =====================================
+     RENDER
+  ===================================== */
+
   return (
-    <header
-      className={`${styles.navbar} ${
-        isDark ? styles.dark : styles.light
-      }`}
-    >
+    <header className={navbarClassName}>
+      {/* LOGO */}
+
       <Link
         to="/"
         className={styles.logo}
@@ -66,12 +109,16 @@ export default function Navbar({
         MEO® PROJECTS
       </Link>
 
-      {/* DESKTOP NAVIGATION */}
+      {/* =====================================
+          DESKTOP NAVIGATION
+      ===================================== */}
 
       <nav
         className={styles.desktopNav}
         aria-label="Main navigation"
       >
+        {/* HOME */}
+
         <NavLink
           to="/"
           end
@@ -84,6 +131,8 @@ export default function Navbar({
           HOME
         </NavLink>
 
+        {/* PROJECTS */}
+
         <NavLink
           to="/projects"
           className={({ isActive }) =>
@@ -94,6 +143,8 @@ export default function Navbar({
         >
           PROJECTS
         </NavLink>
+
+        {/* ABOUT */}
 
         <NavLink
           to="/about"
@@ -108,6 +159,8 @@ export default function Navbar({
           ABOUT
         </NavLink>
 
+        {/* CONTACT */}
+
         <NavLink
           to="/about"
           state={{ chapter: "contact" }}
@@ -118,101 +171,159 @@ export default function Navbar({
             isContactActive ? "page" : undefined
           }
         >
-          CONTACT <span aria-hidden="true">↗</span>
+          CONTACT
+          <span aria-hidden="true">↗</span>
         </NavLink>
       </nav>
 
-      {/* MOBILE MENU BUTTON */}
+      {/* =====================================
+          MOBILE MENU BUTTON
+      ===================================== */}
 
       <button
         type="button"
         className={`${styles.menuToggle} ${
-          menuOpen ? styles.menuToggleOpen : ""
+          menuOpen
+            ? styles.menuToggleOpen
+            : ""
         }`}
         aria-label={
-          menuOpen ? "Close navigation menu" : "Open navigation menu"
+          menuOpen
+            ? "Close navigation menu"
+            : "Open navigation menu"
         }
         aria-expanded={menuOpen}
         aria-controls="mobile-main-navigation"
-        onClick={() => setMenuOpen((previous) => !previous)}
+        onClick={() =>
+          setMenuOpen((previous) => !previous)
+        }
       >
         <span />
         <span />
       </button>
 
-      {/* MOBILE DROPDOWN */}
+      {/* =====================================
+          MOBILE DROPDOWN
+      ===================================== */}
 
       <nav
         id="mobile-main-navigation"
         className={`${styles.mobileNav} ${
-          menuOpen ? styles.mobileNavOpen : ""
+          menuOpen
+            ? styles.mobileNavOpen
+            : ""
         }`}
         aria-label="Mobile navigation"
         inert={!menuOpen}
       >
+        {/* HOME */}
+
         <NavLink
           to="/"
           end
           onClick={closeMenu}
           className={({ isActive }) =>
             `${styles.mobileLink} ${
-              isActive ? styles.mobileActive : ""
+              isActive
+                ? styles.mobileActive
+                : ""
             }`
           }
         >
-          <span className={styles.mobileNumber}>01</span>
+          <span className={styles.mobileNumber}>
+            01
+          </span>
+
           <span>Home</span>
-          <span className={styles.mobileArrow}>↗</span>
+
+          <span className={styles.mobileArrow}>
+            ↗
+          </span>
         </NavLink>
+
+        {/* PROJECTS */}
 
         <NavLink
           to="/projects"
           onClick={closeMenu}
           className={({ isActive }) =>
             `${styles.mobileLink} ${
-              isActive ? styles.mobileActive : ""
+              isActive
+                ? styles.mobileActive
+                : ""
             }`
           }
         >
-          <span className={styles.mobileNumber}>02</span>
+          <span className={styles.mobileNumber}>
+            02
+          </span>
+
           <span>Projects</span>
-          <span className={styles.mobileArrow}>↗</span>
+
+          <span className={styles.mobileArrow}>
+            ↗
+          </span>
         </NavLink>
+
+        {/* ABOUT */}
 
         <NavLink
           to="/about"
           state={{ chapter: "about" }}
           onClick={closeMenu}
           className={`${styles.mobileLink} ${
-            isAboutActive ? styles.mobileActive : ""
+            isAboutActive
+              ? styles.mobileActive
+              : ""
           }`}
           aria-current={
             isAboutActive ? "page" : undefined
           }
         >
-          <span className={styles.mobileNumber}>03</span>
+          <span className={styles.mobileNumber}>
+            03
+          </span>
+
           <span>About</span>
-          <span className={styles.mobileArrow}>↗</span>
+
+          <span className={styles.mobileArrow}>
+            ↗
+          </span>
         </NavLink>
+
+        {/* CONTACT */}
 
         <NavLink
           to="/about"
           state={{ chapter: "contact" }}
           onClick={closeMenu}
           className={`${styles.mobileLink} ${
-            isContactActive ? styles.mobileActive : ""
+            isContactActive
+              ? styles.mobileActive
+              : ""
           }`}
           aria-current={
             isContactActive ? "page" : undefined
           }
         >
-          <span className={styles.mobileNumber}>04</span>
+          <span className={styles.mobileNumber}>
+            04
+          </span>
+
           <span>Contact</span>
-          <span className={styles.mobileArrow}>↗</span>
+
+          <span className={styles.mobileArrow}>
+            ↗
+          </span>
         </NavLink>
 
+        {/* MOBILE FOOTER */}
+
         <div className={styles.mobileFooter}>
-          <span>MEØ® / CREATIVE PORTFOLIO</span>
+          <span>
+            MEØ® / CREATIVE PORTFOLIO
+          </span>
+
           <span>2026</span>
         </div>
       </nav>

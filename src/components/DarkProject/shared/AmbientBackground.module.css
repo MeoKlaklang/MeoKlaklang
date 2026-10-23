@@ -91,3 +91,10 @@
 @media (prefers-reduced-motion: reduce) {
   .floatingMist { animation: none; will-change: auto; }
 }
+
+/* Cursor-only mode for About / Projects */
+
+.cursorOnly {
+  opacity: 1;
+  background: transparent;
+}

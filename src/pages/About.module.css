@@ -25,11 +25,10 @@
   isolation: isolate;
 
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  min-height: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
 
-  overflow: hidden;
+  overflow: clip;
 
   color: var(--text);
   background: var(--background);
@@ -48,7 +47,7 @@
 ===================================== */
 
 .ambient {
-  position: absolute;
+  position: fixed;
   z-index: -1;
   inset: 0;
 
@@ -79,35 +78,67 @@
 }
 
 /* =====================================
-   NAVBAR
+   NAVBAR — NORMAL
+===================================== */
+
+
+/* =====================================
+   ABOUT — CONSISTENT NAVBAR
 ===================================== */
 
 .navbarWrap {
   position: relative;
   z-index: 50;
+
+  width: 100%;
+
+  /*
+    Prevent child margins from collapsing.
+    Keep the same 10px navbar spacing
+    in both normal and sticky mode.
+  */
+  display: flow-root;
+
+  overflow: visible;
+}
+
+/* Navbar remains visible only when
+   Contact was opened through top nav. */
+
+.navbarSticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  background: rgba(19, 20, 22, 0.96);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  /* No additional horizontal line */
+  border: none;
 }
 
 
-
-
 /* =====================================
-   MAIN CONTENT REGION
+   MAIN CONTENT
 ===================================== */
 
 .main {
   position: relative;
   z-index: 2;
 
-  display: flex;
-  flex-direction: column;
-
-  width: min(calc(100% - 100px), 1600px);
-
-  height: calc(100% - 100px);
-  min-height: 0;
+  width: min(
+    calc(100% - 100px),
+    1600px
+  );
 
   margin: 0 auto;
 }
+
+/* =====================================
+   TOP LINE
+===================================== */
 
 .topLine {
   display: flex;
@@ -115,11 +146,11 @@
   justify-content: space-between;
 
   gap: 20px;
-  flex-shrink: 0;
 
   padding: 25px 0;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.12);
 
   color: #a09aa2;
 
@@ -129,74 +160,40 @@
 }
 
 /* =====================================
-   CONTENT PANELS
+   SCROLLABLE CHAPTERS
 ===================================== */
 
-.panelViewport {
+.chapterSection {
   position: relative;
 
-  flex: 1;
-  min-height: 0;
-
-  /* Reserve space for the visible half vinyl */
-  padding-bottom: 210px;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  scrollbar-width: thin;
-  scrollbar-color: rgba(195, 162, 235, 0.3) transparent;
-
-  overscroll-behavior: contain;
-}
-
-.panelViewport::-webkit-scrollbar {
-  width: 4px;
-}
-
-.panelViewport::-webkit-scrollbar-thumb {
-  background: rgba(195, 162, 235, 0.3);
-  border-radius: 20px;
-}
-
-.panelAnimation {
   width: 100%;
-  min-height: 100%;
+  min-height: calc(100svh - 115px);
 
-  animation: panelEnter 550ms
-    cubic-bezier(0.22, 1, 0.36, 1) both;
+  padding: 45px 0 260px;
+
+  scroll-margin-top: 95px;
 }
 
-.panel {
-  width: 100%;
-  min-height: 100%;
-
-  display: grid;
-  align-items: center;
-
-  padding: 35px 0 25px;
-}
-
-@keyframes panelEnter {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-    filter: blur(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+.chapterSection + .chapterSection {
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.085);
 }
 
 /* =====================================
-   SHARED TYPE
+   SHARED PANEL
 ===================================== */
+
+.panel {
+  display: grid;
+  align-items: center;
+
+  width: 100%;
+  min-height: min(680px, 65svh);
+}
 
 .eyebrow {
   display: block;
+
   margin-bottom: 22px;
 
   color: var(--about-color);
@@ -222,21 +219,30 @@
 
 .aboutPanel {
   grid-template-columns:
-    minmax(0, 1.15fr)
-    minmax(0, 0.85fr);
+    minmax(0, 1.25fr)
+    minmax(0, 0.75fr);
 
-  gap: clamp(35px, 5vw, 100px);
+  align-items: center;
+
+  gap: clamp(24px, 3vw, 65px);
 }
 
 .aboutCopy {
-  max-width: 780px;
+  min-width: 0;
+  max-width: 900px;
 }
 
 .mainTitle {
-  margin: 0 0 25px;
+  margin: 0 0 32px;
 
-  font-size: clamp(55px, 6.1vw, 108px);
-  line-height: 0.96;
+  font-size: clamp(
+    38px,
+    4.2vw,
+    74px
+  );
+
+  line-height: 1.08;
+  white-space: nowrap;
 }
 
 .mainTitle span {
@@ -245,11 +251,17 @@
 
 .aboutCopy p {
   max-width: 690px;
+
   margin: 0 0 15px;
 
   color: #bdb7c0;
 
-  font-size: clamp(13px, 1vw, 16px);
+  font-size: clamp(
+    13px,
+    1vw,
+    16px
+  );
+
   line-height: 1.7;
 }
 
@@ -261,28 +273,40 @@
 .aboutCopy .introText {
   color: #eee9ef;
 
-  font-size: clamp(16px, 1.4vw, 21px);
+  font-size: clamp(
+    16px,
+    1.4vw,
+    21px
+  );
+
   line-height: 1.5;
 }
 
 .aboutCopy .personalNote {
   margin-top: 20px;
+
   color: #e9b2d3;
   font-style: italic;
 }
 
+/* =====================================
+   ABOUT TAGS
+===================================== */
+
 .aboutTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 9px;
 
+  gap: 9px;
   margin-top: 25px;
 }
 
 .aboutTags span {
   padding: 8px 13px;
 
-  border: 1px solid rgba(195, 162, 235, 0.3);
+  border: 1px solid
+    rgba(195, 162, 235, 0.3);
+
   border-radius: 999px;
 
   color: #e8ddf5;
@@ -293,7 +317,7 @@
 }
 
 /* =====================================
-   PHOTO
+   PHOTO FOLDER POSITION
 ===================================== */
 
 .aboutVisual {
@@ -303,108 +327,16 @@
   align-items: center;
   justify-content: center;
 
-  min-width: 0;
-  padding: 20px;
-}
-
-.photoFrame {
-  position: relative;
-  isolation: isolate;
-
-  width: min(100%, 350px);
-  aspect-ratio: 4 / 5;
-
-  padding: 9px 9px 42px;
-
-  background: #f5f2ef;
-
-  transform: rotate(5deg);
-
-  box-shadow:
-    0 22px 55px rgba(0, 0, 0, 0.3);
-
-  transition:
-    transform 600ms
-      cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 600ms ease;
-}
-
-.photoFrame:hover {
-  transform: rotate(0deg) translateY(-9px);
-
-  box-shadow:
-    0 35px 70px rgba(0, 0, 0, 0.4);
-}
-
-.portrait {
-  position: relative;
-  z-index: 2;
-
-  display: block;
-
   width: 100%;
-  height: 100%;
+  min-width: 0;
 
-  object-fit: cover;
-  object-position: center;
+  padding: 36px 0 24px;
 }
 
-.photoInitials {
-  position: absolute;
-  z-index: 1;
-
-  inset: 9px 9px 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #d7c9ea;
-  color: #3b2b52;
-
-  font-family: var(--display-font);
-  font-size: 65px;
-  font-weight: 700;
-}
-
-.photoLabel {
-  position: absolute;
-  z-index: 3;
-
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
-
-  display: flex;
-  justify-content: space-between;
-
-  color: #333;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-}
-
-.photoDecoration {
-  position: absolute;
-
-  right: 0;
-  bottom: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  color: #bfa8da;
-
-  font-size: 9px;
-  letter-spacing: 0.12em;
-
-  transform: rotate(-9deg);
-}
-
-.photoDecoration span:first-child {
-  margin-bottom: 3px;
-  font-size: 45px;
-}
+/*
+  AboutPhotoFolder keeps its own
+  image and folder animations.
+*/
 
 /* =====================================
    02 — SKILLS
@@ -412,7 +344,9 @@
 
 .skillsPanel {
   display: block;
-  padding-top: 38px;
+
+  min-height: 0;
+  padding-top: 35px;
 }
 
 .sectionHeader {
@@ -421,13 +355,18 @@
   align-items: flex-end;
 
   gap: 35px;
-  margin-bottom: 30px;
+  margin-bottom: 38px;
 }
 
 .sectionTitle {
   margin: 0;
 
-  font-size: clamp(45px, 5.5vw, 90px);
+  font-size: clamp(
+    45px,
+    5.5vw,
+    90px
+  );
+
   line-height: 1;
 }
 
@@ -442,19 +381,26 @@
 
   font-size: 9px;
   letter-spacing: 0.12em;
+
   text-align: right;
 }
 
+/* =====================================
+   SKILLS GRID
+===================================== */
+
 .skillsGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  gap: 24px clamp(35px, 4vw, 80px);
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 35px clamp(35px, 4vw, 80px);
 }
 
 .skillGroup {
   min-width: 0;
-  padding-top: 12px;
+  padding-top: 14px;
 
   border-top: 1px solid
     color-mix(
@@ -464,13 +410,19 @@
     );
 }
 
-.skillGroup h2 {
+.skillGroup h3 {
   margin: 0 0 15px;
 
   color: var(--skill-color);
 
   font-family: var(--display-font);
-  font-size: clamp(21px, 2vw, 29px);
+
+  font-size: clamp(
+    21px,
+    2vw,
+    29px
+  );
+
   font-weight: 500;
   letter-spacing: -0.045em;
 }
@@ -487,7 +439,12 @@
 
   color: #c3bec7;
 
-  font-size: clamp(12px, 0.95vw, 14px);
+  font-size: clamp(
+    12px,
+    0.95vw,
+    14px
+  );
+
   line-height: 1.55;
 }
 
@@ -504,17 +461,25 @@
     minmax(0, 1.2fr)
     minmax(0, 0.8fr);
 
+  align-items: center;
+
   gap: clamp(45px, 7vw, 130px);
 }
 
 .contactCopy {
+  min-width: 0;
   max-width: 860px;
 }
 
 .contactTitle {
   margin: 0 0 25px;
 
-  font-size: clamp(50px, 6vw, 105px);
+  font-size: clamp(
+    50px,
+    6vw,
+    105px
+  );
+
   line-height: 1;
 }
 
@@ -524,19 +489,29 @@
 
 .contactCopy p {
   max-width: 510px;
+
   margin: 0 0 30px;
 
   color: #bdb7c0;
 
-  font-size: clamp(14px, 1.1vw, 17px);
+  font-size: clamp(
+    14px,
+    1.1vw,
+    17px
+  );
+
   line-height: 1.8;
 }
+
+/* =====================================
+   CONTACT BUTTON
+===================================== */
 
 .primaryContact {
   display: inline-flex;
   align-items: center;
-  gap: 35px;
 
+  gap: 35px;
   padding: 13px 0;
 
   border-bottom: 1px solid var(--blue);
@@ -560,7 +535,7 @@
 }
 
 /* =====================================
-   CONTACT LINKS
+   CONTACT DETAILS
 ===================================== */
 
 .contactDetails {
@@ -569,6 +544,7 @@
 
 .contactLabel {
   display: block;
+
   margin-bottom: 25px;
 
   color: var(--blue);
@@ -579,22 +555,30 @@
 }
 
 .contactLinks {
-  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.13);
 }
 
-.contactLinks a {
+.contactLinks a,
+.locationRow {
   display: grid;
-  grid-template-columns: 90px 1fr 20px;
+
+  grid-template-columns:
+    90px minmax(0, 1fr) 20px;
+
   align-items: center;
 
   gap: 15px;
   padding: 21px 0;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.13);
 
   color: #f0edf2;
-  text-decoration: none;
+}
 
+.contactLinks a {
+  text-decoration: none;
   transition: color 250ms ease;
 }
 
@@ -602,51 +586,39 @@
   color: var(--blue);
 }
 
-.contactLinks a > span:first-child {
+.contactLinks a > span:first-child,
+.locationRow > span:first-child {
   color: #8e9199;
 
   font-size: 9px;
   letter-spacing: 0.12em;
 }
 
-.contactLinks a strong {
+.contactLinks a strong,
+.locationRow strong {
+  min-width: 0;
+
   overflow-wrap: anywhere;
 
   font-size: 14px;
   font-weight: 500;
 }
 
-.contactLinks a > span:last-child {
+.contactLinks a > span:last-child,
+.locationRow > span:last-child {
   color: var(--blue);
   font-size: 20px;
 }
 
-.contactPlaceholder {
-  padding: 22px 0;
-
-  border-top: 1px solid rgba(255, 255, 255, 0.13);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
-}
-
-.contactPlaceholder span {
-  color: #c2dce8;
-  font-size: 10px;
-  letter-spacing: 0.13em;
-}
-
-.contactPlaceholder p {
-  max-width: 300px;
-
-  color: #aaa9b2;
-  font-size: 13px;
-  line-height: 1.7;
-}
+/* =====================================
+   AVAILABILITY
+===================================== */
 
 .availability {
   display: flex;
   align-items: center;
-  gap: 10px;
 
+  gap: 10px;
   margin-top: 30px;
 
   color: #a4a6ac;
@@ -659,14 +631,18 @@
   width: 7px;
   height: 7px;
 
+  flex-shrink: 0;
+
   border-radius: 50%;
+
   background: var(--green);
 
-  box-shadow: 0 0 13px rgba(99, 217, 155, 0.45);
+  box-shadow:
+    0 0 13px rgba(99, 217, 155, 0.45);
 }
 
 /* =====================================
-   RESPONSIVE
+   TABLET
 ===================================== */
 
 @media (max-width: 1150px) {
@@ -679,30 +655,38 @@
     gap: 35px;
   }
 
-  .photoFrame {
-    width: min(100%, 290px);
-  }
-
   .skillsGrid {
-    gap: 24px;
+    gap: 28px;
   }
 }
+
+/* =====================================
+   SMALL TABLET / MOBILE
+===================================== */
 
 @media (max-width: 800px) {
   .main {
     width: calc(100% - 42px);
-    height: calc(100% - 85px);
   }
 
-  .panelViewport {
-    padding-bottom: 195px;
+  .chapterSection {
+    min-height: 0;
+
+    padding: 45px 0 220px;
+
+    scroll-margin-top: 78px;
+  }
+
+  .panel {
+    min-height: 0;
   }
 
   .aboutPanel,
   .contactPanel {
     grid-template-columns: 1fr;
     align-content: start;
-    gap: 35px;
+
+    gap: 45px;
   }
 
   .aboutCopy {
@@ -710,19 +694,22 @@
   }
 
   .mainTitle {
-    font-size: clamp(52px, 9vw, 75px);
+    font-size: clamp(
+      40px,
+      7vw,
+      65px
+    );
+
+    white-space: normal;
   }
 
   .aboutVisual {
     justify-content: flex-start;
   }
 
-  .photoFrame {
-    width: min(65%, 260px);
-  }
-
   .skillsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
   .headerSideNote {
@@ -730,14 +717,21 @@
   }
 
   .contactTitle {
-    font-size: clamp(46px, 8vw, 78px);
+    font-size: clamp(
+      46px,
+      8vw,
+      78px
+    );
   }
 }
+
+/* =====================================
+   MOBILE
+===================================== */
 
 @media (max-width: 520px) {
   .main {
     width: calc(100% - 36px);
-    height: calc(100% - 78px);
   }
 
   .topLine {
@@ -745,20 +739,32 @@
     font-size: 9px;
   }
 
-  .panelViewport {
-    padding-bottom: 150px;
+  .chapterSection {
+    padding: 38px 0 190px;
   }
 
-  .panel {
-    padding-top: 25px;
+  .eyebrow {
+    font-size: 9px;
+    margin-bottom: 20px;
   }
 
   .mainTitle {
-    font-size: clamp(48px, 13vw, 68px);
+    font-size: clamp(
+      34px,
+      9vw,
+      48px
+    );
+
+    white-space: normal;
+    margin-bottom: 27px;
   }
 
   .sectionTitle {
-    font-size: clamp(43px, 11vw, 66px);
+    font-size: clamp(
+      43px,
+      11vw,
+      66px
+    );
   }
 
   .aboutCopy p {
@@ -769,21 +775,28 @@
     font-size: 17px;
   }
 
-  .photoFrame {
-    width: min(70%, 220px);
+  .aboutVisual {
+    justify-content: center;
+    padding: 15px 0 10px;
   }
 
-  .photoDecoration {
-    right: 10%;
+  .skillsPanel {
+    padding-top: 15px;
+  }
+
+  .sectionHeader {
+    margin-bottom: 30px;
   }
 
   .skillsGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
     column-gap: 16px;
-    row-gap: 25px;
+    row-gap: 30px;
   }
 
-  .skillGroup h2 {
+  .skillGroup h3 {
     font-size: 20px;
   }
 
@@ -791,366 +804,40 @@
     font-size: 12px;
   }
 
-  .contactLinks a {
-    grid-template-columns: 75px 1fr 18px;
-    gap: 8px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .panelAnimation {
-    animation: none;
+  .contactTitle {
+    font-size: clamp(
+      43px,
+      10vw,
+      61px
+    );
   }
 
-  .photoFrame,
-  .ambient {
-    transition: none;
-  }
-}
-
-
-/* =====================================
-   ABOUT — ONE-LINE TITLE
-===================================== */
-
-.aboutPanel {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1.25fr)
-    minmax(0, 0.75fr);
-
-  align-items: center;
-  gap: clamp(24px, 3vw, 65px);
-}
-
-.aboutCopy {
-  min-width: 0;
-  max-width: 900px;
-}
-
-.mainTitle {
-  margin: 0 0 32px;
-
-  font-family: var(--display-font);
-  font-size: clamp(38px, 4.2vw, 74px);
-  font-weight: 600;
-  letter-spacing: -0.075em;
-  line-height: 1.08;
-
-  white-space: nowrap;
-}
-
-.mainTitle span {
-  color: var(--purple);
-}
-
-/* =====================================
-   PHOTO FOLDER — RIGHT SIDE
-===================================== */
-
-.aboutVisual {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  min-width: 0;
-
-  padding: 36px 0 24px;
-}
-
-.photoSleeve {
-  position: relative;
-  isolation: isolate;
-
-  width: min(100%, 360px);
-  height: 410px;
-
-  flex-shrink: 0;
-}
-
-/* Photo inside folder */
-
-.photoPrint {
-  position: absolute;
-  z-index: 2;
-
-  left: 13%;
-  top: 12%;
-
-  width: 74%;
-  height: 73%;
-
-  padding: 8px 8px 27px;
-
-  background: #f8f7f3;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.23),
-    0 30px 60px rgba(0, 0, 0, 0.12);
-
-  transform: translateY(0) rotate(-3deg);
-
-  transition:
-    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 700ms ease;
-}
-
-.photoPrint img,
-.photoPlaceholder {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.photoPlaceholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-
-  background: #ded8e5;
-  color: #51415c;
-}
-
-.photoPlaceholder span {
-  font-family: var(--display-font);
-  font-size: 38px;
-  font-weight: 700;
-}
-
-.photoPlaceholder small {
-  font-size: 9px;
-  letter-spacing: 0.12em;
-}
-
-/* Back of folder */
-
-.sleeveBack {
-  position: absolute;
-  z-index: 1;
-
-  left: 5%;
-  bottom: 7%;
-
-  width: 90%;
-  height: 62%;
-
-  border: 1px solid rgba(235, 227, 245, 0.3);
-  border-radius: 16px;
-
-  background: rgba(225, 215, 240, 0.08);
-}
-
-/* Translucent folder front */
-
-.sleeveFront {
-  position: absolute;
-  z-index: 3;
-
-  left: 5%;
-  bottom: 7%;
-
-  width: 90%;
-  height: 62%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  padding: 21px;
-
-  overflow: hidden;
-
-  border-radius: 16px;
-  border: 1px solid rgba(229, 220, 242, 0.4);
-
-  background: linear-gradient(
-    130deg,
-    rgba(235, 230, 246, 0.29),
-    rgba(200, 190, 220, 0.17)
-  );
-
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.2),
-    0 18px 45px rgba(0, 0, 0, 0.15);
-
-  transition:
-    transform 350ms ease,
-    border-color 350ms ease;
-}
-
-.sleeveReflection {
-  position: absolute;
-  inset: 0;
-
-  background: linear-gradient(
-    120deg,
-    transparent 12%,
-    rgba(255, 255, 255, 0.16) 40%,
-    transparent 65%
-  );
-
-  pointer-events: none;
-}
-
-.sleeveTop,
-.sleeveBottom {
-  position: relative;
-  z-index: 1;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.sleeveTop {
-  color: #f4eafc;
-  font-size: 9px;
-  letter-spacing: 0.12em;
-}
-
-.sleeveBottom {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.sleeveBottom span:last-child {
-  font-size: 22px;
-}
-
-.sleeveHint {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-
-  color: #a69cad;
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  white-space: nowrap;
-
-  transform: translateX(-50%);
-}
-
-/* Hover: photo rises out of folder */
-
-.photoSleeve:hover .photoPrint {
-  transform: translateY(-95px) rotate(-7deg);
-
-  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.3);
-}
-
-.photoSleeve:hover .sleeveFront {
-  transform: translateY(5px);
-  border-color: rgba(195, 162, 235, 0.7);
-}
-
-/* =====================================
-   RESPONSIVE
-===================================== */
-
-@media (max-width: 1150px) {
-  .mainTitle {
-    font-size: clamp(34px, 4vw, 55px);
-  }
-
-  .photoSleeve {
-    width: min(100%, 310px);
-    height: 365px;
-  }
-}
-
-@media (max-width: 800px) {
-  .aboutPanel {
-    grid-template-columns: 1fr;
-    align-content: start;
-    gap: 50px;
-  }
-
-  .mainTitle {
-    font-size: clamp(40px, 7vw, 65px);
-  }
-
-  .aboutVisual {
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 520px) {
-  .mainTitle {
-    font-size: clamp(34px, 9vw, 48px);
-    white-space: normal;
-  }
-
-  .photoSleeve {
-    width: min(100%, 270px);
-    height: 325px;
-  }
-
-  .photoSleeve:hover .photoPrint {
-    transform: translateY(-60px) rotate(-6deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .photoPrint,
-  .sleeveFront {
-    transition: none;
-  }
-}
-
-
-/* =====================================
-   CONTACT — LOCATION ROW
-===================================== */
-
-.locationRow {
-  display: grid;
-  grid-template-columns: 90px 1fr 20px;
-  align-items: center;
-
-  gap: 15px;
-  padding: 21px 0;
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
-
-  color: #f0edf2;
-}
-
-.locationRow > span:first-child {
-  color: #8e9199;
-  font-size: 9px;
-  letter-spacing: 0.12em;
-}
-
-.locationRow strong {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.locationRow > span:last-child {
-  color: var(--blue);
-  font-size: 20px;
-}
-
-/* Mobile */
-
-@media (max-width: 520px) {
+  .contactLinks a,
   .locationRow {
-    grid-template-columns: 75px 1fr 18px;
+    grid-template-columns:
+      75px minmax(0, 1fr) 18px;
+
     gap: 8px;
+  }
+
+  .contactLinks a strong,
+  .locationRow strong {
+    font-size: 12px;
+  }
+
+  .availability {
+    font-size: 8px;
+    line-height: 1.6;
   }
 }
 
+/* =====================================
+   REDUCED MOTION
+===================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient,
+  .contactLinks a {
+    transition: none;
+  }
+}

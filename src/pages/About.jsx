@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Navbar from "../components/Navbar/Navbar";
@@ -6,6 +7,8 @@ import AboutVinyl from "../components/AboutVinyl/AboutVinyl";
 import AboutPhotoFolder from "../components/AboutPhotoFolder/AboutPhotoFolder";
 
 import styles from "./About.module.css";
+
+import MouseGlow from "../components/MouseGlow/MouseGlow";
 
 /* =====================================
    CHAPTERS
@@ -77,8 +80,10 @@ const skillGroups = [
 ];
 
 /* =====================================
-   HELPER
+   HELPERS
 ===================================== */
+
+const clamp = (value, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 
 function getChapterIndex(chapterId) {
 	const index = CHAPTERS.findIndex((chapter) => chapter.id === chapterId);
@@ -86,8 +91,12 @@ function getChapterIndex(chapterId) {
 	return index >= 0 ? index : 0;
 }
 
+function prefersReducedMotion() {
+	return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 /* =====================================
-   ABOUT ME
+   01 / ABOUT ME
 ===================================== */
 
 function AboutPanel() {
@@ -128,7 +137,7 @@ function AboutPanel() {
 }
 
 /* =====================================
-   SKILLS
+   02 / SKILLS
 ===================================== */
 
 function SkillsPanel() {
@@ -138,9 +147,9 @@ function SkillsPanel() {
 				<div>
 					<span className={styles.eyebrow}>02 / MY PERSONAL ARCHIVE</span>
 
-					<h1 id="skills-title" className={styles.sectionTitle}>
+					<h2 id="skills-title" className={styles.sectionTitle}>
 						The little <span>details.</span>
-					</h1>
+					</h2>
 				</div>
 
 				<span className={styles.headerSideNote}>A MIX OF CREATIVE & TECHNICAL SKILLS</span>
@@ -155,7 +164,7 @@ function SkillsPanel() {
 							"--skill-color": group.color,
 						}}
 					>
-						<h2>{group.title}</h2>
+						<h3>{group.title}</h3>
 
 						<ul>{group.items.map((item, index) => (item ? <li key={`${item}-${index}`}>{item}</li> : <li key={`space-${index}`} className={styles.skillSpacer} aria-hidden="true" />))}</ul>
 					</section>
@@ -166,7 +175,7 @@ function SkillsPanel() {
 }
 
 /* =====================================
-   CONTACT
+   03 / CONTACT
 ===================================== */
 
 function ContactPanel() {
@@ -188,13 +197,13 @@ function ContactPanel() {
 			<div className={styles.contactCopy}>
 				<span className={styles.eyebrow}>03 / SAY HELLO</span>
 
-				<h1 id="contact-title" className={styles.contactTitle}>
+				<h2 id="contact-title" className={styles.contactTitle}>
 					Let's make
 					<br />
 					something
 					<br />
 					<span>meaningful.</span>
-				</h1>
+				</h2>
 
 				<p>Have an idea, a project or just want to say hi? I'm always happy to meet new people, exchange ideas and explore creative opportunities.</p>
 
@@ -237,58 +246,209 @@ function ContactPanel() {
 }
 
 /* =====================================
-   MAIN ABOUT COMPONENT
+   MAIN ABOUT PAGE
 ===================================== */
 
 export default function About() {
 	const location = useLocation();
 	const navigate = useNavigate();
 
+	const sectionRefs = useRef([]);
+	const scrollFrameRef = useRef(null);
+	const navigationFrameRef = useRef(null);
+
 	const [activeChapter, setActiveChapter] = useState(() => getChapterIndex(location.state?.chapter || "about"));
 
+	const [scrollProgress, setScrollProgress] = useState(0);
+
+	/*
+    Only Contact opened through the
+    TOP NAVBAR uses a sticky navbar.
+  */
+	const [keepNavbarVisible, setKeepNavbarVisible] = useState(() => location.state?.chapter === "contact");
+
 	/* =====================================
-     NAVBAR → CHAPTER NAVIGATION
+     SCROLL TO CHAPTER
+  ===================================== */
+
+	function scrollToChapter(index, behavior = "smooth") {
+		const safeIndex = Math.max(0, Math.min(index, CHAPTERS.length - 1));
+
+		/*
+      ABOUT ME:
+
+      Go to the actual top of the page.
+      Do not offset the first section,
+      otherwise the navbar is clipped.
+    */
+
+		if (safeIndex === 0) {
+			window.scrollTo({
+				top: 0,
+				behavior,
+			});
+
+			return;
+		}
+
+		const section = sectionRefs.current[safeIndex];
+
+		if (!section) return;
+
+		const navbarOffset = window.innerWidth <= 850 ? 78 : 95;
+
+		const targetY = window.scrollY + section.getBoundingClientRect().top - navbarOffset;
+
+		window.scrollTo({
+			top: Math.max(0, targetY),
+			behavior,
+		});
+	}
+
+	/* =====================================
+     SYNC VINYL WITH NORMAL SCROLLING
   ===================================== */
 
 	useEffect(() => {
+		function updateScrollState() {
+			scrollFrameRef.current = null;
+
+			const sections = sectionRefs.current;
+
+			if (sections.length !== CHAPTERS.length || sections.some((section) => !section)) {
+				return;
+			}
+
+			const sectionTops = sections.map((section) => window.scrollY + section.getBoundingClientRect().top);
+
+			/*
+        The focus point determines which
+        chapter is currently active.
+      */
+
+			const focusY = window.scrollY + window.innerHeight * 0.42;
+
+			let closestIndex = 0;
+			let closestDistance = Infinity;
+
+			sectionTops.forEach((top, index) => {
+				const distance = Math.abs(focusY - top);
+
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					closestIndex = index;
+				}
+			});
+
+			setActiveChapter(closestIndex);
+
+			/*
+        Continuous progress:
+        About   = 0
+        Skills  = halfway
+        Contact = 1
+      */
+
+			const firstTop = sectionTops[0];
+
+			const lastTop = sectionTops[sectionTops.length - 1];
+
+			const totalDistance = lastTop - firstTop;
+
+			const nextProgress = totalDistance > 0 ? clamp((focusY - firstTop) / totalDistance) : 0;
+
+			setScrollProgress(nextProgress);
+		}
+
+		function onScroll() {
+			if (scrollFrameRef.current !== null) {
+				return;
+			}
+
+			scrollFrameRef.current = requestAnimationFrame(updateScrollState);
+		}
+
+		updateScrollState();
+
+		window.addEventListener("scroll", onScroll, { passive: true });
+
+		window.addEventListener("resize", onScroll);
+
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+
+			window.removeEventListener("resize", onScroll);
+
+			if (scrollFrameRef.current !== null) {
+				cancelAnimationFrame(scrollFrameRef.current);
+			}
+		};
+	}, []);
+
+	/* =====================================
+     TOP NAVBAR → ABOUT / CONTACT
+  ===================================== */
+
+	useLayoutEffect(() => {
 		const requestedChapter = location.state?.chapter;
 
-		if (!requestedChapter) return;
+		if (!requestedChapter) {
+			return;
+		}
 
 		const requestedIndex = CHAPTERS.findIndex((chapter) => chapter.id === requestedChapter);
 
-		if (requestedIndex === -1) return;
+		if (requestedIndex === -1) {
+			return;
+		}
 
 		/*
-      Works even when already on /about.
+      Clicking Contact in the TOP navbar
+      enables sticky navigation.
 
-      ABOUT   -> chapter 0
-      SKILLS  -> chapter 1
-      CONTACT -> chapter 2
+      Clicking About disables it.
     */
 
-		setActiveChapter(requestedIndex);
+		setKeepNavbarVisible(requestedChapter === "contact");
 
-		/*
-      Remove the one-time instruction
-      so future navigation starts clean.
-    */
+		if (navigationFrameRef.current !== null) {
+			cancelAnimationFrame(navigationFrameRef.current);
+		}
 
-		navigate(
-			{
-				pathname: "/about",
-				hash: "",
-			},
-			{
-				replace: true,
-				state: null,
-				preventScrollReset: true,
-			},
-		);
+		navigationFrameRef.current = requestAnimationFrame(() => {
+			scrollToChapter(requestedIndex, "instant");
+
+			setActiveChapter(requestedIndex);
+
+			/*
+          Remove the one-time navigation
+          request without resetting scroll.
+        */
+
+			navigate(
+				{
+					pathname: "/about",
+					hash: "",
+				},
+				{
+					replace: true,
+					state: null,
+					preventScrollReset: true,
+				},
+			);
+		});
+
+		return () => {
+			if (navigationFrameRef.current !== null) {
+				cancelAnimationFrame(navigationFrameRef.current);
+
+				navigationFrameRef.current = null;
+			}
+		};
 	}, [location.key, location.state?.chapter, navigate]);
 
 	/* =====================================
-     VINYL NAVIGATION
+     VINYL → CHAPTER
   ===================================== */
 
 	function handleChapterChange(index) {
@@ -296,7 +456,25 @@ export default function About() {
 			return;
 		}
 
-		setActiveChapter(index);
+		/*
+      Unlike top-navbar Contact,
+      vinyl navigation does not
+      keep the navbar sticky.
+    */
+
+		setKeepNavbarVisible(false);
+
+		const behavior = prefersReducedMotion() ? "instant" : "smooth";
+
+		/*
+      When disabling sticky positioning,
+      let React apply the layout change
+      before measuring the target.
+    */
+
+		requestAnimationFrame(() => {
+			scrollToChapter(index, behavior);
+		});
 	}
 
 	const chapter = CHAPTERS[activeChapter];
@@ -316,14 +494,25 @@ export default function About() {
 
 			<div className={styles.ambient} aria-hidden="true" />
 
-			{/* NAVBAR */}
-			<div className={styles.navbarWrap}>
-				<Navbar variant="dark" activeAboutChapter={CHAPTERS[activeChapter].id} />
+			{/* SAME MOUSE HIGHLIGHT AS PROJECTS */}
+
+			<MouseGlow color={chapter.color} />
+
+			{/* =====================================
+          NAVBAR
+      ===================================== */}
+
+			<div className={`${styles.navbarWrap} ${keepNavbarVisible ? styles.navbarSticky : ""}`}>
+				<Navbar variant="dark" activeAboutChapter={chapter.id} />
 			</div>
 
-			{/* MAIN CONTENT */}
+			{/* =====================================
+          MAIN CONTENT
+      ===================================== */}
 
 			<main className={styles.main}>
+				{/* TOP LINE */}
+
 				<div className={styles.topLine}>
 					<span>MEØ® / SIDE B</span>
 
@@ -334,20 +523,48 @@ export default function About() {
 					</span>
 				</div>
 
-				<div className={styles.panelViewport} aria-live="polite" aria-atomic="false">
-					<div key={chapter.id} className={styles.panelAnimation}>
-						{activeChapter === 0 && <AboutPanel />}
+				{/* 01 — ABOUT ME */}
 
-						{activeChapter === 1 && <SkillsPanel />}
+				<div
+					id="about-about"
+					ref={(element) => {
+						sectionRefs.current[0] = element;
+					}}
+					className={styles.chapterSection}
+				>
+					<AboutPanel />
+				</div>
 
-						{activeChapter === 2 && <ContactPanel />}
-					</div>
+				{/* 02 — SKILLS */}
+
+				<div
+					id="about-skills"
+					ref={(element) => {
+						sectionRefs.current[1] = element;
+					}}
+					className={styles.chapterSection}
+				>
+					<SkillsPanel />
+				</div>
+
+				{/* 03 — CONTACT */}
+
+				<div
+					id="about-contact"
+					ref={(element) => {
+						sectionRefs.current[2] = element;
+					}}
+					className={styles.chapterSection}
+				>
+					<ContactPanel />
 				</div>
 			</main>
 
-			{/* HALF VINYL NAVIGATION */}
+			{/* =====================================
+          FIXED HALF VINYL
+      ===================================== */}
 
-			<AboutVinyl chapters={CHAPTERS} activeChapter={activeChapter} onChapterChange={handleChapterChange} />
+			<AboutVinyl chapters={CHAPTERS} activeChapter={activeChapter} progress={scrollProgress} onChapterChange={handleChapterChange} />
 		</div>
 	);
 }

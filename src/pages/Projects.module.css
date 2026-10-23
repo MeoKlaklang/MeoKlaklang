@@ -1,0 +1,55 @@
+
+/* =====================================
+   PROJECTS — PAGE LAYOUT
+===================================== */
+
+.projectsLayout {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      ellipse 50% 65% at 78% 36%,
+      rgba(122, 174, 139, 0.14),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 50% 45% at 8% 82%,
+      rgba(99, 155, 117, 0.08),
+      transparent 75%
+    ),
+    #131416;
+
+  color: #f4f4f1;
+}
+
+/* =====================================
+   NAVBAR
+===================================== */
+
+.navbarWrap {
+  position: relative;
+  z-index: 50;
+
+  display: flow-root;
+
+  width: 100%;
+  overflow: visible;
+}
+
+/* =====================================
+   PROJECT CONTENT
+===================================== */
+
+.main {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  min-height: calc(100vh - 70px);
+
+  background: transparent;
+}

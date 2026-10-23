@@ -1,55 +1,259 @@
 
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import HTMLFlipBook from "react-pageflip";
 import styles from "./MagazineFlipbook.module.css";
 
-const TURN_DURATION = 760;
+/* =====================================
+   MAGAZINE SETTINGS
+===================================== */
+
+const FLIP_DURATION = 950;
+
+// 2.png contains the cover on its RIGHT side.
+const COVER_SIDE = "right";
+
+/* =====================================
+   INDIVIDUAL PHYSICAL PAGE
+===================================== */
+
+const MagazinePage = forwardRef(
+  function MagazinePage(
+    {
+      image,
+      side,
+      label,
+      isCover = false,
+    },
+    ref
+  ) {
+    return (
+      <div
+        ref={ref}
+        className={[
+          styles.page,
+          isCover ? styles.coverPage : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        data-density={
+          isCover ? "hard" : "soft"
+        }
+        aria-label={label}
+      >
+        <div
+          className={[
+            styles.pageArtwork,
+            side === "left"
+              ? styles.pageLeft
+              : styles.pageRight,
+          ].join(" ")}
+          style={{
+            backgroundImage: `url("${image}")`,
+          }}
+          role="img"
+          aria-label={label}
+        />
+
+        <span
+          className={styles.paperTexture}
+          aria-hidden="true"
+        />
+
+        <span
+          className={styles.paperEdge}
+          aria-hidden="true"
+        />
+      </div>
+    );
+  }
+);
+
+/* =====================================
+   CREATE PHYSICAL MAGAZINE PAGES
+===================================== */
+
+function createBookPages(spreads) {
+  if (!spreads.length) return [];
+
+  /*
+    Input:
+      2.png = cover on RIGHT half
+      1.png = complete spread
+      3.png = complete spread
+      4.png = complete spread
+      ...
+
+    Output for react-pageflip:
+      Page 0 = cover
+      Page 1 = spread 1 left half
+      Page 2 = spread 1 right half
+      Page 3 = spread 2 left half
+      Page 4 = spread 2 right half
+      ...
+
+    showCover=true places page 0
+    alone on the RIGHT side.
+
+    Every next two physical pages
+    form one complete spread.
+  */
+
+  const result = [
+    {
+      id: "cover",
+      image: spreads[0],
+      side: COVER_SIDE,
+      label: "THEOS Earth Gallery cover",
+      isCover: true,
+    },
+  ];
+
+  spreads.slice(1).forEach(
+    (image, index) => {
+      const spreadNumber = index + 1;
+
+      result.push({
+        id: `spread-${spreadNumber}-left`,
+        image,
+        side: "left",
+        label: `Spread ${spreadNumber}, left page`,
+      });
+
+      result.push({
+        id: `spread-${spreadNumber}-right`,
+        image,
+        side: "right",
+        label: `Spread ${spreadNumber}, right page`,
+      });
+    }
+  );
+
+  return result;
+}
+
+/* =====================================
+   MAIN MAGAZINE FLIPBOOK
+===================================== */
 
 export default function MagazineFlipbook({
   pages = [],
   title = "Magazine",
 }) {
-  const [pageIndex, setPageIndex] = useState(0);
-  const [turn, setTurn] = useState(null);
+  const bookRef = useRef(null);
 
-  const timerRef = useRef(null);
-  const turningRef = useRef(false);
+  const [viewIndex, setViewIndex] =
+    useState(0);
 
-  useEffect(() => {
-    return () => window.clearTimeout(timerRef.current);
-  }, []);
+  const [isFlipping, setIsFlipping] =
+    useState(false);
 
-  function goToPage(direction) {
-    if (turningRef.current || pages.length === 0) return;
+  const bookPages = useMemo(
+    () => createBookPages(pages),
+    [pages]
+  );
 
-    const nextIndex = pageIndex + direction;
+  // One view per original supplied image.
+  const totalViews = pages.length;
 
-    if (nextIndex < 0 || nextIndex >= pages.length) {
+  /* =====================================
+     FLIPBOOK API
+  ===================================== */
+
+  function getBook() {
+    return bookRef.current?.pageFlip?.();
+  }
+
+  /* =====================================
+     PAGE FLIP EVENTS
+  ===================================== */
+
+  function handleFlip(event) {
+    const physicalPageIndex = Number(
+      event.data
+    );
+
+    if (!Number.isFinite(physicalPageIndex)) {
       return;
     }
 
-    turningRef.current = true;
+    /*
+      showCover=true:
 
-    setTurn({
-      from: pageIndex,
-      to: nextIndex,
-      direction,
-    });
+      Index 0 = cover
+      Index 1 = first complete spread
+      Index 3 = second complete spread
+      Index 5 = third complete spread
+    */
 
-    window.clearTimeout(timerRef.current);
+    const nextView =
+      physicalPageIndex === 0
+        ? 0
+        : Math.ceil(
+            physicalPageIndex / 2
+          );
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    timerRef.current = window.setTimeout(
-      () => {
-        setPageIndex(nextIndex);
-        setTurn(null);
-        turningRef.current = false;
-      },
-      reducedMotion ? 0 : TURN_DURATION
+    setViewIndex(
+      Math.max(
+        0,
+        Math.min(
+          totalViews - 1,
+          nextView
+        )
+      )
     );
   }
+
+  function handleFlipState(event) {
+    setIsFlipping(
+      event.data === "flipping"
+    );
+  }
+
+  /* =====================================
+     PREVIOUS / NEXT
+  ===================================== */
+
+  function goToPage(direction) {
+    const book = getBook();
+
+    if (
+      !book ||
+      isFlipping ||
+      totalViews === 0
+    ) {
+      return;
+    }
+
+    if (
+      direction < 0 &&
+      viewIndex === 0
+    ) {
+      return;
+    }
+
+    if (
+      direction > 0 &&
+      viewIndex >= totalViews - 1
+    ) {
+      return;
+    }
+
+    if (direction > 0) {
+      book.flipNext("bottom");
+    } else {
+      book.flipPrev("bottom");
+    }
+  }
+
+  /* =====================================
+     KEYBOARD NAVIGATION
+  ===================================== */
 
   function handleKeyDown(event) {
     if (event.key === "ArrowRight") {
@@ -63,13 +267,25 @@ export default function MagazineFlipbook({
     }
   }
 
-  if (pages.length === 0) return null;
+  if (pages.length === 0) {
+    return null;
+  }
 
-  const fromIndex = turn ? turn.from : pageIndex;
-  const displayedIndex = turn ? turn.to : pageIndex;
+  const isFirstView = viewIndex === 0;
+
+  const isLastView =
+    viewIndex >= totalViews - 1;
+
+  const progress =
+    ((viewIndex + 1) / totalViews) *
+    100;
 
   return (
     <div className={styles.book}>
+      {/* =====================================
+          TOOLBAR
+      ===================================== */}
+
       <div className={styles.toolbar}>
         <div className={styles.bookMeta}>
           <span className={styles.label}>
@@ -77,9 +293,13 @@ export default function MagazineFlipbook({
           </span>
 
           <span className={styles.counter}>
-            {String(displayedIndex + 1).padStart(2, "0")}
+            {String(
+              viewIndex + 1
+            ).padStart(2, "0")}
             {" / "}
-            {String(pages.length).padStart(2, "0")}
+            {String(
+              totalViews
+            ).padStart(2, "0")}
           </span>
         </div>
 
@@ -87,8 +307,11 @@ export default function MagazineFlipbook({
           <button
             type="button"
             onClick={() => goToPage(-1)}
-            disabled={pageIndex === 0 || Boolean(turn)}
+            disabled={
+              isFirstView || isFlipping
+            }
             aria-label="Previous magazine spread"
+            title="Previous spread"
           >
             ←
           </button>
@@ -97,70 +320,112 @@ export default function MagazineFlipbook({
             type="button"
             onClick={() => goToPage(1)}
             disabled={
-              pageIndex === pages.length - 1 || Boolean(turn)
+              isLastView || isFlipping
             }
             aria-label="Next magazine spread"
+            title="Next spread"
           >
             →
           </button>
         </div>
       </div>
 
+      {/* =====================================
+          MAGAZINE VIEWER
+      ===================================== */}
+
       <div
         className={styles.stage}
         tabIndex={0}
         role="group"
-        aria-label={`${title}: use the left and right arrow keys to turn pages`}
+        aria-label={`${title}: use the arrow keys or drag a page to browse`}
         onKeyDown={handleKeyDown}
       >
-        <div className={styles.bookSurface}>
-          {/* The page revealed underneath. */}
-          <img
-            className={styles.underPage}
-            src={pages[displayedIndex]}
-            alt={`${title}, spread ${displayedIndex + 1}`}
-          />
+        <div className={styles.bookFrame}>
+          <HTMLFlipBook
+            ref={bookRef}
 
-          {/* Current page rotates away. */}
-          {turn && (
-            <div
-              key={`${turn.from}-${turn.to}`}
-              className={`${styles.turningPage} ${
-                turn.direction > 0
-                  ? styles.turnForward
-                  : styles.turnBackward
-              }`}
-            >
-              <img
-                src={pages[fromIndex]}
-                alt=""
-                aria-hidden="true"
+            /* PAGE DIMENSIONS */
+
+            width={600}
+            height={600}
+            size="stretch"
+            minWidth={120}
+            maxWidth={900}
+            minHeight={120}
+            maxHeight={900}
+
+            /* COVER ON THE RIGHT */
+
+            startPage={0}
+            showCover={true}
+            usePortrait={false}
+
+            /* SMOOTH PAGE FLIP */
+
+            flippingTime={FLIP_DURATION}
+            drawShadow={true}
+            maxShadowOpacity={0.35}
+
+            /* INTERACTIONS */
+
+            useMouseEvents={true}
+            showPageCorners={true}
+            disableFlipByClick={false}
+            mobileScrollSupport={true}
+
+            /* LAYOUT */
+
+            autoSize={true}
+            startZIndex={0}
+
+            /* EVENTS */
+
+            onFlip={handleFlip}
+            onChangeState={handleFlipState}
+
+            className={styles.flipbook}
+          >
+            {bookPages.map((page) => (
+              <MagazinePage
+                key={page.id}
+                image={page.image}
+                side={page.side}
+                label={page.label}
+                isCover={page.isCover}
               />
-
-              <span
-                className={styles.paperShadow}
-                aria-hidden="true"
-              />
-            </div>
-          )}
-
-          <div className={styles.bookFold} aria-hidden="true" />
+            ))}
+          </HTMLFlipBook>
         </div>
       </div>
 
-      <div className={styles.progressTrack}>
+      {/* =====================================
+          PROGRESS BAR
+      ===================================== */}
+
+      <div
+        className={styles.progressTrack}
+        role="progressbar"
+        aria-label="Magazine progress"
+        aria-valuemin={1}
+        aria-valuemax={totalViews}
+        aria-valuenow={viewIndex + 1}
+      >
         <div
           className={styles.progressFill}
           style={{
-            width: `${
-              ((displayedIndex + 1) / pages.length) * 100
-            }%`,
+            width: `${progress}%`,
           }}
         />
       </div>
 
+      {/* =====================================
+          HINT
+      ===================================== */}
+
       <p className={styles.hint}>
-        Browse the spreads with the arrows.
+        Drag a page corner or use the arrows
+        to explore the magazine.
       </p>
     </div>
   );
