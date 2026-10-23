@@ -1,4 +1,8 @@
 
+/* ============================================
+   GISTDA PROJECT
+============================================ */
+
 .project {
   --project-color: #c3a2eb;
 
@@ -6,6 +10,8 @@
   z-index: 2;
 
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 
   padding-left: var(
     --content-left,
@@ -15,27 +21,57 @@
 
   background: transparent;
   color: #f5f1fa;
+
   pointer-events: none;
 }
 
+.project *,
+.project *::before,
+.project *::after {
+  box-sizing: border-box;
+}
+
+/* ============================================
+   CHAPTER LAYOUT
+============================================ */
+
 .chapter {
   position: relative;
+
+  width: 100%;
+  min-width: 0;
   min-height: 100dvh;
+
   padding: 115px 0 140px;
+
   scroll-margin-top: 0;
 }
 
 .chapterInner {
-  width: min(100%, 1120px);
-  margin: 0 auto;
+  width: 100%;
+  max-width: 1120px;
+  min-width: 0;
+
+  margin-inline: auto;
+
   pointer-events: auto;
 }
 
+.chapter:last-child {
+  padding-bottom: 160px;
+}
+
+/* ============================================
+   SHARED TYPOGRAPHY
+============================================ */
+
 .eyebrow {
   display: block;
+
   margin-bottom: 25px;
 
   color: var(--project-color);
+
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.17em;
@@ -44,30 +80,40 @@
 .introTitle,
 .sectionTitle {
   margin: 0;
+
+  color: #f5f1fa;
+
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.065em;
-  color: #f5f1fa;
+
+  overflow-wrap: break-word;
 }
 
 .introTitle {
   max-width: 950px;
-  font-size: clamp(42px, 5.5vw, 84px);
+
   margin-bottom: 32px;
+
+  font-size: clamp(42px, 5.5vw, 84px);
 }
 
 .sectionTitle {
   max-width: 950px;
-  font-size: clamp(42px, 5.6vw, 86px);
+
   margin-bottom: 24px;
+
+  font-size: clamp(42px, 5.6vw, 86px);
 }
 
 .introDescription,
 .sectionDescription {
   max-width: 670px;
+
   margin: 0;
 
   color: #bfb0cc;
+
   font-size: clamp(14px, 1.35vw, 18px);
   line-height: 1.85;
 }
@@ -76,9 +122,14 @@
   margin-bottom: 65px;
 }
 
+/* ============================================
+   INTRO DETAILS
+============================================ */
+
 .introDetails {
   display: flex;
   flex-wrap: wrap;
+
   gap: 15px 28px;
 
   margin-top: 65px;
@@ -90,46 +141,157 @@
 
 .introDetails span {
   color: #aa9db8;
+
   font-size: 10px;
+  font-weight: 500;
   letter-spacing: 0.09em;
 }
 
-/* BRANDING */
+/* ============================================
+   PROJECT TAGS
+============================================ */
+
+.projectTags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 32px;
+}
+
+.projectTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 35px;
+  padding: 10px 14px;
+
+  border: 1px solid
+    rgba(195, 162, 235, 0.38);
+
+  border-radius: 999px;
+
+  background: rgba(195, 162, 235, 0.065);
+
+  color: #d8c5eb;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.055em;
+  line-height: 1.2;
+
+  white-space: nowrap;
+}
+
+/* ============================================
+   INTRO PHOTO
+============================================ */
+
+.introFigure {
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 65px 0 0;
+}
+
+.introImage {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  border: 1px solid
+    rgba(195, 162, 235, 0.18);
+
+  border-radius: 12px;
+
+  background: #29252f;
+}
+
+.introImage img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  object-fit: cover;
+}
+
+.introCaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  gap: 8px 20px;
+
+  padding-top: 16px;
+
+  color: #aa9bb8;
+
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+/* ============================================
+   BRANDING — IMAGES
+============================================ */
 
 .brandingVisual,
 .brandingPoster {
+  width: 100%;
+
   margin: 0 0 95px;
 }
 
 .brandingVisual img {
   display: block;
+
   width: 100%;
   height: auto;
 }
 
 .brandingPoster img {
   display: block;
+
   width: min(100%, 720px);
   height: auto;
-  margin: 0 auto;
+
+  margin-inline: auto;
 }
 
 .brandingVisual figcaption,
 .brandingPoster figcaption {
   padding-top: 17px;
+
   color: #a89ab5;
+
   font-size: 10px;
   letter-spacing: 0.13em;
 }
 
-/* STICKERS */
+/* ============================================
+   STICKER COLLECTION
+============================================ */
 
 .stickerSection {
+  width: 100%;
+  min-width: 0;
+
   margin-top: 140px;
 }
 
 .stickerHeading {
+  max-width: 100%;
+
   margin: 0 0 18px;
+
+  color: #f5f1fa;
+
   font-size: clamp(36px, 4.7vw, 67px);
   font-weight: 500;
   line-height: 1.1;
@@ -137,173 +299,29 @@
 }
 
 .stickerDescription {
+  max-width: 650px;
+
   margin: 0 0 45px;
+
   color: #b9abca;
+
   font-size: 15px;
   line-height: 1.7;
 }
 
-/* LOGO */
-
-.logoShowcase {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 560px;
-  margin: 65px 0 0;
-}
-
-.logoShowcase img {
-  display: block;
-  width: min(88%, 650px);
-  height: auto;
-  object-fit: contain;
-}
-
-.logoCaption {
-  margin-top: 20px;
-  text-align: center;
-  color: #a89ab7;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1000px) {
-  .project {
-    padding-left: var(--content-left, 250px);
-  }
-}
-
-@media (max-width: 650px) {
-  .project {
-    padding-left: var(--content-left, 112px);
-    padding-right: 14px;
-  }
-
-  .chapter {
-    padding: 95px 0 105px;
-  }
-
-  .introTitle,
-  .sectionTitle {
-    font-size: clamp(27px, 7vw, 43px);
-  }
-
-  .introDescription,
-  .sectionDescription {
-    font-size: 12px;
-  }
-
-  .sectionDescription {
-    margin-bottom: 40px;
-  }
-
-  .introDetails {
-    margin-top: 40px;
-  }
-
-  .brandingVisual,
-  .brandingPoster {
-    margin-bottom: 65px;
-  }
-
-  .stickerSection {
-    margin-top: 85px;
-  }
-
-  .stickerDescription {
-    font-size: 12px;
-  }
-
-  .logoShowcase {
-    min-height: 300px;
-  }
-
-  .logoShowcase img {
-    width: 100%;
-  }
-}
-
-
-/* =====================================
-   RAHU — LOGO APPLICATIONS
-===================================== */
-
-.logoShowcase {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  margin: 65px 0 0;
-}
-
-.logoShowcase img {
-  display: block;
-  width: min(88%, 650px);
-  height: auto;
-  object-fit: contain;
-}
-
-.logoApplications {
-  margin-top: 140px;
-  margin-bottom: 70px;
-}
-
-.logoApplicationsHeading {
-  margin-bottom: 45px;
-}
-
-.logoApplicationsHeading h3 {
-  margin: 0 0 16px;
-  font-size: clamp(32px, 4.4vw, 64px);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.055em;
-  color: #f5f1fa;
-}
-
-.logoApplicationsHeading p {
-  max-width: 520px;
-  margin: 0;
-  color: #b9abca;
-  font-size: 15px;
-  line-height: 1.75;
-}
-
-.logoMockupFigure {
-  width: 100%;
-  margin: 0;
-}
-
-.logoMockupFigure img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-@media (max-width: 650px) {
-  .logoApplications {
-    margin-top: 85px;
-  }
-
-  .logoApplicationsHeading p {
-    font-size: 12px;
-  }
-}
-
-
-/* =====================================
+/* ============================================
    RAHU — EDITORIAL SPLIT
-===================================== */
+============================================ */
 
 .rahuIntro {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.05fr);
+
   align-items: center;
+
   gap: clamp(35px, 5vw, 95px);
 
   min-height: 70vh;
@@ -315,16 +333,19 @@
 }
 
 .rahuStory .sectionTitle {
+  margin-bottom: 45px;
+
   font-size: clamp(37px, 4.1vw, 64px);
   line-height: 1.1;
-  margin-bottom: 45px;
 }
 
 .rahuLabel {
   display: block;
+
   margin-bottom: 20px;
 
   color: var(--project-color);
+
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -332,77 +353,175 @@
 
 .rahuDescription {
   max-width: 470px;
+
   margin: 0 0 20px;
+
+  color: #c2b6cf;
 
   font-size: clamp(14px, 1.2vw, 16px);
   line-height: 1.9;
-  color: #c2b6cf;
 }
 
-/* COLOUR PALETTE */
+/* ============================================
+   RAHU COLOUR PALETTE
+============================================ */
 
 .rahuColors {
   display: flex;
   align-items: center;
+
   gap: 11px;
+
   margin-top: 35px;
 }
 
 .rahuColors span {
   display: block;
+
   width: 24px;
   height: 24px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.13);
+
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.13);
 }
 
 .rahuFootnote {
   display: block;
+
   margin-top: 18px;
 
   color: #95889f;
+
   font-size: 10px;
   letter-spacing: 0.1em;
 }
 
-/* ORIGINAL RAHU */
+/* ============================================
+   RAHU ILLUSTRATION
+============================================ */
 
 .rahuIllustration {
-  margin: 0;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  min-width: 0;
+  margin: 0;
 }
 
 .rahuIllustration img {
   display: block;
+
   width: 100%;
   max-width: 550px;
   height: auto;
+
   object-fit: contain;
 
-  transition: transform 0.7s cubic-bezier(
-    0.22, 1, 0.36, 1
-  );
+  transition: transform 0.7s
+    cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .rahuIllustration:hover img {
-  transform: translateY(-10px) rotate(-2deg);
+  transform: translateY(-10px)
+    rotate(-2deg);
 }
 
 .rahuIllustration figcaption {
   margin-top: 22px;
+
   color: #9d8fad;
+
   font-size: 10px;
   letter-spacing: 0.12em;
+  text-align: center;
 }
+
+/* ============================================
+   RAHU DESIGN APPLICATIONS
+============================================ */
+
+.logoApplications {
+  margin-top: 140px;
+  margin-bottom: 70px;
+}
+
+.logoApplicationsHeading {
+  margin-bottom: 45px;
+}
+
+.logoApplicationsHeading h3 {
+  max-width: 900px;
+
+  margin: 0 0 16px;
+
+  color: #f5f1fa;
+
+  font-size: clamp(32px, 4.4vw, 64px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.055em;
+}
+
+.logoApplicationsHeading p {
+  max-width: 520px;
+  margin: 0;
+
+  color: #b9abca;
+
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.logoMockupFigure {
+  width: 100%;
+  margin: 0;
+}
+
+.logoMockupFigure img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  border-radius: 8px;
+}
+
+/* ============================================
+   TABLET
+============================================ */
+
+@media (max-width: 1000px) {
+  .project {
+    padding-left: var(
+      --content-left,
+      250px
+    );
+  }
+
+  .introTitle,
+  .sectionTitle {
+    font-size: clamp(36px, 5.4vw, 65px);
+  }
+
+  .introFigure {
+    margin-top: 50px;
+  }
+}
+
+/* ============================================
+   SMALL TABLET
+============================================ */
 
 @media (max-width: 900px) {
   .rahuIntro {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+
     gap: 35px;
+    min-height: 0;
   }
 
   .rahuIllustration img {
@@ -410,21 +529,372 @@
   }
 }
 
-@media (max-width: 650px) {
+/* ============================================
+   MOBILE — CONSISTENT MARGINS
+============================================ */
+
+@media (max-width: 767px) {
+  /*
+    IMPORTANT:
+    Only .project controls the horizontal
+    spacing of all GISTDA chapters.
+
+    This matches the other projects.
+  */
+
+  .project {
+    --content-left: 0px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding-left: 24px;
+    padding-right: 24px;
+
+    margin: 0;
+
+    box-sizing: border-box;
+  }
+
+  /*
+    Remove forced full-screen chapter
+    heights and excessive vertical gaps.
+  */
+
+  .chapter {
+    width: 100%;
+    min-width: 0;
+
+    min-height: 0;
+    height: auto;
+
+    padding: 65px 0 45px;
+
+    scroll-margin-top: 0;
+  }
+
+  .chapterInner {
+    width: 100%;
+    max-width: 620px;
+    min-width: 0;
+
+    margin-inline: auto;
+    padding: 0;
+  }
+
+  /*
+    Intro has a slightly larger top
+    margin for visual breathing room.
+  */
+
+  .introChapter {
+    padding-top: 95px;
+    padding-bottom: 45px;
+  }
+
+  /*
+    Chapter gaps are intentionally
+    smaller than on desktop.
+  */
+
+  .chapter + .chapter {
+    padding-top: 55px;
+  }
+
+  .chapter:last-child {
+    padding-bottom: 200px;
+  }
+
+  /* =====================================
+     MOBILE TYPOGRAPHY
+  ===================================== */
+
+  .eyebrow {
+    margin-bottom: 19px;
+
+    font-size: 10px;
+  }
+
+  .introTitle,
+  .sectionTitle {
+    max-width: 100%;
+
+    font-size: clamp(29px, 7vw, 43px);
+    line-height: 1.12;
+    letter-spacing: -0.055em;
+  }
+
+  .introTitle {
+    margin-bottom: 25px;
+  }
+
+  .sectionTitle {
+    margin-bottom: 20px;
+  }
+
+  .introDescription,
+  .sectionDescription {
+    max-width: 100%;
+
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .sectionDescription {
+    margin-bottom: 34px;
+  }
+
+  /* =====================================
+     MOBILE INTRO DETAILS
+  ===================================== */
+
+  .introDetails {
+    gap: 12px 22px;
+
+    margin-top: 35px;
+    padding-top: 18px;
+  }
+
+  .introDetails span {
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  /* =====================================
+     MOBILE PROJECT TAGS
+  ===================================== */
+
+  .projectTags {
+    gap: 8px;
+    margin-top: 25px;
+  }
+
+  .projectTag {
+    min-height: 32px;
+
+    padding: 9px 12px;
+
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+
+  /* =====================================
+     MOBILE INTRO PHOTO
+  ===================================== */
+
+  .introFigure {
+    width: 100%;
+    margin: 36px 0 0;
+  }
+
+  .introImage {
+    width: 100%;
+    border-radius: 7px;
+  }
+
+  .introImage img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+  }
+
+  .introCaption {
+    padding-top: 12px;
+
+    font-size: 9px;
+    line-height: 1.6;
+  }
+
+  /* =====================================
+     MOBILE BRANDING
+  ===================================== */
+
+  .brandingVisual,
+  .brandingPoster {
+    width: 100%;
+    margin-bottom: 48px;
+  }
+
+  .brandingVisual img,
+  .brandingPoster img {
+    display: block;
+
+    max-width: 100%;
+    height: auto;
+  }
+
+  .brandingVisual figcaption,
+  .brandingPoster figcaption {
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  /* =====================================
+     MOBILE STICKER COLLECTION
+  ===================================== */
+
+  .stickerSection {
+    width: 100%;
+    min-width: 0;
+
+    margin-top: 65px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .stickerHeading {
+    margin-bottom: 16px;
+
+    font-size: clamp(32px, 7vw, 43px);
+    line-height: 1.12;
+  }
+
+  .stickerDescription {
+    max-width: 100%;
+
+    margin-bottom: 26px;
+
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* =====================================
+     MOBILE RAHU STORY
+  ===================================== */
+
+  .rahuIntro {
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: 35px;
+    min-height: 0;
+
+    margin-top: 15px;
+  }
+
+  .rahuStory {
+    width: 100%;
+    min-width: 0;
+  }
+
   .rahuStory .sectionTitle {
-    font-size: clamp(29px, 7vw, 42px);
     margin-bottom: 30px;
+
+    font-size: clamp(29px, 7vw, 42px);
+  }
+
+  .rahuLabel {
+    margin-bottom: 15px;
+    font-size: 10px;
   }
 
   .rahuDescription {
-    font-size: 12px;
+    max-width: 100%;
+
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .rahuColors {
+    gap: 10px;
+    margin-top: 25px;
   }
 
   .rahuColors span {
     width: 20px;
     height: 20px;
   }
+
+  .rahuFootnote {
+    font-size: 9px;
+    line-height: 1.5;
+  }
+
+  .rahuIllustration {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .rahuIllustration img {
+    width: 100%;
+    max-width: 430px;
+    height: auto;
+  }
+
+  .rahuIllustration figcaption {
+    font-size: 9px;
+  }
+
+  /* =====================================
+     MOBILE DESIGN APPLICATIONS
+  ===================================== */
+
+  .logoApplications {
+    margin-top: 70px;
+    margin-bottom: 0;
+  }
+
+  .logoApplicationsHeading {
+    margin-bottom: 28px;
+  }
+
+  .logoApplicationsHeading h3 {
+    font-size: clamp(29px, 7vw, 42px);
+    line-height: 1.15;
+  }
+
+  .logoApplicationsHeading p {
+    max-width: 100%;
+
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .logoMockupFigure {
+    width: 100%;
+    margin: 0;
+  }
+
+  .logoMockupFigure img {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
 }
+
+/* ============================================
+   VERY SMALL MOBILE
+============================================ */
+
+@media (max-width: 380px) {
+  .project {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .introChapter {
+    padding-top: 85px;
+  }
+
+  .introTitle,
+  .sectionTitle,
+  .stickerHeading {
+    font-size: 28px;
+  }
+
+  .projectTag {
+    font-size: 8px;
+    padding: 8px 10px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+============================================ */
 
 @media (prefers-reduced-motion: reduce) {
   .rahuIllustration img {
@@ -434,12 +904,4 @@
   .rahuIllustration:hover img {
     transform: none;
   }
-}
-
-.project {
-  background: transparent;
-}
-
-.chapter:last-child {
-  padding-bottom: 160px;
 }
