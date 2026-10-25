@@ -12,6 +12,7 @@
   isolation: isolate;
 
   width: 100%;
+
   background: var(--dark);
   color: #f4f5f2;
 }
@@ -92,13 +93,12 @@
   pointer-events: none;
 }
 
-/* Used inside individual project components */
-
 .scrollContent {
   position: relative;
   z-index: 2;
 
   margin-top: -100dvh;
+
   pointer-events: none;
 }
 
@@ -141,7 +141,6 @@
 
 .eyebrow {
   display: block;
-
   margin-bottom: 20px;
 
   color: var(--project-color);
@@ -211,7 +210,6 @@
 
 /* ============================================
    RECORD HANDOFF BETWEEN PROJECTS
-   DESKTOP ONLY
 ============================================ */
 
 .recordTransitionZone {
@@ -262,7 +260,6 @@
 
 .recordScrollArrow {
   display: block;
-
   margin-top: 30px;
 
   color: var(--next-color);
@@ -358,12 +355,10 @@
 .projectIdentityCurrent,
 .projectIdentityNext {
   position: absolute;
-
   right: 0;
   bottom: 0;
 
   white-space: nowrap;
-
   transition: opacity 0.08s linear;
 }
 
@@ -383,7 +378,6 @@
   align-items: flex-start;
 
   gap: 6px;
-
   padding: 8px 0;
 
   border: 0;
@@ -474,12 +468,6 @@
     overflow-x: clip;
   }
 
-  /*
-    Keep ambient background sticky.
-    Mobile vinyl is rendered separately
-    using MobileProjectDock.
-  */
-
   .stickyWorld {
     position: sticky;
     top: 0;
@@ -493,9 +481,7 @@
     pointer-events: none;
   }
 
-  /*
-    No desktop vinyl stacks on mobile.
-  */
+  /* No desktop vinyl on mobile */
 
   .desktopVinylLayer,
   .desktopTransitionLayer,
@@ -505,20 +491,13 @@
     display: none;
   }
 
-  /*
-    No desktop record transition
-    between mobile projects.
-  */
+  /* No desktop record transitions */
 
   .recordTransitionZone,
   .nextProjectShortcut,
   .projectIdentity {
     display: none;
   }
-
-  /*
-    Content takes up full mobile width.
-  */
 
   .projectSection {
     width: 100%;
@@ -545,7 +524,6 @@
     margin-right: auto;
 
     padding: 0;
-
     box-sizing: border-box;
   }
 
@@ -567,18 +545,10 @@
     line-height: 1.75;
   }
 
-  /*
-    Keep images and video responsive.
-  */
-
   .chapterContent img,
   .chapterContent video {
     max-width: 100%;
   }
-
-  /*
-    Close button stays in the sticky layer.
-  */
 
   .projectClose {
     top: 18px;
@@ -626,10 +596,9 @@
   }
 }
 
-
-/* =====================================
+/* ============================================
    MOBILE CLOSE BUTTON
-===================================== */
+============================================ */
 
 .mobileClose {
   display: none;
@@ -684,6 +653,82 @@
   .mobileClose:focus-visible {
     outline: 2px solid
       var(--project-color, #c3a2eb);
+
     outline-offset: 4px;
+  }
+}
+
+/* ============================================
+   NEW — FINAL SECTION
+============================================ */
+
+.finalSection {
+  position: relative;
+  z-index: 30;
+
+  width: 100%;
+  min-height: 100svh;
+
+  margin: 0;
+  padding: 0;
+
+  isolation: isolate;
+
+  pointer-events: auto;
+}
+
+/* Keep Final's content interactive */
+
+.finalSection a,
+.finalSection button {
+  pointer-events: auto;
+}
+
+/* ============================================
+   HIDE VINYL WHEN FINAL IS ACTIVE
+============================================ */
+
+.desktopVinylLayer,
+.desktopTransitionLayer {
+  transition: opacity 650ms ease;
+}
+
+.finalActive .desktopVinylLayer,
+.finalActive .desktopTransitionLayer {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Hide project-specific UI */
+
+.finalActive .projectIdentity,
+.finalActive .nextProjectShortcut,
+.finalActive .projectClose {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ============================================
+   FINAL — MOBILE
+============================================ */
+
+@media (max-width: 767px) {
+  .finalSection {
+    width: 100%;
+    min-height: 100svh;
+    overflow: visible;
+  }
+}
+
+/* ============================================
+   FINAL — REDUCED MOTION
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .desktopVinylLayer,
+  .desktopTransitionLayer {
+    transition: none;
   }
 }

@@ -1,31 +1,52 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,600&display=swap");
 
-/* ============================================
+/* =========================================
    CD OPENING EXPERIENCE
-============================================ */
+========================================= */
 
 .experience {
-  --disc-size: clamp(240px, min(34vw, 56vh), 460px);
+  --disc-size: clamp(
+    240px,
+    min(34vw, 56vh),
+    460px
+  );
+
+  --disc-diameter:
+    calc(var(--disc-size) * 0.88);
 
   position: absolute;
   inset: 0;
+
   z-index: 8;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
   overflow: hidden;
+
   perspective: 1800px;
 
-  opacity: var(--visibility);
+  opacity: 0;
+  visibility: hidden;
+
   pointer-events: none;
+  isolation: isolate;
+
+  transition:
+    opacity 500ms ease,
+    visibility 500ms ease;
 }
 
-/* ============================================
-   OPEN JEWEL CASE
-============================================ */
+.experienceVisible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* =========================================
+   CASE SPREAD
+========================================= */
 
 .caseSpread {
   position: relative;
@@ -35,16 +56,54 @@
 
   flex-shrink: 0;
 
-  transform: translateX(var(--horizontal-shift));
   transform-style: preserve-3d;
 
-  transition: transform 280ms
-    cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-25%);
+
+  transition:
+    transform 900ms cubic-bezier(
+      0.22, 1, 0.36, 1
+    ),
+    opacity 750ms ease,
+    filter 750ms ease;
+
+  will-change: transform;
 }
 
-/* ============================================
+/* CLOSED CASE */
+
+.stageClosed .caseSpread {
+  transform: translateX(-25%);
+  opacity: 1;
+  filter: none;
+}
+
+/* OPEN CASE */
+
+.stageOpen .caseSpread {
+  transform: translateX(0);
+  opacity: 1;
+  filter: none;
+}
+
+/* CASE DISAPPEARS WHILE DISC EXITS */
+
+.stageLeaving .caseSpread {
+  transform: translateX(0) scale(0.94);
+  opacity: 0;
+  filter: blur(6px);
+
+  transition:
+    transform 950ms cubic-bezier(
+      0.22, 1, 0.36, 1
+    ) 180ms,
+    opacity 750ms ease 180ms,
+    filter 750ms ease 180ms;
+}
+
+/* =========================================
    RIGHT TRAY
-============================================ */
+========================================= */
 
 .tray {
   position: absolute;
@@ -55,17 +114,27 @@
   width: var(--disc-size);
   height: var(--disc-size);
 
-  overflow: visible;
+  z-index: 1;
 
-  border: 3px solid rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+
+  border: 3px solid
+    rgba(255, 255, 255, 0.9);
+
   border-radius: 3px;
 
   background: #e7eee7;
 
   box-shadow:
-    3px 5px 0 rgba(157, 171, 160, 0.28),
-    15px 22px 45px rgba(0, 0, 0, 0.13),
-    inset 0 0 0 5px rgba(255, 255, 255, 0.2);
+    3px 5px 0 rgba(
+      157, 171, 160, 0.28
+    ),
+    15px 22px 45px rgba(
+      0, 0, 0, 0.13
+    ),
+    inset 0 0 0 5px rgba(
+      255, 255, 255, 0.2
+    );
 }
 
 .trayBackground {
@@ -87,28 +156,61 @@
   opacity: 0.58;
 }
 
-/* ============================================
-   CD FLIGHT
-============================================ */
+/* =========================================
+   CD INSIDE TRAY
+========================================= */
 
 .discFlight {
   position: absolute;
   inset: 0;
-  z-index: 5;
 
-  transform: translateX(var(--flight-x));
+  z-index: 2;
 
-  transition: transform 440ms
-    cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  visibility: hidden;
 
-  will-change: transform;
+  transform: scale(0.92);
+
+  transition:
+    opacity 300ms ease,
+    transform 600ms cubic-bezier(
+      0.22, 1, 0.36, 1
+    );
+
   pointer-events: none;
 }
 
-/* ============================================
-   ROUND DISC
-   NO PROJECT-COLOUR TINT
-============================================ */
+/* CD COMPLETELY HIDDEN WHEN CLOSED */
+
+.stageClosed .discFlight {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.92);
+}
+
+/* CD APPEARS AFTER OPENING */
+
+.stageOpen .discFlight {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+
+  transition-delay: 550ms;
+}
+
+/* ORIGINAL TRAY CD HIDES WHEN FLYING */
+
+.stageLeaving .discFlight {
+  opacity: 0;
+  visibility: hidden;
+
+  transform: scale(1);
+  transition-delay: 0ms;
+}
+
+/* =========================================
+   DISC
+========================================= */
 
 .disc {
   position: absolute;
@@ -125,10 +227,29 @@
   background: #151917;
 
   box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.85),
-    0 3px 10px rgba(0, 0, 0, 0.18);
+    0 0 0 2px rgba(
+      255, 255, 255, 0.85
+    ),
+    0 3px 10px rgba(
+      0, 0, 0, 0.18
+    );
 
-  animation: discSpin 9s linear infinite;
+  transform:
+    translate(-50%, -50%)
+    rotate(0deg);
+
+  animation:
+    discSpin 9s linear infinite;
+
+  animation-play-state: paused;
+}
+
+.stageOpen .disc {
+  animation-play-state: running;
+}
+
+.stageLeaving .disc {
+  animation-play-state: paused;
 }
 
 @keyframes discSpin {
@@ -159,6 +280,7 @@
 
   opacity: 1;
   filter: none;
+
   pointer-events: none;
 }
 
@@ -189,21 +311,30 @@
   width: 11%;
   aspect-ratio: 1;
 
-  transform: translate(-50%, -50%);
+  transform: translate(
+    -50%,
+    -50%
+  );
 
   border-radius: 50%;
 
   background: #f5f5f1;
-  border: 4px solid rgba(255, 255, 255, 0.9);
+
+  border: 4px solid
+    rgba(255, 255, 255, 0.9);
 
   box-shadow:
-    0 0 0 3px rgba(40, 70, 50, 0.18),
-    inset 0 1px 5px rgba(0, 0, 0, 0.16);
+    0 0 0 3px rgba(
+      40, 70, 50, 0.18
+    ),
+    inset 0 1px 5px rgba(
+      0, 0, 0, 0.16
+    );
 }
 
-/* ============================================
-   PLASTIC TRAY DETAILS
-============================================ */
+/* =========================================
+   TRAY DETAILS
+========================================= */
 
 .trayEdge {
   position: absolute;
@@ -212,8 +343,12 @@
   pointer-events: none;
 
   box-shadow:
-    inset 0 0 0 8px rgba(255, 255, 255, 0.2),
-    inset 0 0 15px rgba(255, 255, 255, 0.26);
+    inset 0 0 0 8px rgba(
+      255, 255, 255, 0.2
+    ),
+    inset 0 0 15px rgba(
+      255, 255, 255, 0.26
+    );
 }
 
 .trayReflection {
@@ -231,9 +366,9 @@
   );
 }
 
-/* ============================================
-   HINGED FRONT COVER
-============================================ */
+/* =========================================
+   COVER PANEL
+========================================= */
 
 .coverPanel {
   position: absolute;
@@ -244,14 +379,28 @@
   width: var(--disc-size);
   height: var(--disc-size);
 
+  z-index: 5;
+
   transform-origin: left center;
-  transform: rotateY(var(--cover-angle));
+
+  transform: rotateY(0deg);
   transform-style: preserve-3d;
 
-  transition: transform 300ms
-    cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 900ms cubic-bezier(
+      0.22, 1, 0.36, 1
+    );
 
   will-change: transform;
+}
+
+.stageClosed .coverPanel {
+  transform: rotateY(0deg);
+}
+
+.stageOpen .coverPanel,
+.stageLeaving .coverPanel {
+  transform: rotateY(-180deg);
 }
 
 .frontSurface,
@@ -261,27 +410,35 @@
 
   overflow: hidden;
 
-  border: 3px solid rgba(255, 255, 255, 0.86);
+  border: 3px solid rgba(
+    255, 255, 255, 0.86
+  );
+
   border-radius: 3px;
 
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+    inset 0 0 0 2px rgba(
+      255, 255, 255, 0.3
+    );
 }
 
-/* ============================================
-   OUTSIDE OF COVER
-   PROJECT COLOUR IS KEPT
-============================================ */
+/* =========================================
+   FRONT COVER
+========================================= */
 
 .frontSurface {
   background: var(--project-color);
 
   box-shadow:
-    4px 8px 24px rgba(0, 0, 0, 0.11),
-    inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+    4px 8px 24px rgba(
+      0, 0, 0, 0.11
+    ),
+    inset 0 0 0 2px rgba(
+      255, 255, 255, 0.3
+    );
 }
 
 .frontImage {
@@ -292,7 +449,6 @@
   height: 100%;
 
   object-fit: cover;
-
   opacity: 0.88;
 
   filter:
@@ -323,7 +479,9 @@
   );
 
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+    inset 0 0 0 2px rgba(
+      255, 255, 255, 0.25
+    );
 }
 
 .frontSpine {
@@ -343,7 +501,9 @@
   );
 
   border-right:
-    1px solid rgba(255, 255, 255, 0.5);
+    1px solid rgba(
+      255, 255, 255, 0.5
+    );
 }
 
 .frontText {
@@ -373,14 +533,17 @@
 .frontText h2 {
   margin: 8px 0 0;
 
-  font-size: clamp(24px, 3vw, 42px);
+  font-size: clamp(
+    24px, 3vw, 42px
+  );
+
   font-weight: 500;
   letter-spacing: -0.05em;
 }
 
-/* ============================================
+/* =========================================
    INSIDE COVER
-============================================ */
+========================================= */
 
 .insideSurface {
   transform: rotateY(180deg);
@@ -392,8 +555,12 @@
   );
 
   box-shadow:
-    -8px 14px 30px rgba(0, 0, 0, 0.09),
-    inset 0 0 0 8px rgba(255, 255, 255, 0.22);
+    -8px 14px 30px rgba(
+      0, 0, 0, 0.09
+    ),
+    inset 0 0 0 8px rgba(
+      255, 255, 255, 0.22
+    );
 }
 
 .insideContent {
@@ -403,30 +570,53 @@
   display: flex;
   flex-direction: column;
 
-  padding: clamp(14px, 2.3vw, 32px);
+  padding: clamp(
+    14px, 2.3vw, 32px
+  );
 
-  opacity: var(--details-opacity);
+  opacity: 0;
+
+  transition:
+    opacity 450ms ease;
 
   color: #264435;
 }
 
+.stageOpen .insideContent {
+  opacity: 1;
+  transition-delay: 700ms;
+}
+
+.stageClosed .insideContent,
+.stageLeaving .insideContent {
+  opacity: 0;
+  transition-delay: 0ms;
+}
+
 .eyebrow {
-  font-size: clamp(7px, 0.75vw, 10px);
+  font-size: clamp(
+    7px, 0.75vw, 10px
+  );
+
   letter-spacing: 0.11em;
   opacity: 0.65;
 }
 
-/* ============================================
-   NEW EDITORIAL HEADLINE
-============================================ */
+/* =========================================
+   TYPEWRITER HEADLINE
+========================================= */
 
 .introHeadline {
   margin: auto 0 16px;
   max-width: 100%;
 
-  font-family: "Fraunces", Georgia, serif;
+  font-family:
+    "Fraunces", Georgia, serif;
 
-  font-size: clamp(20px, 2.6vw, 40px);
+  font-size: clamp(
+    20px, 2.6vw, 40px
+  );
+
   font-weight: 600;
   font-style: italic;
   font-optical-sizing: auto;
@@ -435,15 +625,13 @@
   letter-spacing: -0.045em;
 
   color: #264435;
+
   overflow-wrap: break-word;
 }
 
-/* ============================================
-   TYPEWRITER CURSOR
-============================================ */
-
 .typingCursor {
   display: inline-block;
+
   margin-left: 2px;
 
   font-family: Arial, sans-serif;
@@ -453,7 +641,8 @@
 
   color: #bf745c;
 
-  animation: cdCursorBlink 700ms
+  animation:
+    cdCursorBlink 700ms
     steps(1, end) infinite;
 }
 
@@ -467,23 +656,29 @@
   }
 }
 
-/* ============================================
-   DESCRIPTION AFTER TYPING
-============================================ */
+/* =========================================
+   DESCRIPTION
+========================================= */
 
 .introDescription {
   max-width: 380px;
   margin: 0;
 
-  font-size: clamp(10px, 1.05vw, 15px);
+  font-size: clamp(
+    10px, 1.05vw, 15px
+  );
+
   line-height: 1.5;
 
-  color: rgba(38, 68, 53, 0.78);
+  color: rgba(
+    38, 68, 53, 0.78
+  );
 
   transition:
     opacity 650ms ease,
-    transform 650ms
-    cubic-bezier(0.22, 1, 0.36, 1);
+    transform 650ms cubic-bezier(
+      0.22, 1, 0.36, 1
+    );
 }
 
 .descriptionHidden {
@@ -496,9 +691,9 @@
   transform: translateY(0);
 }
 
-/* ============================================
-   SCROLL HINT
-============================================ */
+/* =========================================
+   INSIDE HINT
+========================================= */
 
 .insideHint {
   display: block;
@@ -537,9 +732,9 @@
   );
 }
 
-/* ============================================
+/* =========================================
    PLASTIC HINGE
-============================================ */
+========================================= */
 
 .hinge {
   position: absolute;
@@ -560,19 +755,154 @@
   );
 
   border-left:
-    1px solid rgba(255, 255, 255, 0.6);
+    1px solid rgba(
+      255, 255, 255, 0.6
+    );
 
   border-right:
-    1px solid rgba(120, 140, 130, 0.18);
+    1px solid rgba(
+      120, 140, 130, 0.18
+    );
 
-  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    1px 0 4px rgba(
+      0, 0, 0, 0.08
+    );
+
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.stageOpen .hinge {
+  opacity: 1;
+}
+
+/* =========================================
+   FLOATING DISC
+
+   The center of the tray is:
+
+   viewport center + half disc-size
+
+   So the flying CD starts exactly there.
+========================================= */
+
+.floatingDisc {
+  position: absolute;
+
+  top: 50%;
+
+  left: calc(
+    50% + var(--disc-size) / 2
+  );
+
+  width: var(--disc-diameter);
+  height: var(--disc-diameter);
+
+  z-index: 12;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform:
+    translate(-50%, -50%);
 
   pointer-events: none;
 }
 
-/* ============================================
-   CAPTION BELOW CASE
-============================================ */
+/* =========================================
+   STAGE 3: FLY TO THE RIGHT
+
+   Starts from tray position.
+   Travels completely offscreen.
+
+   No sudden jump to the left.
+========================================= */
+
+.stageLeaving .floatingDisc {
+  opacity: 1;
+  visibility: visible;
+
+  animation:
+    discExitRight 1150ms
+    cubic-bezier(0.45, 0, 0.2, 1)
+    forwards;
+}
+
+@keyframes discExitRight {
+  0% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg)
+      scale(1);
+  }
+
+  18% {
+    opacity: 1;
+
+    transform:
+      translate(
+        calc(-50% + 5vw),
+        -50%
+      )
+      rotate(40deg)
+      scale(1.02);
+  }
+
+  65% {
+    opacity: 1;
+
+    transform:
+      translate(
+        calc(-50% + 48vw),
+        -50%
+      )
+      rotate(220deg)
+      scale(1);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translate(
+        calc(-50% + 105vw),
+        -50%
+      )
+      rotate(430deg)
+      scale(0.95);
+  }
+}
+
+/* DISC APPEARANCE */
+
+.floatingDiscInner {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+  border-radius: 50%;
+
+  background: #151917;
+
+  box-shadow:
+    0 0 0 2px rgba(
+      255, 255, 255, 0.85
+    ),
+    0 12px 30px rgba(
+      0, 0, 0, 0.15
+    );
+}
+
+/* =========================================
+   PROJECT CAPTION
+========================================= */
 
 .projectCaption {
   position: absolute;
@@ -583,14 +913,28 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
   gap: 6px;
 
   transform: translateX(-50%);
 
-  opacity: var(--details-opacity);
+  opacity: 0;
+
+  transition:
+    opacity 400ms ease;
 
   white-space: nowrap;
   pointer-events: none;
+}
+
+.stageOpen .projectCaption {
+  opacity: 1;
+  transition-delay: 850ms;
+}
+
+.stageLeaving .projectCaption {
+  opacity: 0;
+  transition-delay: 0ms;
 }
 
 .projectCaption span {
@@ -605,13 +949,93 @@
   color: #303a30;
 }
 
-/* ============================================
+/* =========================================
+   KEEP SCROLLING INDICATOR
+========================================= */
+
+.scrollCue {
+  position: absolute;
+
+  left: 50%;
+  bottom: clamp(
+    26px, 6vh, 64px
+  );
+
+  z-index: 30;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  transform: translateX(-50%);
+
+  opacity: 0;
+
+  transition:
+    opacity 350ms ease;
+
+  pointer-events: none;
+  user-select: none;
+
+  color: #35313e;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.stageClosed .scrollCue {
+  opacity: 0.7;
+  transition-delay: 600ms;
+}
+
+.stageOpen .scrollCue {
+  opacity: 0.55;
+  transition-delay: 1400ms;
+}
+
+.stageLeaving .scrollCue {
+  opacity: 0;
+  transition-delay: 0ms;
+}
+
+.scrollCueLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+}
+
+.scrollCueArrow {
+  display: inline-block;
+
+  font-size: 23px;
+  font-weight: 300;
+  line-height: 1;
+
+  animation:
+    scrollCueFloat 1.8s
+    ease-in-out infinite;
+}
+
+@keyframes scrollCueFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* =========================================
    TABLET
-============================================ */
+========================================= */
 
 @media (max-width: 768px) {
   .experience {
-    --disc-size: min(44vw, 36vh);
+    --disc-size: min(43vw, 35vh);
   }
 
   .insideContent {
@@ -619,7 +1043,10 @@
   }
 
   .introHeadline {
-    font-size: clamp(14px, 2.8vw, 22px);
+    font-size: clamp(
+      14px, 2.8vw, 22px
+    );
+
     margin-bottom: 8px;
   }
 
@@ -633,64 +1060,156 @@
   }
 
   .projectCaption {
-    bottom: 16%;
+    bottom: 14%;
   }
 }
 
-/* ============================================
+/* =========================================
    MOBILE
-============================================ */
+========================================= */
 
 @media (max-width: 480px) {
   .experience {
-    --disc-size: min(45vw, 35vh);
+    --disc-size: min(45vw, 31vh);
+  }
+
+  .stageClosed .caseSpread {
+    transform: translateX(-25%);
+  }
+
+  .stageOpen .caseSpread {
+    transform: translateX(0);
+  }
+
+  .stageLeaving .caseSpread {
+    transform:
+      translateX(0)
+      scale(0.94);
+  }
+
+  .frontText {
+    padding: 12px;
+  }
+
+  .frontText span {
+    font-size: 7px;
+  }
+
+  .frontText h2 {
+    font-size: clamp(
+      17px, 5vw, 24px
+    );
+  }
+
+  .frontSpine {
+    width: 9px;
   }
 
   .insideContent {
-    padding: 9px;
+    padding: 10px;
   }
 
   .eyebrow {
     font-size: 6px;
+    letter-spacing: 0.06em;
   }
 
   .introHeadline {
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: clamp(
+      13px, 3.6vw, 17px
+    );
+
+    line-height: 1.15;
+    margin-bottom: 7px;
   }
 
   .introDescription {
     font-size: 8px;
+    line-height: 1.35;
   }
 
   .insideHint {
     font-size: 6px;
+    padding-top: 7px;
   }
 
   .projectCaption {
-    bottom: 22%;
+    bottom: 19%;
+  }
+
+  .projectCaption strong {
+    font-size: 12px;
+  }
+
+  .scrollCue {
+    bottom: 29px;
+    gap: 5px;
+  }
+
+  .scrollCueLabel {
+    font-size: 9px;
+  }
+
+  .scrollCueArrow {
+    font-size: 21px;
   }
 }
 
-/* ============================================
-   REDUCED MOTION
-============================================ */
+/* =========================================
+   SHORT SCREENS
+========================================= */
 
-@media (prefers-reduced-motion: reduce) {
-  .disc {
-    animation: none;
-    transform: translate(-50%, -50%);
+@media (max-height: 600px) {
+  .experience {
+    --disc-size: min(
+      36vw, 43vh
+    );
   }
 
+  .scrollCue {
+    bottom: 15px;
+  }
+
+  .projectCaption {
+    bottom: 5%;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
   .caseSpread,
   .coverPanel,
   .discFlight,
+  .insideContent,
   .introDescription,
-  .insideHint {
+  .insideHint,
+  .scrollCue,
+  .experience {
     transition: none;
   }
 
-  .typingCursor {
+  .disc,
+  .typingCursor,
+  .scrollCueArrow {
     animation: none;
+  }
+
+  .disc {
+    transform:
+      translate(-50%, -50%);
+  }
+
+  .stageLeaving .floatingDisc {
+    animation: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .stageLeaving .caseSpread {
+    opacity: 0;
+    filter: none;
   }
 }

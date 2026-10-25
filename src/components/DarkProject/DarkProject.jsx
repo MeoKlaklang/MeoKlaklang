@@ -9,6 +9,7 @@ import VinylNavigation from "./shared/VinylNavigation";
 import RecordTransition from "./shared/RecordTransition";
 import AmbientBackground from "./shared/AmbientBackground";
 import MobileProjectDock from "./MobileProjectDock";
+import Final from "../Final/Final";
 
 import { portfolioRecords } from "../../data/portfolioRecords";
 
@@ -62,11 +63,7 @@ function getTransitionState(element, viewport) {
    CHAPTER SCROLL STATE
 ===================================== */
 
-function getChapterState(
-  refs,
-  readingLine,
-  viewport
-) {
+function getChapterState(refs, readingLine, viewport) {
   const elements = (refs?.current || []).filter(Boolean);
 
   if (!elements.length) {
@@ -254,6 +251,9 @@ export default function DarkProject() {
   const worldRef = useRef(null);
   const stickyRef = useRef(null);
 
+  // NEW: Final section reference
+  const finalRef = useRef(null);
+
   const chapterRefs = useRef(
     records.map(() => ({
       current: [],
@@ -304,6 +304,13 @@ export default function DarkProject() {
   ] = useState(0);
 
   /* =====================================
+     FINAL STATE
+  ===================================== */
+
+  const [finalActive, setFinalActive] =
+    useState(false);
+
+  /* =====================================
      SCROLL UPDATE
   ===================================== */
 
@@ -331,6 +338,30 @@ export default function DarkProject() {
       setIsMobile((previous) =>
         previous === mobile ? previous : mobile
       );
+
+      /* ---------------------------------
+         NEW: FINAL VISIBILITY
+
+         When the Final section reaches
+         the screen, hide the vinyl.
+      --------------------------------- */
+
+      const finalElement = finalRef.current;
+
+      if (finalElement) {
+        const finalRect =
+          finalElement.getBoundingClientRect();
+
+        const active =
+          finalRect.top <= viewport * 0.5 &&
+          finalRect.bottom > viewport * 0.15;
+
+        setFinalActive((previous) =>
+          previous === active
+            ? previous
+            : active
+        );
+      }
 
       /* ---------------------------------
          ENTRANCE
@@ -605,6 +636,7 @@ export default function DarkProject() {
 
   function handleDiscUp(event) {
     const drag = dragRef.current;
+
     dragRef.current = null;
 
     if (!drag) return;
@@ -701,7 +733,9 @@ export default function DarkProject() {
   return (
     <section
       ref={worldRef}
-      className={styles.world}
+      className={`${styles.world} ${
+        finalActive ? styles.finalActive : ""
+      }`}
       id="portfolio-records"
       onPointerMove={handleBackgroundMove}
       style={{
@@ -791,7 +825,8 @@ export default function DarkProject() {
               entered * (1 - exit);
 
             const interactive =
-              recordIndex === desktopActiveRecordIndex;
+              recordIndex === desktopActiveRecordIndex &&
+              !finalActive;
 
             const state =
               chapters[recordIndex] || {
@@ -883,7 +918,8 @@ export default function DarkProject() {
               desktopActiveRecordIndex === index &&
               state.progress > 0.18 &&
               state.progress < 0.96 &&
-              visible > 0.05;
+              visible > 0.05 &&
+              !finalActive;
 
             return (
               <div
@@ -916,37 +952,39 @@ export default function DarkProject() {
             NEXT PROJECT SHORTCUT
         ===================================== */}
 
-        {upcomingRecord && entrance > 0.8 && (
-          <button
-            type="button"
-            className={styles.nextProjectShortcut}
-            onClick={() =>
-              playRecord(activeRecordIndex + 1)
-            }
-            aria-label={`Next project: ${upcomingRecord.title}`}
-            style={{
-              "--next-project-color":
-                upcomingRecord.color,
-            }}
-          >
-            <span
-              className={
-                styles.nextProjectShortcutLabel
+        {upcomingRecord &&
+          entrance > 0.8 &&
+          !finalActive && (
+            <button
+              type="button"
+              className={styles.nextProjectShortcut}
+              onClick={() =>
+                playRecord(activeRecordIndex + 1)
               }
+              aria-label={`Next project: ${upcomingRecord.title}`}
+              style={{
+                "--next-project-color":
+                  upcomingRecord.color,
+              }}
             >
-              NEXT PROJECT
-            </span>
+              <span
+                className={
+                  styles.nextProjectShortcutLabel
+                }
+              >
+                NEXT PROJECT
+              </span>
 
-            <span
-              className={
-                styles.nextProjectShortcutName
-              }
-            >
-              {upcomingRecord.title}
-              <span aria-hidden="true">↗</span>
-            </span>
-          </button>
-        )}
+              <span
+                className={
+                  styles.nextProjectShortcutName
+                }
+              >
+                {upcomingRecord.title}
+                <span aria-hidden="true">↗</span>
+              </span>
+            </button>
+          )}
 
         {/* =====================================
             NOW PLAYING
@@ -955,9 +993,9 @@ export default function DarkProject() {
         <div
           className={styles.projectIdentity}
           style={{
-            opacity: clamp(
-              (entrance - 0.7) / 0.3
-            ),
+            opacity: finalActive
+              ? 0
+              : clamp((entrance - 0.7) / 0.3),
             pointerEvents: "none",
           }}
         >
@@ -987,12 +1025,29 @@ export default function DarkProject() {
       ))}
 
       {/* =====================================
+          NEW: FINAL
+
+          Separate from the projects.
+          Full-screen content.
+          No vinyl on desktop or mobile.
+      ===================================== */}
+
+      <div
+        ref={finalRef}
+        className={styles.finalSection}
+      >
+        <Final />
+      </div>
+
+      {/* =====================================
           MOBILE VINYL — ABOVE CONTENT
       ===================================== */}
 
       {isMobile && (
         <MobileProjectDock
-          visible={mobileDockVisible}
+          visible={
+            mobileDockVisible && !finalActive
+          }
           project={activeRecord}
           activeChapter={
             chapters[activeRecordIndex]?.active ?? 0
@@ -1019,11 +1074,12 @@ export default function DarkProject() {
       )}
 
       {/* =====================================
-          MOBILE CLOSE — ALWAYS ABOVE VINYL
+          MOBILE CLOSE — ABOVE VINYL
       ===================================== */}
 
       {isMobile &&
         mobileDockVisible &&
+        !finalActive &&
         entrance > 0.9 &&
         createPortal(
           <button

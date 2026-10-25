@@ -11,20 +11,39 @@ const HEADLINE =
   "What if a temporary home could change an animal's life?";
 
 const TYPING_SPEED = 48;
-const VISIBILITY_GRACE = 350;
+const OPEN_DURATION = 900;
 
 const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
 
-function smoothstep(value) {
-  const t = clamp(value);
-  return t * t * (3 - 2 * t);
+/* =========================================
+   ANIMATION STAGES
+
+   1 = Closed jewel case
+   2 = Open jewel case
+   3 = Disc flies RIGHT out of screen
+========================================= */
+
+function getStage(progress, departureProgress) {
+  if (
+    departureProgress > 0.05 ||
+    progress >= 0.84
+  ) {
+    return 3;
+  }
+
+  if (progress >= 0.49) {
+    return 2;
+  }
+
+  return 1;
 }
 
 export default function CDOpening({
   project,
   progress = 0,
   departureProgress = 0,
+  step,
 }) {
   const [characterCount, setCharacterCount] =
     useState(0);
@@ -32,20 +51,21 @@ export default function CDOpening({
   const [typingFinished, setTypingFinished] =
     useState(false);
 
+  const [
+    openAnimationFinished,
+    setOpenAnimationFinished,
+  ] = useState(false);
+
   const [isOnScreen, setIsOnScreen] =
     useState(false);
 
   const experienceRef = useRef(null);
   const audioRef = useRef(null);
-  const intervalRef = useRef(null);
-  const pauseTimerRef = useRef(null);
-
-  const characterRef = useRef(0);
-  const startedRef = useRef(false);
-  const finishedRef = useRef(false);
+  const typingTimerRef = useRef(null);
+  const openingTimerRef = useRef(null);
 
   /* =====================================
-     PROJECT IMAGES / COLORS
+     PROJECT IMAGES & COLORS
   ===================================== */
 
   const image =
@@ -59,85 +79,26 @@ export default function CDOpening({
     project?.color || "#F4D869";
 
   /* =====================================
-     SCROLL-DRIVEN OPENING
+     DETERMINE CURRENT STAGE
   ===================================== */
 
-  const visibility = smoothstep(
-    (progress - 0.23) / 0.1
-  );
+  const controlled =
+    step !== undefined && step !== null;
 
-  const openAmount = smoothstep(
-    (progress - 0.34) / 0.29
-  );
+  const stage = controlled
+    ? clamp(Math.round(Number(step) || 1), 1, 3)
+    : getStage(progress, departureProgress);
 
-  const detailsOpacity = smoothstep(
-    (progress - 0.58) / 0.09
-  );
+  const isClosed = stage === 1;
+  const isOpen = stage === 2;
+  const isLeaving = stage === 3;
 
-  const leaveAmount = smoothstep(
-    departureProgress
-  );
-
-  const coverAngle = -180 * openAmount;
-
-  const horizontalShift =
-    -25 * (1 - openAmount);
-
-  /*
-    Start only when the CD is actually
-    open and visible.
-
-    IMPORTANT:
-    This controls the START of typing,
-    not every individual character.
-  */
-
-  const canStartTyping =
-    progress >= 0.65 &&
-    departureProgress < 0.08 &&
-    isOnScreen;
-
-  const isLeaving =
-    departureProgress >= 0.15 ||
-    progress < 0.5;
+  const isVisible = controlled
+    ? true
+    : progress >= 0.23;
 
   /* =====================================
-     HELPERS
-  ===================================== */
-
-  function stopTyping() {
-    if (intervalRef.current !== null) {
-      window.clearInterval(
-        intervalRef.current
-      );
-
-      intervalRef.current = null;
-    }
-
-    const sound = audioRef.current;
-
-    if (sound) {
-      sound.pause();
-    }
-  }
-
-  function finishTyping() {
-    stopTyping();
-
-    characterRef.current =
-      HEADLINE.length;
-
-    finishedRef.current = true;
-
-    setCharacterCount(
-      HEADLINE.length
-    );
-
-    setTypingFinished(true);
-  }
-
-  /* =====================================
-     CREATE AUDIO ONCE
+     CREATE AUDIO
   ===================================== */
 
   useEffect(() => {
@@ -147,16 +108,17 @@ export default function CDOpening({
 
     audio.preload = "auto";
     audio.volume = 0.18;
+    audio.loop = true;
 
     audioRef.current = audio;
 
     return () => {
       window.clearInterval(
-        intervalRef.current
+        typingTimerRef.current
       );
 
       window.clearTimeout(
-        pauseTimerRef.current
+        openingTimerRef.current
       );
 
       audio.pause();
@@ -167,11 +129,7 @@ export default function CDOpening({
   }, []);
 
   /* =====================================
-     TRACK VISIBILITY
-
-     Use a generous viewport threshold.
-     Small changes in intersection ratio
-     should not interrupt typing.
+     CHECK VIEWPORT VISIBILITY
   ===================================== */
 
   useEffect(() => {
@@ -187,9 +145,8 @@ export default function CDOpening({
         );
       },
       {
-        root: null,
-        rootMargin: "-5% 0px -5% 0px",
         threshold: 0,
+        rootMargin: "-5% 0px -5% 0px",
       }
     );
 
@@ -201,124 +158,152 @@ export default function CDOpening({
   }, []);
 
   /* =====================================
-     START / RESUME TYPING
+     WAIT UNTIL COVER IS OPEN
   ===================================== */
 
   useEffect(() => {
-    if (!canStartTyping) return;
-
-    if (finishedRef.current) return;
-
-    /*
-      Cancel a pending pause if the
-      opening becomes visible again.
-    */
-
     window.clearTimeout(
-      pauseTimerRef.current
+      openingTimerRef.current
     );
 
-    pauseTimerRef.current = null;
-
-    /*
-      The interval is already running.
-      Don't create another one.
-    */
-
-    if (intervalRef.current !== null) {
+    if (!isOpen) {
+      setOpenAnimationFinished(false);
       return;
     }
 
-    const reduceMotion =
+    const reducedMotion =
       window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-    if (reduceMotion) {
-      finishTyping();
+    if (reducedMotion) {
+      setOpenAnimationFinished(true);
       return;
     }
 
-    startedRef.current = true;
-
-    const sound = audioRef.current;
-
-    if (sound) {
-      sound.loop = true;
-
-      sound.play().catch(() => {});
-    }
-
-    /*
-      Continue from the previous
-      character instead of restarting.
-    */
-
-    intervalRef.current = window.setInterval(
-      () => {
-        const next = Math.min(
-          characterRef.current + 1,
-          HEADLINE.length
-        );
-
-        characterRef.current = next;
-
-        setCharacterCount(next);
-
-        if (next >= HEADLINE.length) {
-          finishTyping();
-        }
-      },
-      TYPING_SPEED
-    );
-  }, [canStartTyping]);
-
-  /* =====================================
-     STOP WHEN REALLY LEAVING
-
-     Give temporary visibility changes
-     a small grace period.
-
-     This avoids choppy typing caused
-     by the CD flip animation.
-  ===================================== */
-
-  useEffect(() => {
-    if (!startedRef.current) return;
-
-    if (finishedRef.current) return;
-
-    window.clearTimeout(
-      pauseTimerRef.current
-    );
-
-    if (isLeaving) {
-      stopTyping();
-      return;
-    }
-
-    if (!isOnScreen) {
-      pauseTimerRef.current =
-        window.setTimeout(() => {
-          stopTyping();
-        }, VISIBILITY_GRACE);
-    }
+    openingTimerRef.current =
+      window.setTimeout(() => {
+        setOpenAnimationFinished(true);
+      }, OPEN_DURATION);
 
     return () => {
       window.clearTimeout(
-        pauseTimerRef.current
+        openingTimerRef.current
       );
     };
-  }, [isOnScreen, isLeaving]);
+  }, [isOpen]);
 
   /* =====================================
-     STOP AUDIO IF TAB IS HIDDEN
+     TYPEWRITER
+
+     Only starts after opening.
+     Stops when leaving.
+  ===================================== */
+
+  useEffect(() => {
+    window.clearInterval(
+      typingTimerRef.current
+    );
+
+    typingTimerRef.current = null;
+
+    const audio = audioRef.current;
+
+    if (audio) {
+      audio.pause();
+    }
+
+    if (isClosed) {
+      setCharacterCount(0);
+      setTypingFinished(false);
+      return;
+    }
+
+    if (isLeaving) {
+      return;
+    }
+
+    if (
+      !isOpen ||
+      !openAnimationFinished ||
+      !isOnScreen ||
+      typingFinished
+    ) {
+      return;
+    }
+
+    const reducedMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+    if (reducedMotion) {
+      setCharacterCount(HEADLINE.length);
+      setTypingFinished(true);
+      return;
+    }
+
+    if (audio) {
+      audio.play().catch(() => {});
+    }
+
+    typingTimerRef.current =
+      window.setInterval(() => {
+        setCharacterCount((previous) => {
+          const next = Math.min(
+            previous + 1,
+            HEADLINE.length
+          );
+
+          if (next >= HEADLINE.length) {
+            window.clearInterval(
+              typingTimerRef.current
+            );
+
+            typingTimerRef.current = null;
+
+            if (audioRef.current) {
+              audioRef.current.pause();
+            }
+
+            setTypingFinished(true);
+          }
+
+          return next;
+        });
+      }, TYPING_SPEED);
+
+    return () => {
+      window.clearInterval(
+        typingTimerRef.current
+      );
+
+      typingTimerRef.current = null;
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, [
+    isClosed,
+    isOpen,
+    isLeaving,
+    openAnimationFinished,
+    isOnScreen,
+    typingFinished,
+  ]);
+
+  /* =====================================
+     PAUSE AUDIO WHEN TAB IS HIDDEN
   ===================================== */
 
   useEffect(() => {
     function handleVisibilityChange() {
-      if (document.hidden) {
-        stopTyping();
+      if (
+        document.hidden &&
+        audioRef.current
+      ) {
+        audioRef.current.pause();
       }
     }
 
@@ -336,27 +321,51 @@ export default function CDOpening({
   }, []);
 
   /* =====================================
+     STAGE CLASSES
+  ===================================== */
+
+  const experienceClass = [
+    styles.experience,
+
+    isClosed
+      ? styles.stageClosed
+      : "",
+
+    isOpen
+      ? styles.stageOpen
+      : "",
+
+    isLeaving
+      ? styles.stageLeaving
+      : "",
+
+    isVisible
+      ? styles.experienceVisible
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  /* =====================================
      RENDER
   ===================================== */
 
   return (
     <div
       ref={experienceRef}
-      className={styles.experience}
+      className={experienceClass}
       style={{
-        "--visibility": visibility,
-        "--cover-angle": `${coverAngle}deg`,
-        "--horizontal-shift":
-          `${horizontalShift}%`,
-        "--details-opacity":
-          detailsOpacity,
         "--project-color": color,
-        "--flight-x":
-          `${leaveAmount * 115}vw`,
       }}
+      data-stage={stage}
     >
+      {/* =================================
+          JEWEL CASE
+      ================================= */}
+
       <div className={styles.caseSpread}>
-        {/* CD TRAY */}
+
+        {/* RIGHT TRAY */}
 
         <div className={styles.tray}>
           <div
@@ -364,6 +373,8 @@ export default function CDOpening({
               styles.trayBackground
             }
           />
+
+          {/* CD INSIDE TRAY */}
 
           <div
             className={styles.discFlight}
@@ -403,13 +414,17 @@ export default function CDOpening({
           />
         </div>
 
-        {/* OPENING COVER */}
+        {/* =================================
+            FRONT COVER
+        ================================= */}
 
         <div
           className={styles.coverPanel}
         >
           <div
-            className={styles.frontSurface}
+            className={
+              styles.frontSurface
+            }
           >
             <img
               src={image}
@@ -447,7 +462,9 @@ export default function CDOpening({
             </div>
           </div>
 
-          {/* INSIDE OF COVER */}
+          {/* =================================
+              INSIDE COVER
+          ================================= */}
 
           <div
             className={
@@ -460,7 +477,9 @@ export default function CDOpening({
               }
             >
               <span
-                className={styles.eyebrow}
+                className={
+                  styles.eyebrow
+                }
               >
                 01 / A PROJECT WITH A PURPOSE
               </span>
@@ -471,7 +490,9 @@ export default function CDOpening({
                 }
                 aria-label={HEADLINE}
               >
-                <span aria-hidden="true">
+                <span
+                  aria-hidden="true"
+                >
                   {HEADLINE.slice(
                     0,
                     characterCount
@@ -492,29 +513,29 @@ export default function CDOpening({
               </h2>
 
               <p
-                className={`${
-                  styles.introDescription
-                } ${
+                className={[
+                  styles.introDescription,
+
                   typingFinished
                     ? styles.descriptionVisible
-                    : styles.descriptionHidden
-                }`}
+                    : styles.descriptionHidden,
+                ].join(" ")}
               >
                 Het Mandje connects animal
                 shelters, foster families
                 and veterinarians to make
-                temporary animal care easier
-                to organize.
+                temporary animal care
+                easier to organize.
               </p>
 
               <span
-                className={`${
-                  styles.insideHint
-                } ${
+                className={[
+                  styles.insideHint,
+
                   typingFinished
                     ? styles.hintVisible
-                    : styles.descriptionHidden
-                }`}
+                    : styles.descriptionHidden,
+                ].join(" ")}
               >
                 SCROLL TO DISCOVER ↓
               </span>
@@ -528,21 +549,101 @@ export default function CDOpening({
           </div>
         </div>
 
+        {/* HINGE */}
+
         <div
           className={styles.hinge}
         />
       </div>
+
+      {/* =====================================
+          FLOATING DISC
+
+          Starts at EXACT tray position.
+          Then FLIES RIGHT offscreen.
+
+          Only visible at stage 3.
+      ===================================== */}
+
+      <div
+        className={
+          styles.floatingDisc
+        }
+        aria-hidden="true"
+      >
+        <div
+          className={
+            styles.floatingDiscInner
+          }
+        >
+          <img
+            src={discImage}
+            alt=""
+            draggable={false}
+            className={
+              styles.discImage
+            }
+          />
+
+          <span
+            className={
+              styles.discRings
+            }
+          />
+
+          <span
+            className={
+              styles.discHole
+            }
+          />
+        </div>
+      </div>
+
+      {/* =====================================
+          PROJECT CAPTION
+      ===================================== */}
 
       <div
         className={
           styles.projectCaption
         }
       >
-        <span>NOW PLAYING</span>
+        <span>
+          NOW PLAYING
+        </span>
 
         <strong>
           {project?.title}
         </strong>
+      </div>
+
+      {/* =====================================
+          KEEP SCROLLING
+      ===================================== */}
+
+      <div
+        className={
+          styles.scrollCue
+        }
+        aria-hidden="true"
+      >
+        <span
+          className={
+            styles.scrollCueLabel
+          }
+        >
+          {isOpen
+            ? "SCROLL TO DISCOVER"
+            : "KEEP SCROLLING"}
+        </span>
+
+        <span
+          className={
+            styles.scrollCueArrow
+          }
+        >
+          ↓
+        </span>
       </div>
     </div>
   );
