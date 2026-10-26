@@ -91,7 +91,7 @@ export const portfolioRecords = [
       title: "GISTDA",
     },
     "#C3A2EB",
-    ["Intro", "Editorial", "Branding", "Logo"],
+    ["Intro", "Editorial", "Visual", "Logo"],
     Gistda
   ),
 ];
