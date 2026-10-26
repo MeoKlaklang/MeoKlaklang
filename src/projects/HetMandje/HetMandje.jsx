@@ -65,35 +65,18 @@ const WIREFRAMES = [
 ];
 
 const MOCKUPS = [
-	{
-		src: `${BASE}/mockup2.png`,
-
-		category: "01 / HOMEPAGE",
-
-		label: "First impressions",
-
-		className: "mockupMain",
-	},
-
-	{
-		src: `${BASE}/mockup3.png`,
-
-		category: "02 / ANIMAL DISCOVERY",
-
-		label: "Foster families",
-
-		className: "mockupTop",
-	},
-
-	{
-		src: `${BASE}/home mockup final.png`,
-
-		category: "03 / VETERINARIAN DASHBOARD",
-
-		label: "Medical care",
-
-		className: "mockupBottom",
-	},
+  {
+    src: "/images/projects/mockup1.png",
+    label: "Interactive Animal Map",
+    category: "DISCOVER & EXPLORE",
+    className: "mockupOne",
+  },
+  {
+    src: "/images/projects/mockup4.png",
+    label: "Shelter Management Platform",
+    category: "MANAGE & CONNECT",
+    className: "mockupTwo",
+  },
 ];
 
 export default function HetMandje({ chaptersRef, revealedWords }) {

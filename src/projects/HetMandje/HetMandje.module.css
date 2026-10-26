@@ -2081,3 +2081,144 @@
 		letter-spacing: 0.06em;
 	}
 }
+
+
+/* =========================================
+   FINAL SHOWCASE
+========================================= */
+
+.finalShowcase {
+  position: relative;
+  width: 100%;
+  padding: 100px 0 120px;
+  overflow: hidden;
+}
+
+.finalShowcaseHeading {
+  width: min(90%, 1400px);
+  margin: 0 auto 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+/* =========================================
+   MOCKUP LAYOUT
+========================================= */
+
+.mockupCollage {
+  width: min(94%, 1550px);
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 85px;
+}
+
+/* =========================================
+   EACH MOCKUP
+========================================= */
+
+.mockupItem {
+  position: relative;
+
+  width: 100%;
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow: visible;
+}
+
+/* Keep both mockups large */
+
+.mockupOne,
+.mockupTwo {
+  width: 100%;
+}
+
+/* Show complete image */
+
+.mockupItem img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  max-width: 100%;
+  object-fit: contain;
+
+  border-radius: 16px;
+}
+
+/* =========================================
+   CAPTIONS
+========================================= */
+
+.mockupItem figcaption {
+  width: 100%;
+  margin-top: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.mockupItem figcaption span:first-child {
+  opacity: 0.5;
+}
+
+.mockupItem figcaption span:last-child {
+  font-weight: 600;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+  .finalShowcase {
+    padding: 65px 0 80px;
+  }
+
+  .finalShowcaseHeading {
+    width: 92%;
+    margin-bottom: 35px;
+
+    font-size: 9px;
+  }
+
+  .mockupCollage {
+    width: 96%;
+    gap: 45px;
+  }
+
+  .mockupItem img {
+    width: 100%;
+    height: auto;
+
+    object-fit: contain;
+    border-radius: 10px;
+  }
+
+  .mockupItem figcaption {
+    margin-top: 14px;
+    font-size: 9px;
+  }
+}
