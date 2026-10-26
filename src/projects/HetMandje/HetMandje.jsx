@@ -64,20 +64,28 @@ const WIREFRAMES = [
 	},
 ];
 
+
 const MOCKUPS = [
   {
-    src: "/images/projects/mockup1.png",
-    label: "Interactive Animal Map",
-    category: "DISCOVER & EXPLORE",
+    src: "/images/projects/mockup5.png",
+    label: "Find Your Perfect Match",
+    category: "ANIMAL SEARCH & DISCOVERY",
     className: "mockupOne",
   },
   {
-    src: "/images/projects/mockup4.png",
-    label: "Shelter Management Platform",
-    category: "MANAGE & CONNECT",
+    src: "/images/projects/mockup1.png",
+    label: "Shelter & Veterinary Dashboard",
+    category: "MEDICAL RECORDS & FOSTER APPLICATIONS",
     className: "mockupTwo",
   },
+  {
+    src: "/images/projects/mockup4.png",
+    label: "Interactive Shelter Map",
+    category: "LOCATION-BASED ANIMAL DISCOVERY",
+    className: "mockupThree",
+  },
 ];
+
 
 export default function HetMandje({ chaptersRef, revealedWords }) {
 	const statsRef = useRef(null);
@@ -139,7 +147,6 @@ export default function HetMandje({ chaptersRef, revealedWords }) {
 						{/* PROJECT DIVIDER */}
 
 						<div className={styles.projectDivider}>
-
 							<span className={styles.dividerLine} aria-hidden="true" />
 
 							<span className={styles.dividerYear}>2026</span>

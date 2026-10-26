@@ -6,7 +6,7 @@ export const projects = [
     slug: "het-mandje",
     category: "UX/UI · Full-stack",
     year: "2026",
-    image: "/images/projects/mockup4.png",
+    image: "/images/projects/mockup5.png",
     color: "#F5D76E",
     description:
       "A digital platform connecting animal shelters and foster families.",
