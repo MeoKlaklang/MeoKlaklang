@@ -55,7 +55,7 @@ const skillGroups = [
 	{
 		title: "Design Tools",
 		color: "#F59AC2",
-		items: ["Figma", "Adobe Illustrator", "Adobe Photoshop", "Adobe XD", "Adobe InDesign", "Premiere Pro", "Rive"],
+		items: ["Figma", "Adobe Illustrator", "Adobe Photoshop", "Adobe XD", "Adobe InDesign", "Premiere Pro"],
 	},
 	{
 		title: "Development",
