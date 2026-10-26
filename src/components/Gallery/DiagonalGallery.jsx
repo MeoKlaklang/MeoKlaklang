@@ -14,12 +14,30 @@ import styles from "./DiagonalGallery.module.css";
    SETTINGS
 ===================================== */
 
-const AUTO_SPEED = 0.000085;
+// Desktop automatic orbit
+const AUTO_SPEED = 0.00016;
+
+// Mobile automatic vertical ring
+const MOBILE_AUTO_SPEED = 0.000015;
+
+// Pause after mobile interaction (ms)
+const MOBILE_RESUME_DELAY = 2500;
+
+// Drag sensitivity
 const DESKTOP_DRAG_SPEED = 0.005;
 const MOBILE_DRAG_SPEED = 0.008;
 
+// Swipe settings
 const SWIPE_THRESHOLD = 8;
-const SNAP_DELAY = 0;
+
+// Desktop spin-open animation
+const INTRO_DURATION = 2200;
+
+const TAU = Math.PI * 2;
+
+/* =====================================
+   HELPERS
+===================================== */
 
 const clamp = (value, min = 0, max = 1) =>
   Math.max(min, Math.min(max, value));
@@ -29,11 +47,115 @@ const wrap = (value, length) =>
 
 const smoothstep = (value) => {
   const t = clamp(value);
+
   return t * t * (3 - 2 * t);
 };
 
+const lerp = (a, b, t) =>
+  a + (b - a) * t;
+
 /* =====================================
-   GALLERY
+   DESKTOP ORBIT
+
+   Compact diagonal orbit.
+===================================== */
+
+function getOrbitPosition(index, position) {
+  const count = Math.max(
+    projects.length,
+    1
+  );
+
+  const angle =
+    ((index - position) / count) * TAU;
+
+  const along = Math.sin(angle);
+  const across = Math.cos(angle);
+
+  /* Compact orbit */
+
+  const radiusX = 285;
+  const radiusY = 185;
+
+  const crossX = 84;
+  const crossY = 55;
+
+  const x =
+    along * radiusX +
+    across * crossX;
+
+  const y =
+    -along * radiusY +
+    across * crossY;
+
+  const z =
+    -175 + across * 165;
+
+  const depth =
+    (across + 1) / 2;
+
+  return {
+    x,
+    y,
+    z,
+    depth,
+    angle,
+  };
+}
+
+/* =====================================
+   MOBILE VERTICAL MOMENTUM RING
+
+   The nearest CD is at the front.
+
+   Other CDs travel vertically around
+   a 3D ellipse.
+
+   Because we use sin/cos, the ring
+   rotates endlessly without resetting.
+===================================== */
+
+function getMobileRingPosition(index, position) {
+  const count = Math.max(
+    projects.length,
+    1
+  );
+
+  const offset =
+    wrap(
+      index - position + count / 2,
+      count
+    ) - count / 2;
+
+  const angle =
+    (offset / count) * TAU;
+
+  const sine = Math.sin(angle);
+  const cosine = Math.cos(angle);
+
+  return {
+    x: (1 - cosine) * 15,
+
+    y: sine * 170,
+
+    z: (cosine - 1) * 190,
+
+    rotateX: -sine * 20,
+
+    depth: (cosine + 1) / 2,
+
+    opacity: clamp(
+      (cosine + 0.55) / 1.55,
+      0,
+      1
+    ),
+
+    front: cosine > 0.72,
+  };
+}
+
+/* =====================================
+   DIAGONAL GALLERY
 ===================================== */
 
 export default function DiagonalGallery({
@@ -41,26 +163,66 @@ export default function DiagonalGallery({
   selectedProjectId,
   onProjectOpen,
 }) {
-  const [position, setPosition] = useState(0);
-  const [hoveredId, setHoveredId] = useState(null);
-  const [dragging, setDragging] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  /* =====================================
+     STATE
+  ===================================== */
+
+  const [position, setPosition] =
+    useState(0);
+
+  const [introProgress, setIntroProgress] =
+    useState(0);
+
+  const [hoveredId, setHoveredId] =
+    useState(null);
+
+  const [dragging, setDragging] =
+    useState(false);
+
+  const [isMobile, setIsMobile] =
+    useState(() =>
+      typeof window !== "undefined"
+        ? window.matchMedia(
+            "(max-width: 767px)"
+          ).matches
+        : false
+    );
+
+  /* =====================================
+     REFS
+  ===================================== */
+
+  const galleryRef = useRef(null);
+  const soundRef = useRef(null);
 
   const positionRef = useRef(0);
   const targetRef = useRef(0);
 
+  const introRef = useRef(0);
+
+  const hoveredRef = useRef(false);
   const draggingRef = useRef(false);
+
   const pointerRef = useRef(null);
   const didDragRef = useRef(false);
 
-  const hoveredRef = useRef(false);
-  const soundRef = useRef(null);
-  const galleryRef = useRef(null);
+  const isMobileRef = useRef(isMobile);
 
-  const isMobileRef = useRef(false);
-  const scrollProgressRef = useRef(scrollProgress);
+  const scrollProgressRef = useRef(
+    scrollProgress
+  );
 
-  const snapTimerRef = useRef(null);
+  const dragClickUntilRef = useRef(0);
+
+  /* =====================================
+     NEW: MOBILE AUTO-ROTATION REFS
+  ===================================== */
+
+  // When mobile animation may resume
+  const mobileResumeAtRef = useRef(0);
+
+  // Whether the user is touching the reel
+  const mobileTouchingRef = useRef(false);
 
   /* =====================================
      RESPONSIVE DETECTION
@@ -78,16 +240,29 @@ export default function DiagonalGallery({
       setIsMobile(mobile);
 
       pointerRef.current = null;
+
       draggingRef.current = false;
       hoveredRef.current = false;
+      mobileTouchingRef.current = false;
 
       setDragging(false);
       setHoveredId(null);
 
       if (mobile) {
-        targetRef.current = Math.round(
-          targetRef.current
+        // Start on the nearest project
+        // when switching to mobile.
+        const nearest = Math.round(
+          positionRef.current
         );
+
+        targetRef.current = nearest;
+        positionRef.current = nearest;
+
+        setPosition(nearest);
+
+        mobileResumeAtRef.current =
+          performance.now() +
+          MOBILE_RESUME_DELAY;
       }
     }
 
@@ -106,12 +281,19 @@ export default function DiagonalGallery({
     };
   }, []);
 
+  /* =====================================
+     KEEP SCROLL PROGRESS UPDATED
+  ===================================== */
+
   useEffect(() => {
-    scrollProgressRef.current = scrollProgress;
+    scrollProgressRef.current =
+      scrollProgress;
   }, [scrollProgress]);
 
   /* =====================================
-     SCROLL TRANSITION
+     ORIGINAL SCROLL TRANSITION
+
+     Preserve project opening.
   ===================================== */
 
   const centering = smoothstep(
@@ -126,15 +308,20 @@ export default function DiagonalGallery({
     (scrollProgress - 0.23) / 0.11
   );
 
-  const galleryLocked = scrollProgress > 0.035;
+  const galleryLocked =
+    scrollProgress > 0.035;
+
+  const introFinished =
+    introProgress >= 1;
 
   const idle =
+    introFinished &&
     !galleryLocked &&
     !dragging &&
     hoveredId === null;
 
   /* =====================================
-     MOBILE ACTIVE CD
+     MOBILE ACTIVE PROJECT
   ===================================== */
 
   const mobileIndex = wrap(
@@ -146,7 +333,7 @@ export default function DiagonalGallery({
     projects[mobileIndex];
 
   /* =====================================
-     SOUND
+     ORIGINAL CD SOUND
   ===================================== */
 
   useEffect(() => {
@@ -167,6 +354,7 @@ export default function DiagonalGallery({
 
   function playSound() {
     const sound = soundRef.current;
+
     if (!sound) return;
 
     sound.pause();
@@ -176,79 +364,167 @@ export default function DiagonalGallery({
   }
 
   /* =====================================
-     AUTOMATIC MOVEMENT + SMOOTH SNAP
+     ANIMATION LOOP
+
+     DESKTOP
+     - Spin-open intro
+     - Automatic diagonal orbit
+     - Pauses on hover and drag
+
+     MOBILE
+     - Gentle automatic vertical movement
+     - Pauses while touching
+     - Resumes 2.5 seconds after interaction
+     - Preserves momentum and snapping
   ===================================== */
 
   useEffect(() => {
     let frame;
-    let lastTime = 0;
 
-    const reducedMotion = window.matchMedia(
+    let lastTime = 0;
+    let introStart = null;
+
+    const motionQuery = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
-    ).matches;
+    );
 
     function animate(time) {
       const delta = lastTime
-        ? Math.min(time - lastTime, 50)
+        ? Math.min(
+            time - lastTime,
+            50
+          )
         : 16;
 
       lastTime = time;
 
+      const reducedMotion =
+        motionQuery.matches;
+
       const locked =
         scrollProgressRef.current > 0.035;
 
-      if (locked) {
-        hoveredRef.current = false;
-        draggingRef.current = false;
+      /* =================================
+         DESKTOP SPIN-OPEN INTRO
+      ================================= */
+
+      if (introStart === null) {
+        introStart = time;
       }
 
-      /*
-        Desktop keeps its original
-        automatic gentle movement.
+      if (reducedMotion) {
+        introRef.current = 1;
+      } else {
+        introRef.current = clamp(
+          (time - introStart) /
+            INTRO_DURATION
+        );
+      }
 
-        Mobile stays snapped to a CD
-        so visitors can browse precisely.
-      */
+      setIntroProgress(
+        introRef.current
+      );
+
+      /* =================================
+         DESKTOP AUTOMATIC ORBIT
+      ================================= */
 
       if (
+        introRef.current >= 1 &&
         !locked &&
         !reducedMotion &&
         !hoveredRef.current &&
         !draggingRef.current &&
-        !isMobileRef.current
+        !isMobileRef.current &&
+        !document.hidden
       ) {
         targetRef.current +=
           delta * AUTO_SPEED;
       }
 
-      /*
-        Responsive easing:
-        slightly faster during dragging,
-        smoother when snapping.
-      */
+      /* =================================
+         MOBILE AUTOMATIC ROTATION
+
+         Slowly move the ring vertically.
+
+         Negative direction creates
+         top-to-bottom visual movement.
+      ================================= */
+
+      if (
+        introRef.current >= 1 &&
+        !locked &&
+        !reducedMotion &&
+        isMobileRef.current &&
+        !draggingRef.current &&
+        !mobileTouchingRef.current &&
+        time >= mobileResumeAtRef.current &&
+        !document.hidden
+      ) {
+        targetRef.current -=
+          delta * MOBILE_AUTO_SPEED;
+      }
+
+      /* =================================
+         SMOOTH MOMENTUM
+      ================================= */
 
       const speed = draggingRef.current
-        ? 0.022
+        ? 0.026
         : isMobileRef.current
-          ? 0.012
-          : 0.01;
+          ? 0.011
+          : 0.009;
 
       const ease = reducedMotion
         ? 1
-        : 1 - Math.exp(-delta * speed);
+        : 1 - Math.exp(
+            -delta * speed
+          );
 
       positionRef.current +=
-        (targetRef.current -
-          positionRef.current) * ease;
+        (
+          targetRef.current -
+          positionRef.current
+        ) * ease;
 
-      setPosition(positionRef.current);
+      /* =================================
+         PREVENT VERY LARGE NUMBERS
+
+         The circular positions remain
+         identical after each revolution.
+      ================================= */
+
+      const count = projects.length;
+
+      if (
+        count > 0 &&
+        Math.abs(
+          positionRef.current
+        ) > count * 100
+      ) {
+        const revolutions = Math.trunc(
+          positionRef.current / count
+        );
+
+        const shift =
+          revolutions * count;
+
+        positionRef.current -= shift;
+        targetRef.current -= shift;
+      }
+
+      setPosition(
+        positionRef.current
+      );
 
       frame = requestAnimationFrame(
         animate
       );
     }
 
-    frame = requestAnimationFrame(animate);
+    frame = requestAnimationFrame(
+      animate
+    );
 
     return () => {
       cancelAnimationFrame(frame);
@@ -256,19 +532,35 @@ export default function DiagonalGallery({
   }, []);
 
   /* =====================================
-     SNAP TO CLOSEST MOBILE CD
+     MOBILE PAUSE HELPERS
   ===================================== */
 
-  function snapToClosest() {
+  function pauseMobileRotation() {
     if (!isMobileRef.current) return;
 
-    targetRef.current = Math.round(
-      targetRef.current
-    );
+    mobileTouchingRef.current = true;
+  }
+
+  function resumeMobileRotation() {
+    if (!isMobileRef.current) return;
+
+    mobileTouchingRef.current = false;
+
+    mobileResumeAtRef.current =
+      performance.now() +
+      MOBILE_RESUME_DELAY;
   }
 
   /* =====================================
-     CLEAN UP DRAG
+     FINISH DRAG
+
+     Desktop:
+     - End mouse drag
+
+     Mobile:
+     - Preserve swipe momentum
+     - Snap to nearest CD
+     - Pause auto-rotation
   ===================================== */
 
   function finishDrag(cancelled = false) {
@@ -276,8 +568,8 @@ export default function DiagonalGallery({
 
     if (!pointer) return;
 
-    const wasHorizontal =
-      pointer.axis === "horizontal";
+    const wasVertical =
+      pointer.axis === "vertical";
 
     const wasDragging =
       didDragRef.current;
@@ -287,58 +579,75 @@ export default function DiagonalGallery({
 
     setDragging(false);
 
+    if (wasDragging) {
+      dragClickUntilRef.current =
+        Date.now() + 320;
+    }
+
     if (isMobileRef.current) {
       if (
         !cancelled &&
-        wasHorizontal &&
+        wasVertical &&
         wasDragging
       ) {
-        snapToClosest();
+        /* Momentum based on swipe speed */
 
-        if (projects.length > 0) {
-          playSound();
-        }
+        const inertia = clamp(
+          pointer.velocity * 140,
+          -1.25,
+          1.25
+        );
+
+        targetRef.current = Math.round(
+          targetRef.current + inertia
+        );
+
+        playSound();
       } else {
+        /* No swipe: stay near current CD */
+
         targetRef.current = Math.round(
           targetRef.current
         );
       }
+
+      resumeMobileRotation();
     }
   }
 
+  /* =====================================
+     POINTER CLEANUP
+  ===================================== */
+
   useEffect(() => {
-    function handleWindowPointerUp() {
+    function onPointerUp() {
       finishDrag(false);
     }
 
-    function handleWindowPointerCancel() {
+    function onPointerCancel() {
       finishDrag(true);
     }
 
     window.addEventListener(
       "pointerup",
-      handleWindowPointerUp
+      onPointerUp
     );
 
     window.addEventListener(
       "pointercancel",
-      handleWindowPointerCancel
+      onPointerCancel
     );
 
     return () => {
       window.removeEventListener(
         "pointerup",
-        handleWindowPointerUp
+        onPointerUp
       );
 
       window.removeEventListener(
         "pointercancel",
-        handleWindowPointerCancel
+        onPointerCancel
       );
-
-      if (snapTimerRef.current) {
-        clearTimeout(snapTimerRef.current);
-      }
     };
   });
 
@@ -349,8 +658,10 @@ export default function DiagonalGallery({
   function handlePointerDown(event) {
     if (
       galleryLocked ||
-      (event.pointerType === "mouse" &&
-        event.button !== 0)
+      (
+        event.pointerType === "mouse" &&
+        event.button !== 0
+      )
     ) {
       return;
     }
@@ -359,7 +670,6 @@ export default function DiagonalGallery({
 
     pointerRef.current = {
       pointerId: event.pointerId,
-      pointerType: event.pointerType,
 
       x: event.clientX,
       y: event.clientY,
@@ -367,33 +677,44 @@ export default function DiagonalGallery({
       startX: event.clientX,
       startY: event.clientY,
 
+      lastTime: event.timeStamp,
+
+      velocity: 0,
       axis: null,
     };
 
-    /*
-      Desktop starts dragging immediately.
-      Mobile waits to determine whether
-      the gesture is horizontal or vertical.
-    */
-
-    if (!isMobileRef.current) {
+    if (isMobileRef.current) {
+      pauseMobileRotation();
+    } else {
       draggingRef.current = true;
       setDragging(true);
     }
   }
 
   /* =====================================
-     CURSOR GLOW + PARALLAX + DRAG
+     POINTER MOVE
+
+     Desktop:
+     - Mouse glow
+     - Parallax
+     - Drag to rotate orbit
+
+     Mobile:
+     - Vertical swipe
+     - Track velocity for momentum
   ===================================== */
 
   function handlePointerMove(event) {
     const gallery = galleryRef.current;
 
-    /* DESKTOP PARALLAX */
+    /* =================================
+       DESKTOP MOUSE PARALLAX
+    ================================= */
 
     if (
       gallery &&
-      event.pointerType === "mouse"
+      event.pointerType === "mouse" &&
+      !isMobileRef.current
     ) {
       const rect =
         gallery.getBoundingClientRect();
@@ -414,90 +735,101 @@ export default function DiagonalGallery({
         `${mouseY}px`
       );
 
-      const normalizedX =
-        (mouseX / rect.width - 0.5) * 2;
+      const nx =
+        (
+          mouseX / rect.width -
+          0.5
+        ) * 2;
 
-      const normalizedY =
-        (mouseY / rect.height - 0.5) * 2;
+      const ny =
+        (
+          mouseY / rect.height -
+          0.5
+        ) * 2;
 
-      const strength = 1 - centering;
+      const strength =
+        1 - centering;
 
       gallery.style.setProperty(
         "--gallery-rotate-y",
         `${
-          normalizedX * 5 * strength
+          nx * 5 * strength
         }deg`
       );
 
       gallery.style.setProperty(
         "--gallery-rotate-x",
         `${
-          -normalizedY * 4 * strength
+          -ny * 4 * strength
         }deg`
       );
 
       gallery.style.setProperty(
         "--gallery-move-x",
         `${
-          normalizedX * 15 * strength
+          nx * 15 * strength
         }px`
       );
 
       gallery.style.setProperty(
         "--gallery-move-y",
         `${
-          normalizedY * 12 * strength
+          ny * 12 * strength
         }px`
       );
     }
 
-    /* DRAG INTERACTION */
+    /* =================================
+       DRAG INTERACTION
+    ================================= */
 
-    const pointer = pointerRef.current;
+    const pointer =
+      pointerRef.current;
 
     if (
-      galleryLocked ||
       !pointer ||
-      event.pointerId !== pointer.pointerId
+      galleryLocked ||
+      event.pointerId !==
+        pointer.pointerId
     ) {
       return;
     }
 
     const totalDx =
-      event.clientX - pointer.startX;
+      event.clientX -
+      pointer.startX;
 
     const totalDy =
-      event.clientY - pointer.startY;
+      event.clientY -
+      pointer.startY;
 
     const distance = Math.hypot(
       totalDx,
       totalDy
     );
 
-    if (isMobileRef.current) {
-      /*
-        Distinguish horizontal swipes
-        from vertical page scrolling.
-      */
+    /* =================================
+       MOBILE VERTICAL SWIPE
+    ================================= */
 
+    if (isMobileRef.current) {
       if (pointer.axis === null) {
-        if (distance < SWIPE_THRESHOLD) {
+        if (
+          distance <
+          SWIPE_THRESHOLD
+        ) {
           return;
         }
 
         if (
-          Math.abs(totalDy) >
-          Math.abs(totalDx)
+          Math.abs(totalDx) >
+          Math.abs(totalDy)
         ) {
-          pointer.axis = "vertical";
-
-          draggingRef.current = false;
-          setDragging(false);
-
+          pointer.axis = "horizontal";
           return;
         }
 
-        pointer.axis = "horizontal";
+        pointer.axis = "vertical";
 
         draggingRef.current = true;
         didDragRef.current = true;
@@ -505,35 +837,64 @@ export default function DiagonalGallery({
         setDragging(true);
       }
 
-      /*
-        Allow normal vertical scrolling.
-      */
-
-      if (pointer.axis === "vertical") {
+      if (
+        pointer.axis !== "vertical"
+      ) {
         return;
       }
 
-      const dx =
-        event.clientX - pointer.x;
+      const dy =
+        event.clientY -
+        pointer.y;
+
+      const dt = Math.max(
+        8,
+        event.timeStamp -
+          pointer.lastTime
+      );
+
+      const movement =
+        -dy * MOBILE_DRAG_SPEED;
 
       targetRef.current +=
-        -dx * MOBILE_DRAG_SPEED;
+        movement;
 
-      pointer.x = event.clientX;
-      pointer.y = event.clientY;
+      const velocity =
+        movement / dt;
+
+      pointer.velocity =
+        pointer.velocity * 0.35 +
+        velocity * 0.65;
+
+      pointer.y =
+        event.clientY;
+
+      pointer.x =
+        event.clientX;
+
+      pointer.lastTime =
+        event.timeStamp;
 
       return;
     }
 
-    /* DESKTOP DRAG */
+    /* =================================
+       DESKTOP DRAG
+    ================================= */
 
-    if (!draggingRef.current) return;
+    if (
+      !draggingRef.current
+    ) {
+      return;
+    }
 
     const dx =
-      event.clientX - pointer.x;
+      event.clientX -
+      pointer.x;
 
     const dy =
-      event.clientY - pointer.y;
+      event.clientY -
+      pointer.y;
 
     if (distance > 7) {
       didDragRef.current = true;
@@ -541,15 +902,23 @@ export default function DiagonalGallery({
 
     if (didDragRef.current) {
       targetRef.current +=
-        (-dx + dy) * DESKTOP_DRAG_SPEED;
+        (
+          -dx + dy
+        ) * DESKTOP_DRAG_SPEED;
     }
 
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
+    pointer.x =
+      event.clientX;
+
+    pointer.y =
+      event.clientY;
   }
 
   /* =====================================
-     HOVER — DESKTOP ONLY
+     DESKTOP HOVER
+
+     Keeps original spin-open,
+     reflection, tilt and sound.
   ===================================== */
 
   function handleCardEnter(
@@ -559,12 +928,14 @@ export default function DiagonalGallery({
     if (
       isMobileRef.current ||
       galleryLocked ||
-      draggingRef.current
+      draggingRef.current ||
+      introRef.current < 1
     ) {
       return;
     }
 
     hoveredRef.current = true;
+
     setHoveredId(id);
 
     if (withSound) {
@@ -573,167 +944,316 @@ export default function DiagonalGallery({
   }
 
   function handleCardLeave(id) {
-    if (isMobileRef.current) return;
+    if (
+      isMobileRef.current
+    ) {
+      return;
+    }
 
     hoveredRef.current = false;
 
-    setHoveredId((current) =>
-      current === id ? null : current
+    setHoveredId(
+      (current) =>
+        current === id
+          ? null
+          : current
     );
   }
 
   /* =====================================
      OPEN PROJECT
+
+     Preserves existing onProjectOpen.
   ===================================== */
 
   function handleOpen(event, project) {
     if (
       didDragRef.current ||
-      galleryLocked
+      Date.now() <
+        dragClickUntilRef.current ||
+      galleryLocked ||
+      (
+        !isMobileRef.current &&
+        introRef.current < 1
+      )
     ) {
       event?.preventDefault?.();
       return;
     }
 
-    /*
-      On mobile:
-      tap to open project.
+    /* =================================
+       MOBILE:
+       Only open the currently
+       selected front CD.
+    ================================= */
 
-      On desktop:
-      preserve original click behavior.
-    */
+    if (
+      isMobileRef.current
+    ) {
+      const selected =
+        projects[
+          wrap(
+            Math.round(
+              positionRef.current
+            ),
+            projects.length
+          )
+        ];
+
+      if (
+        project.id !==
+        selected?.id
+      ) {
+        return;
+      }
+
+      // Pause before page transition.
+      pauseMobileRotation();
+    }
 
     onProjectOpen?.(project);
   }
 
   /* =====================================
-     CARD POSITION
+     DESKTOP CARD STYLE
+
+     Intro:
+       One CD appears.
+       Others spin out from behind it.
+
+     Afterwards:
+       Compact diagonal orbit.
   ===================================== */
 
-  function getCardStyle(index) {
-    const count = projects.length;
-    const project = projects[index];
+  function getDesktopCardStyle(index) {
+    const project =
+      projects[index];
 
-    /*
-      Desktop:
-      default selectedProjectId still
-      controls the homepage CD opening.
+    const orbit =
+      getOrbitPosition(
+        index,
+        position
+      );
 
-      Mobile:
-      closest card gets visual focus.
-    */
-
-    const offset =
-      wrap(
-        index - position + count / 2,
-        count
-      ) -
-      count / 2;
-
-    const depth = Math.abs(offset);
+    const anchor =
+      getOrbitPosition(
+        0,
+        0
+      );
 
     const isOpeningSelected =
-      project.id === selectedProjectId;
-
-    const isMobileCentered =
-      isMobile &&
       project.id ===
-        mobileSelectedProject?.id;
+      selectedProjectId;
 
-    /* MOBILE COMPACT DIAGONAL LAYOUT */
+    const isHovered =
+      hoveredId ===
+        project.id &&
+      !galleryLocked;
 
-    const spacingX = isMobile ? 100 : 150;
-    const spacingY = isMobile ? 48 : 112;
-    const spacingZ = isMobile ? 90 : 135;
+    /* =================================
+       INTRO REVEAL
+    ================================= */
 
-    const originalX =
-      offset * spacingX;
+    let reveal = 1;
 
-    const originalY =
-      -offset * spacingY;
+    if (index !== 0) {
+      const delay =
+        0.12 +
+        (index - 1) * 0.075;
 
-    const originalZ =
-      -depth * spacingZ;
+      reveal = smoothstep(
+        (
+          introProgress -
+          delay
+        ) / 0.48
+      );
+    }
 
-    const x = isOpeningSelected
-      ? originalX * (1 - centering)
-      : originalX;
+    /* =================================
+       SPREAD FROM FIRST CD
+    ================================= */
 
-    const y = isOpeningSelected
-      ? originalY * (1 - centering)
-      : originalY;
-
-    const z = isOpeningSelected
-      ? originalZ * (1 - centering)
-      : originalZ;
-
-    const baseOpacity = Math.max(
-      0.65,
-      1 - depth * 0.09
+    const x = lerp(
+      anchor.x,
+      orbit.x,
+      reveal
     );
 
-    const opacity = isOpeningSelected
-      ? baseOpacity * selectedFade
-      : baseOpacity * othersFade;
+    const y = lerp(
+      anchor.y,
+      orbit.y,
+      reveal
+    );
 
-    const directions = [
-      { x: -580, y: -280 },
-      { x: 490, y: -420 },
-      { x: -430, y: 450 },
-      { x: 620, y: 280 },
-      { x: 0, y: -650 },
-      { x: -520, y: 250 },
-    ];
+    let z = lerp(
+      anchor.z -
+        index * 10,
+      orbit.z,
+      reveal
+    );
 
-    const direction =
-      directions[index % directions.length];
+    const fanRotation =
+      index === 0
+        ? 0
+        : lerp(
+            -65 -
+              index * 7,
+            0,
+            reveal
+          );
 
-    const focusScale =
-      isMobileCentered &&
-      !galleryLocked
-        ? 1.07
-        : 1;
+    const introOpacity =
+      index === 0
+        ? smoothstep(
+            introProgress /
+              0.22
+          )
+        : reveal;
+
+    /* =================================
+       HOVER DEPTH
+    ================================= */
+
+    if (isHovered) {
+      z += 85;
+    }
+
+    let finalX = x;
+    let finalY = y;
+    let finalZ = z;
+
+    /* =================================
+       PROJECT OPEN TRANSITION
+    ================================= */
+
+    if (
+      isOpeningSelected
+    ) {
+      finalX *=
+        1 - centering;
+
+      finalY *=
+        1 - centering;
+
+      finalZ *=
+        1 - centering;
+    }
+
+    const baseOpacity =
+      0.72 +
+      orbit.depth * 0.28;
+
+    const opacity =
+      introOpacity *
+      (
+        isOpeningSelected
+          ? baseOpacity *
+            selectedFade
+          : baseOpacity *
+            othersFade
+      );
 
     return {
-      "--x": `${x}px`,
-      "--y": `${y}px`,
-      "--z": `${z}px`,
+      "--x": `${finalX}px`,
+      "--y": `${finalY}px`,
+      "--z": `${finalZ}px`,
 
       "--opacity": opacity,
-      "--card-color": project.color,
 
-      "--entry-x": `${direction.x}px`,
-      "--entry-y": `${direction.y}px`,
-      "--entry-delay": `${
-        0.12 + index * 0.13
-      }s`,
+      "--card-color":
+        project.color,
 
-      /*
-        Optional CSS scale variable.
-        Does not overwrite the existing
-        ProjectCard transforms.
-      */
+      "--fan-spin":
+        `${fanRotation}deg`,
 
-      "--mobile-focus-scale": focusScale,
-
-      zIndex: isMobile
-        ? isMobileCentered
-          ? 1000
-          : Math.round(
-              100 - depth * 10
-            )
-        : isOpeningSelected
+      zIndex:
+        isOpeningSelected
           ? 500
-          : hoveredId === project.id &&
-              !galleryLocked
+          : isHovered
             ? 1000
-            : Math.round(
-                100 - depth * 10
-              ),
+            : introProgress < 1
+              ? 100 - index
+              : Math.round(
+                  100 +
+                  orbit.depth *
+                    100
+                ),
 
-      pointerEvents: galleryLocked
-        ? "none"
-        : "auto",
+      pointerEvents:
+        galleryLocked ||
+        introProgress < 1
+          ? "none"
+          : "auto",
+    };
+  }
+
+  /* =====================================
+     MOBILE CARD STYLE
+
+     Vertical momentum ring.
+     Same original CD visuals.
+  ===================================== */
+
+  function getMobileCardStyle(index) {
+    const project =
+      projects[index];
+
+    const ring =
+      getMobileRingPosition(
+        index,
+        position
+      );
+
+    const isOpeningSelected =
+      project.id ===
+      selectedProjectId;
+
+    const opacity =
+      isOpeningSelected
+        ? ring.opacity *
+          selectedFade
+        : ring.opacity *
+          othersFade;
+
+    const scale =
+      0.76 +
+      ring.depth * 0.24;
+
+    return {
+      "--ring-x":
+        `${ring.x}px`,
+
+      "--ring-y":
+        `${ring.y}px`,
+
+      "--ring-z":
+        `${ring.z}px`,
+
+      "--ring-tilt":
+        `${ring.rotateX}deg`,
+
+      "--ring-scale":
+        scale,
+
+      "--ring-opacity":
+        opacity,
+
+      "--card-color":
+        project.color,
+
+      zIndex:
+        isOpeningSelected
+          ? 500
+          : Math.round(
+              100 +
+              ring.depth * 100
+            ),
+
+      pointerEvents:
+        galleryLocked ||
+        !ring.front
+          ? "none"
+          : "auto",
     };
   }
 
@@ -747,7 +1267,8 @@ export default function DiagonalGallery({
       className={[
         styles.gallery,
 
-        dragging && !galleryLocked
+        dragging &&
+        !galleryLocked
           ? styles.dragging
           : "",
 
@@ -770,36 +1291,126 @@ export default function DiagonalGallery({
       ]
         .filter(Boolean)
         .join(" ")}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
+      onPointerDown={
+        handlePointerDown
+      }
+      onPointerMove={
+        handlePointerMove
+      }
     >
-      <div className={styles.scene}>
-        {projects.map((project, index) => {
-          const mobileActive =
-            isMobile &&
-            project.id ===
-              mobileSelectedProject?.id;
+      {/* =================================
+          DESKTOP:
+          SPIN-OPEN DIAGONAL ORBIT
+      ================================= */}
 
-          return (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              positionStyle={
-                getCardStyle(index)
+      {!isMobile && (
+        <div
+          className={
+            styles.scene
+          }
+        >
+          {projects.map(
+            (project, index) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                positionStyle={
+                  getDesktopCardStyle(
+                    index
+                  )
+                }
+                active={
+                  !galleryLocked &&
+                  hoveredId ===
+                    project.id
+                }
+                onEnter={
+                  handleCardEnter
+                }
+                onLeave={
+                  handleCardLeave
+                }
+                onOpen={
+                  handleOpen
+                }
+              />
+            )
+          )}
+        </div>
+      )}
+
+      {/* =================================
+          MOBILE:
+          AUTO-ROTATING VERTICAL RING
+      ================================= */}
+
+      {isMobile && (
+        <div
+          className={
+            styles.mobileScene
+          }
+          aria-label="Swipe vertically to explore projects"
+        >
+          <div
+            className={
+              styles.mobileRing
+            }
+          >
+            {projects.map(
+              (project, index) => {
+                const ring =
+                  getMobileRingPosition(
+                    index,
+                    position
+                  );
+
+                const active =
+                  project.id ===
+                  mobileSelectedProject?.id;
+
+                return (
+                  <div
+                    key={project.id}
+                    className={
+                      styles.mobileSlot
+                    }
+                    style={
+                      getMobileCardStyle(
+                        index
+                      )
+                    }
+                  >
+                    <ProjectCard
+                      project={project}
+                      variant="final"
+                      positionStyle={{
+                        "--opacity": 1,
+
+                        "--card-color":
+                          project.color,
+
+                        pointerEvents:
+                          ring.front
+                            ? "auto"
+                            : "none",
+                      }}
+                      active={
+                        active &&
+                        !galleryLocked
+                      }
+                      onEnter={() => {}}
+                      onLeave={() => {}}
+                      onOpen={
+                        handleOpen
+                      }
+                    />
+                  </div>
+                );
               }
-              active={
-                !galleryLocked &&
-                (isMobile
-                  ? mobileActive
-                  : hoveredId === project.id)
-              }
-              onEnter={handleCardEnter}
-              onLeave={handleCardLeave}
-              onOpen={handleOpen}
-            />
-          );
-        })}
-      </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

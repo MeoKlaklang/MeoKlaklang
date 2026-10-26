@@ -95,7 +95,7 @@
 }
 
 /* =====================================
-   DESKTOP DESCRIPTION
+   DESCRIPTION
 ===================================== */
 
 .desktopDescription {
@@ -110,7 +110,7 @@
   color: #777b74;
 }
 
-/* Hidden on desktop */
+/* We use the same paragraph on mobile */
 
 .mobileDescription {
   display: none;
@@ -188,15 +188,14 @@
 ===================================== */
 
 @media (max-width: 768px) {
-
   .scrollSection {
     height: 360vh;
   }
 
-  /* Title at the top */
+  /* Title moves slightly upward */
 
   .intro {
-    top: 16%;
+    top: 12%;
     left: 25px;
     right: 25px;
 
@@ -208,43 +207,29 @@
     line-height: 1.05;
   }
 
-  /* Hide original desktop paragraph */
+  /* Show description directly below title */
 
   .desktopDescription {
-    display: none;
-  }
-
-  /* =====================================
-     DESCRIPTION BELOW THE CD GALLERY
-  ===================================== */
-
-  .mobileDescription {
-    position: absolute;
-
-    bottom: 116px;
-    left: 25px;
-    right: 25px;
-
-    z-index: 12;
-
     display: block;
 
-    width: auto;
-    max-width: 360px;
+    position: relative;
+    margin-top: 18px;
+    margin-bottom: 0;
 
-    margin: 0;
+    max-width: 345px;
 
     font-size: 13px;
     font-weight: 400;
     line-height: 1.65;
 
-    text-align: left;
     color: #777b74;
-
-    pointer-events: none;
   }
 
-  /* Scroll arrow below description */
+  /* Hide the separate bottom description */
+
+  .mobileDescription {
+    display: none;
+  }
 
   .scrollHint {
     bottom: 35px;
@@ -256,8 +241,8 @@
 ===================================== */
 
 @media (max-width: 380px) {
-
   .intro {
+    top: 12%;
     left: 20px;
     right: 20px;
   }
@@ -266,11 +251,9 @@
     font-size: clamp(30px, 8vw, 38px);
   }
 
-  .mobileDescription {
-    left: 20px;
-    right: 20px;
-
-    bottom: 105px;
+  .desktopDescription {
+    margin-top: 15px;
+    max-width: 300px;
 
     font-size: 12px;
     line-height: 1.6;
@@ -286,17 +269,16 @@
 ===================================== */
 
 @media (max-width: 768px) and (max-height: 650px) {
-
   .intro {
-    top: 14%;
+    top: 11%;
   }
 
   .intro h1 {
     font-size: clamp(29px, 7vw, 38px);
   }
 
-  .mobileDescription {
-    bottom: 75px;
+  .desktopDescription {
+    margin-top: 12px;
     font-size: 11px;
     line-height: 1.5;
   }
@@ -311,7 +293,6 @@
 ===================================== */
 
 @media (prefers-reduced-motion: reduce) {
-
   .intro,
   .scrollHint span {
     animation: none;

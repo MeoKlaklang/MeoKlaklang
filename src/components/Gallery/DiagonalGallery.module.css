@@ -53,6 +53,7 @@
 
 .gallery::before {
   content: "";
+
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -70,11 +71,12 @@
 }
 
 /* =====================================
-   EXTRA SOFT AMBIENT GLOW
+   AMBIENT GLOW
 ===================================== */
 
 .gallery::after {
   content: "";
+
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -93,11 +95,13 @@
       transparent 37%
     );
 
-  animation: ambientBreathe 8s ease-in-out infinite;
+  animation:
+    ambientBreathe 8s ease-in-out infinite;
 }
 
 @keyframes ambientBreathe {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.45;
   }
 
@@ -107,7 +111,7 @@
 }
 
 /* =====================================
-   3D SCENE + PARALLAX
+   DESKTOP 3D SCENE + PARALLAX
 ===================================== */
 
 .scene {
@@ -131,66 +135,48 @@
     rotateY(var(--gallery-rotate-y));
 
   transition:
-    transform 0.7s cubic-bezier(.22, 1, .36, 1);
+    transform 0.7s cubic-bezier(
+      0.22, 1, 0.36, 1
+    );
 }
 
 /* =====================================
-   FLYING CD INTRO
+   SPIN-OPEN DESKTOP INTRO
+
+   The positions are controlled by JSX.
+
+   Each CD opens around its Y axis
+   while spreading away from the
+   initial stacked position.
 ===================================== */
 
-/*
-  The translate property is animated
-  independently of ProjectCard's transform.
-
-  This keeps the original 3D position,
-  dragging and hover animation intact.
-*/
-
 .scene > * {
-  animation: cdFlyIn 1.65s
-    cubic-bezier(.16, 1, .3, 1)
-    both;
+  transform-style: preserve-3d;
+  transform-origin: center center;
 
-  animation-delay: var(--entry-delay);
-}
+  /*
+    Separate from ProjectCard's
+    existing transform property.
+  */
+  rotate: 0 1 0 var(--fan-spin, 0deg);
 
-@keyframes cdFlyIn {
-  0% {
-    translate:
-      var(--entry-x)
-      var(--entry-y);
+  backface-visibility: hidden;
 
-    opacity: 0;
-    filter: blur(10px);
-  }
-
-  58% {
-    opacity: var(--opacity);
-    filter: blur(0);
-  }
-
-  100% {
-    translate: 0 0;
-    opacity: var(--opacity);
-    filter: blur(0);
-  }
+  /*
+    JSX drives frame-by-frame movement.
+    Do not add a transform transition.
+  */
+  transition: none;
 }
 
 /* =====================================
    IDLE FLOATING MOVEMENT
 ===================================== */
 
-/*
-  The entire rack slowly floats
-  while nobody is interacting.
-
-  It stops when dragging, hovering
-  or scrolling into the CD opening.
-*/
-
 .idle .scene {
-  animation: sceneFloat 7s
-    ease-in-out infinite alternate;
+  animation:
+    sceneFloat 7s ease-in-out
+    infinite alternate;
 }
 
 @keyframes sceneFloat {
@@ -211,17 +197,260 @@
 }
 
 /* =====================================
-   MOBILE
+   ORIGINAL DESKTOP INTERACTIONS
 ===================================== */
 
-@media (max-width: 768px) {
-  .scene {
-    perspective: 1000px;
-    transform: none;
+.gallery:not(.locked) .scene > * {
+  pointer-events: auto;
+}
+
+/* =====================================
+   MOBILE VERTICAL REEL SCENE
+
+   Starts below the hero heading.
+===================================== */
+
+.mobileScene {
+  position: absolute;
+  z-index: 2;
+
+  top: clamp(290px, 38svh, 370px);
+  left: 0;
+  right: 0;
+
+  height: clamp(330px, 46svh, 460px);
+
+  perspective: 1100px;
+  perspective-origin: center center;
+
+  /*
+    The reel handles vertical gestures.
+
+    Native vertical scrolling remains
+    available outside this area.
+  */
+  touch-action: pan-x;
+
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* =====================================
+   VERTICAL RING
+===================================== */
+
+.mobileRing {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  perspective: 1100px;
+  transform-style: preserve-3d;
+
+  pointer-events: none;
+}
+
+/* =====================================
+   MOBILE PROJECT SLOTS
+
+   Each one holds an ORIGINAL ProjectCard.
+
+   They move in a vertical ellipse
+   with depth and perspective.
+===================================== */
+
+.mobileSlot {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  width: min(64vw, 270px);
+  aspect-ratio: 1;
+
+  opacity: var(--ring-opacity, 1);
+
+  transform:
+    translate3d(
+      calc(-50% + var(--ring-x, 0px)),
+      calc(-50% + var(--ring-y, 0px)),
+      var(--ring-z, 0px)
+    )
+    rotateX(var(--ring-tilt, 0deg))
+    scale(var(--ring-scale, 1));
+
+  transform-style: preserve-3d;
+
+  will-change: transform, opacity;
+
+  /*
+    Let the center CD be interactive.
+  */
+  pointer-events: auto;
+}
+
+/* The ProjectCard itself fills its slot. */
+
+.mobileSlot > * {
+  width: 100%;
+  height: 100%;
+}
+
+/* =====================================
+   MOBILE REEL CONTROLS
+===================================== */
+
+.mobileControls {
+  position: absolute;
+
+  bottom: 10px;
+  left: 50%;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 22px;
+
+  transform: translateX(-50%);
+
+  padding: 8px 11px;
+
+  border: 1px solid rgba(
+    90, 100, 92, 0.12
+  );
+
+  border-radius: 50px;
+
+  background: rgba(
+    255, 255, 255, 0.72
+  );
+
+  backdrop-filter: blur(12px);
+
+  box-shadow:
+    0 7px 25px rgba(
+      30, 40, 35, 0.055
+    );
+}
+
+.mobileControls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 35px;
+  height: 35px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #e8e3ef;
+  color: #242424;
+
+  font-size: 19px;
+  cursor: pointer;
+
+  transition:
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+.mobileControls button:active {
+  transform: scale(0.94);
+}
+
+.mobileControls button:disabled {
+  opacity: 0.35;
+}
+
+.mobileControls span {
+  white-space: nowrap;
+
+  font-family: "Syne", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+
+  color: #777d76;
+
+  letter-spacing: 0.1em;
+}
+
+/* =====================================
+   MOBILE SWIPE HINT
+===================================== */
+
+.mobileHint {
+  position: absolute;
+
+  bottom: -24px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  white-space: nowrap;
+
+  color: #9b9f98;
+
+  font-family: "Syne", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.11em;
+
+  pointer-events: none;
+}
+
+/* =====================================
+   MOBILE RESPONSIVE LAYOUT
+===================================== */
+
+@media (max-width: 767px) {
+  .gallery {
+    cursor: default;
+
+    -webkit-tap-highlight-color:
+      transparent;
+
+    overscroll-behavior-x: contain;
   }
 
-  .scene > * {
-    animation-duration: 1.2s;
+  .mobileGallery.dragging {
+    cursor: default;
+  }
+
+  /* Only a mobile ring, no desktop orbit */
+
+  .scene {
+    display: none;
+  }
+}
+
+/* =====================================
+   SMALL PHONE
+===================================== */
+
+@media (max-width: 390px) {
+  .mobileScene {
+    top: clamp(275px, 37svh, 340px);
+    height: clamp(315px, 43svh, 390px);
+  }
+
+  .mobileSlot {
+    width: min(65vw, 245px);
+  }
+
+  .mobileControls {
+    gap: 15px;
+  }
+
+  .mobileHint {
+    font-size: 8px;
   }
 }
 
@@ -233,76 +462,51 @@
   .scene {
     transform: none;
     translate: none;
+
     transition: none;
     animation: none !important;
   }
 
   .scene > * {
-    animation: none;
+    rotate: none;
+    transition: none;
   }
 
   .gallery::after {
     animation: none;
   }
+
+  .mobileSlot {
+    transition: none;
+  }
+
+  .mobileControls button {
+    transition: none;
+  }
 }
 
 
-/* ============================================
-   MOBILE — TOUCH FRIENDLY CD GALLERY
-============================================ */
+/* =====================================
+   MOBILE RING — BELOW HERO TEXT
+===================================== */
 
 @media (max-width: 767px) {
-  .gallery {
-    /*
-      Horizontal finger gestures belong
-      to the CD gallery.
-
-      Vertical gestures must still allow
-      normal page scrolling.
-    */
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-    overscroll-behavior-x: contain;
+  .mobileScene {
+    top: clamp(350px, 45svh, 415px);
+    height: clamp(300px, 42svh, 420px);
   }
 
-  .scene {
-    touch-action: pan-y;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+  /* No arrows or counter */
 
-  /*
-    Remove desktop hover-related
-    cursor behavior on touch devices.
-  */
-
-  .mobileGallery {
-    cursor: default;
-  }
-
-  .mobileGallery.dragging {
-    cursor: default;
+  .mobileControls,
+  .mobileHint {
+    display: none;
   }
 }
 
-/* ============================================
-   TOUCH DEVICES
-============================================ */
-
-@media (hover: none) and (pointer: coarse) {
-  .gallery,
-  .scene {
-    touch-action: pan-y;
-    -webkit-tap-highlight-color: transparent;
-  }
-}
-
-/* ============================================
-   REDUCED MOTION
-============================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  .mobileGallery {
-    scroll-behavior: auto;
+@media (max-width: 390px) {
+  .mobileScene {
+    top: clamp(325px, 43svh, 380px);
+    height: clamp(290px, 40svh, 380px);
   }
 }

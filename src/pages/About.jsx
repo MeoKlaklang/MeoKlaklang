@@ -10,6 +10,8 @@ import styles from "./About.module.css";
 
 import MouseGlow from "../components/MouseGlow/MouseGlow";
 
+import ContactGlobe from "../components/ContactGlobe/ContactGlobe";
+
 /* =====================================
    CHAPTERS
 ===================================== */
@@ -178,6 +180,10 @@ function SkillsPanel() {
    03 / CONTACT
 ===================================== */
 
+/* =====================================
+   03 / CONTACT
+===================================== */
+
 function ContactPanel() {
 	const contactLinks = [
 		{
@@ -194,52 +200,57 @@ function ContactPanel() {
 
 	return (
 		<section className={`${styles.panel} ${styles.contactPanel}`} aria-labelledby="contact-title">
+			{/* LEFT — CONTACT CONTENT */}
+
 			<div className={styles.contactCopy}>
 				<span className={styles.eyebrow}>03 / SAY HELLO</span>
 
 				<h2 id="contact-title" className={styles.contactTitle}>
-					Let's make
+					Let's
 					<br />
-					something
-					<br />
-					<span>meaningful.</span>
+					<span>connect.</span>
 				</h2>
 
 				<p>Have an idea, a project or just want to say hi? I'm always happy to meet new people, exchange ideas and explore creative opportunities.</p>
 
-				<a className={styles.primaryContact} href={`mailto:${CONTACT.email}`}>
-					GET IN TOUCH
-					<span aria-hidden="true">↗</span>
-				</a>
-			</div>
+			
 
-			<div className={styles.contactDetails}>
-				<span className={styles.contactLabel}>FIND ME HERE</span>
+				{/* CONTACT DETAILS BELOW TEXT */}
 
-				<div className={styles.contactLinks}>
-					{contactLinks.map((link) => {
-						const isEmail = link.label === "EMAIL";
+				<div className={styles.contactDetails}>
+					<span className={styles.contactLabel}>FIND ME HERE</span>
 
-						return (
-							<a key={link.label} href={link.href} target={isEmail ? undefined : "_blank"} rel={isEmail ? undefined : "noopener noreferrer"}>
-								<span>{link.label}</span>
-								<strong>{link.value}</strong>
-								<span aria-hidden="true">↗</span>
-							</a>
-						);
-					})}
+					<div className={styles.contactLinks}>
+						{contactLinks.map((link) => {
+							const isEmail = link.label === "EMAIL";
 
-					<div className={styles.locationRow}>
-						<span>LOCATION</span>
-						<strong>{CONTACT.location}</strong>
-						<span aria-hidden="true">⌖</span>
+							return (
+								<a key={link.label} href={link.href} target={isEmail ? undefined : "_blank"} rel={isEmail ? undefined : "noopener noreferrer"}>
+									<span>{link.label}</span>
+									<strong>{link.value}</strong>
+									<span aria-hidden="true">↗</span>
+								</a>
+							);
+						})}
+
+						<div className={styles.locationRow}>
+							<span>LOCATION</span>
+							<strong>{CONTACT.location}</strong>
+							<span aria-hidden="true">⌖</span>
+						</div>
+					</div>
+
+					<div className={styles.availability}>
+						<span className={styles.availabilityDot} />
+						OPEN TO CREATIVE OPPORTUNITIES
 					</div>
 				</div>
+			</div>
 
-				<div className={styles.availability}>
-					<span className={styles.availabilityDot} />
-					OPEN TO CREATIVE OPPORTUNITIES
-				</div>
+			{/* RIGHT — INTERACTIVE GLOBE */}
+
+			<div className={styles.contactGlobe}>
+				<ContactGlobe />
 			</div>
 		</section>
 	);

@@ -1,0 +1,123 @@
+
+/* =====================================
+   CONTACT GLOBE
+===================================== */
+
+.globeWrap {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 680px;
+
+  margin: 0 auto;
+
+  isolation: isolate;
+}
+
+/* =====================================
+   INTERACTIVE CANVAS
+===================================== */
+
+.canvas {
+  display: block;
+
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+
+  background: transparent;
+
+  cursor: grab;
+
+  /*
+    Required for full 360-degree
+    touch rotation on both axes.
+
+    Vertical page scrolling still
+    works outside the globe.
+  */
+  touch-action: none;
+
+  user-select: none;
+  -webkit-user-select: none;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.canvas:active {
+  cursor: grabbing;
+}
+
+.canvas:focus-visible {
+  outline: 1px solid #70c9e8;
+  outline-offset: -8px;
+  border-radius: 50%;
+}
+
+/* =====================================
+   CAPTION
+===================================== */
+
+.globeCaption {
+  position: relative;
+
+  margin-top: -12px;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.16em;
+  text-align: center;
+
+  color: #8295a0;
+
+  pointer-events: none;
+}
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 800px) {
+  .globeWrap {
+    max-width: 510px;
+  }
+
+  .globeCaption {
+    margin-top: -8px;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 520px) {
+  .globeWrap {
+    max-width: 100%;
+  }
+
+  .globeCaption {
+    font-size: 7px;
+    letter-spacing: 0.1em;
+  }
+}
+
+/* =====================================
+   REDUCED MOTION
+===================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas {
+    scroll-behavior: auto;
+  }
+}

@@ -841,3 +841,129 @@
     transition: none;
   }
 }
+
+
+/* =====================================
+   CONTACT REDESIGN
+   LET'S CONNECT + GLOBE
+===================================== */
+
+.contactPanel {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: clamp(35px, 5vw, 100px);
+}
+
+.contactCopy {
+  max-width: 760px;
+}
+
+.contactTitle {
+  margin-bottom: 27px;
+
+  font-size: clamp(58px, 6.5vw, 110px);
+  line-height: 0.98;
+  letter-spacing: -0.075em;
+}
+
+.contactTitle span {
+  color: #70c9e8;
+}
+
+/* CONTACT LINKS NOW BELOW HEADING */
+
+.contactDetails {
+  width: 100%;
+  max-width: 610px;
+
+  margin-top: 56px;
+}
+
+.contactLabel {
+  margin-bottom: 20px;
+}
+
+.contactLinks a,
+.locationRow {
+  padding: 18px 0;
+}
+
+.availability {
+  margin-top: 24px;
+}
+
+/* GLOBE ON THE RIGHT */
+
+.contactGlobe {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+
+  align-self: center;
+}
+
+/* =====================================
+   TABLET / MOBILE
+===================================== */
+
+@media (max-width: 900px) {
+  .contactPanel {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .contactTitle {
+    font-size: clamp(55px, 10vw, 85px);
+  }
+
+  .contactDetails {
+    margin-top: 42px;
+  }
+
+  .contactGlobe {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .contactPanel {
+    gap: 15px;
+  }
+
+  .contactTitle {
+    font-size: clamp(53px, 13vw, 72px);
+  }
+
+  .contactCopy p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .contactDetails {
+    margin-top: 40px;
+  }
+
+  .contactLinks a,
+  .locationRow {
+    grid-template-columns:
+      70px minmax(0, 1fr) 18px;
+
+    padding: 16px 0;
+    gap: 8px;
+  }
+
+  .contactGlobe {
+    width: 100%;
+    margin-top: 0;
+  }
+}
