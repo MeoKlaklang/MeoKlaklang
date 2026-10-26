@@ -50,7 +50,7 @@ export const projects = [
     slug: "gistda",
     category: "Editorial · Graphic Design · Web",
     year: "2026",
-    image: "/images/gistda/calvalPoster-02.jpg",
+    image: "/images/gistda/rahu.png",
     color: "#C3A2EB",
     description:
       "A collection of graphic and digital design projects created during my international internship in Thailand.",
