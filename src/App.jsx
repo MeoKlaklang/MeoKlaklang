@@ -1,3 +1,4 @@
+
 import {
   lazy,
   Suspense,
@@ -6,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+
 import {
   BrowserRouter,
   Route,
@@ -22,27 +24,26 @@ import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import SoundButton from "./components/SoundButton/SoundButton";
 
 /* =========================================
-   YOUR CINEMATIC LOADING EXPERIENCE
-
-   A minimum 6.5-second introduction.
-   The actual page mounts behind the intro.
-   Critical images preload during the intro.
+   CINEMATIC LOADING EXPERIENCE
 ========================================= */
 
 const LOADING_DURATION = 6500;
 const FADE_DURATION = 850;
 
-// If a critical image is slow or missing, the visitor isn't stuck forever.
 const IMAGE_TIMEOUT = 4500;
 const MAX_TOTAL_WAIT = 11000;
 const MAX_PRELOAD_IMAGES = 8;
 
-// Pages are downloaded separately. The current route starts mounting
-// immediately while the intro stays on top.
-const Home = lazy(() => import("./pages/Home"));
+/* =========================================
+   PAGE LOADING
 
-// Share one module loader between the route and background prefetch.
-// The browser caches the module once downloaded.
+   Home code loads during the intro,
+   but Home itself mounts AFTER the intro.
+========================================= */
+
+const loadHomePage = () => import("./pages/Home");
+const Home = lazy(loadHomePage);
+
 const loadAboutPage = () => import("./pages/About");
 const About = lazy(loadAboutPage);
 
@@ -53,12 +54,21 @@ const Projects = lazy(() => import("./pages/Projects"));
 ========================================= */
 
 function sameOriginImageUrl(value) {
-  if (typeof value !== "string" || !value.trim()) return null;
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
 
   try {
     const url = new URL(value, window.location.origin);
-    if (url.origin !== window.location.origin) return null;
-    if (!/\.(avif|webp|png|jpe?g|gif|svg)(\?|$)/i.test(url.href)) return null;
+
+    if (url.origin !== window.location.origin) {
+      return null;
+    }
+
+    if (!/\.(avif|webp|png|jpe?g|gif|svg)(\?|$)/i.test(url.href)) {
+      return null;
+    }
+
     return url.href;
   } catch {
     return null;
@@ -68,29 +78,38 @@ function sameOriginImageUrl(value) {
 function preloadImage(url) {
   return new Promise((resolve) => {
     const image = new Image();
+
     let settled = false;
 
     const finish = () => {
       if (settled) return;
+
       settled = true;
+
       clearTimeout(timer);
+
       image.onload = null;
       image.onerror = null;
-      resolve(); // Failed assets shouldn't trap visitors in the intro.
+
+      resolve();
     };
 
     const timer = setTimeout(finish, IMAGE_TIMEOUT);
 
     image.onload = async () => {
       try {
-        // Decode the image before displaying it if supported.
-        if (typeof image.decode === "function") await image.decode();
+        if (typeof image.decode === "function") {
+          await image.decode();
+        }
       } catch {
-        // Browsers may reject decode even when the image can be shown.
+        // Image decoding failure should not block the intro.
       }
+
       finish();
     };
+
     image.onerror = finish;
+
     image.src = url;
 
     if (image.complete && image.naturalWidth > 0) {
@@ -102,26 +121,41 @@ function preloadImage(url) {
 async function preloadFirstScreenImages() {
   const urls = new Set();
 
-  // 1. Existing images in the first viewport (including loading artwork).
-  // The Home route is mounted behind the loading screen at this point.
+  // Collect images already present in the document.
   for (const image of document.images) {
     const box = image.getBoundingClientRect();
-    const nearTop = box.bottom > -10 && box.top < window.innerHeight * 1.5;
+
+    const nearTop =
+      box.bottom > -10 &&
+      box.top < window.innerHeight * 1.5;
+
     if (!nearTop) continue;
 
-    const url = sameOriginImageUrl(image.currentSrc || image.src);
-    if (url) urls.add(url);
+    const url = sameOriginImageUrl(
+      image.currentSrc || image.src
+    );
+
+    if (url) {
+      urls.add(url);
+    }
   }
 
-  // 2. Collect project cover images when your data/projects records expose
-  // one of these common properties. No image filenames are invented.
+  // Collect project cover images from your project data.
   try {
     const { projects = [] } = await import("./data/projects");
-    const fields = ["image", "cover", "coverImage", "thumbnail", "artwork"];
+
+    const fields = [
+      "image",
+      "cover",
+      "coverImage",
+      "thumbnail",
+      "artwork",
+    ];
 
     for (const project of projects) {
       for (const field of fields) {
         const url = sameOriginImageUrl(project?.[field]);
+
         if (url) {
           urls.add(url);
           break;
@@ -129,45 +163,82 @@ async function preloadFirstScreenImages() {
       }
     }
   } catch (error) {
-    console.warn("Optional project cover preload skipped:", error);
+    console.warn(
+      "Optional project cover preload skipped:",
+      error
+    );
   }
 
-  const priorityUrls = [...urls].slice(0, MAX_PRELOAD_IMAGES);
+  const priorityUrls = [...urls].slice(
+    0,
+    MAX_PRELOAD_IMAGES
+  );
+
   await Promise.all(priorityUrls.map(preloadImage));
 }
 
 /* =========================================
-   ROUTES & READY SIGNAL
+   ROUTE FALLBACK
 ========================================= */
 
 function RouteFallback() {
   const { pathname } = useLocation();
+
   return (
     <div
       style={{
         minHeight: "100svh",
-        background: pathname === "/about" ? "#131416" : "#fff",
+        background:
+          pathname === "/about" ? "#131416" : "#fff",
       }}
     />
   );
 }
 
+/* =========================================
+   PAGE READY SIGNAL
+========================================= */
+
 function PageReadySignal({ onReady }) {
   useEffect(() => {
-    // This runs once the current lazy-loaded page is mounted.
     onReady();
   }, [onReady]);
+
   return null;
 }
 
-function AppRoutes({ onReady }) {
+/* =========================================
+   ROUTES
+
+   IMPORTANT:
+   Home only mounts after introDone is true.
+
+   This prevents the CD entrance animation
+   from playing behind the loading screen.
+========================================= */
+
+function AppRoutes({ onReady, introDone }) {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/about" element={<About />} />
+        <Route
+          path="/"
+          element={
+            introDone ? <Home /> : <RouteFallback />
+          }
+        />
+
+        <Route
+          path="/projects"
+          element={<Projects />}
+        />
+
+        <Route
+          path="/about"
+          element={<About />}
+        />
       </Routes>
+
       <PageReadySignal onReady={onReady} />
     </Suspense>
   );
@@ -176,8 +247,8 @@ function AppRoutes({ onReady }) {
 /* =========================================
    LOADING OVERLAY
 
-   Progress is isolated in this component so its state updates don't
-   cause your homepage / vinyl gallery to rerender on every frame.
+   Progress updates are isolated here,
+   preventing unnecessary App rerenders.
 ========================================= */
 
 function LoadingOverlay({ pageReady, onFinish }) {
@@ -188,7 +259,15 @@ function LoadingOverlay({ pageReady, onFinish }) {
   const [finished, setFinished] = useState(false);
 
   const elapsedRef = useRef(0);
-  const { pausePlayback, resumePlayback } = useAudio();
+
+  const {
+    pausePlayback,
+    resumePlayback,
+  } = useAudio();
+
+  /* =========================================
+     PAUSE / RESUME
+  ========================================= */
 
   function togglePause() {
     if (exiting || finished) return;
@@ -202,12 +281,17 @@ function LoadingOverlay({ pageReady, onFinish }) {
     }
   }
 
-  // Preload critical assets once while the cinematic intro plays.
+  /* =========================================
+     PRELOAD IMAGES
+  ========================================= */
+
   useEffect(() => {
     let active = true;
 
     preloadFirstScreenImages().finally(() => {
-      if (active) setAssetsReady(true);
+      if (active) {
+        setAssetsReady(true);
+      }
     });
 
     return () => {
@@ -215,8 +299,10 @@ function LoadingOverlay({ pageReady, onFinish }) {
     };
   }, []);
 
-  // Animated intro: always at least LOADING_DURATION, then finish when
-  // route + critical images are ready (or after a safety timeout).
+  /* =========================================
+     ANIMATED LOADING PROGRESS
+  ========================================= */
+
   useEffect(() => {
     if (paused || exiting || finished) return;
 
@@ -225,14 +311,22 @@ function LoadingOverlay({ pageReady, onFinish }) {
 
     function tick(time) {
       if (previousTime !== null) {
-        elapsedRef.current += Math.min(time - previousTime, 100);
+        elapsedRef.current += Math.min(
+          time - previousTime,
+          100
+        );
       }
+
       previousTime = time;
 
       const elapsed = elapsedRef.current;
+
       const canLeave =
         elapsed >= LOADING_DURATION &&
-        ((assetsReady && pageReady) || elapsed >= MAX_TOTAL_WAIT);
+        (
+          (assetsReady && pageReady) ||
+          elapsed >= MAX_TOTAL_WAIT
+        );
 
       if (canLeave) {
         setProgress(100);
@@ -240,37 +334,67 @@ function LoadingOverlay({ pageReady, onFinish }) {
         return;
       }
 
-      // 98% means the intro is complete, but critical elements are still
-      // being prepared. It won't misleadingly jump to 100% too early.
       const nextProgress = Math.min(
         98,
-        Math.floor((elapsed / LOADING_DURATION) * 98)
+        Math.floor(
+          (elapsed / LOADING_DURATION) * 98
+        )
       );
-      setProgress((old) => (old === nextProgress ? old : nextProgress));
+
+      setProgress((old) =>
+        old === nextProgress ? old : nextProgress
+      );
+
       frame = requestAnimationFrame(tick);
     }
 
     frame = requestAnimationFrame(tick);
+
     return () => {
-      if (frame !== null) cancelAnimationFrame(frame);
+      if (frame !== null) {
+        cancelAnimationFrame(frame);
+      }
     };
-  }, [paused, exiting, finished, assetsReady, pageReady]);
+  }, [
+    paused,
+    exiting,
+    finished,
+    assetsReady,
+    pageReady,
+  ]);
+
+  /* =========================================
+     FINISH LOADING SCREEN
+  ========================================= */
 
   useEffect(() => {
     if (!exiting) return;
+
     const timeout = setTimeout(() => {
       setFinished(true);
       onFinish();
     }, FADE_DURATION);
-    return () => clearTimeout(timeout);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [exiting, onFinish]);
+
+  /* =========================================
+     LOCK SCROLL DURING INTRO
+  ========================================= */
 
   useEffect(() => {
     if (finished) return;
-    const previousOverflow = document.body.style.overflow;
+
+    const previousOverflow =
+      document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
+
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow =
+        previousOverflow;
     };
   }, [finished]);
 
@@ -296,45 +420,126 @@ function LoadingOverlay({ pageReady, onFinish }) {
   );
 }
 
+/* =========================================
+   MAIN APP CONTENT
+========================================= */
+
 function AppContent() {
+  const { pathname } = useLocation();
+
   const [pageReady, setPageReady] = useState(false);
   const [introDone, setIntroDone] = useState(false);
+  const [homeCodeReady, setHomeCodeReady] =
+    useState(false);
 
-  const handlePageReady = useCallback(() => setPageReady(true), []);
-  const handleIntroFinish = useCallback(() => setIntroDone(true), []);
+  const handlePageReady = useCallback(() => {
+    setPageReady(true);
+  }, []);
 
-  // Download About (and its imported JS/CSS) in the background while
-  // the cinematic intro is still playing. This short delay gives Home's
-  // first-screen assets priority, instead of fetching everything at once.
-  // No About component is mounted yet: its scroll effects stay inactive.
+  const handleIntroFinish = useCallback(() => {
+    setIntroDone(true);
+  }, []);
+
+  /* =========================================
+     PRELOAD HOME CODE
+
+     Download Home while the intro plays.
+
+     Do NOT mount Home yet.
+     Its CD animations must start after
+     the loading screen disappears.
+  ========================================= */
+
   useEffect(() => {
-    if (!pageReady || window.location.pathname === "/about") return;
+    if (pathname !== "/") {
+      setHomeCodeReady(true);
+      return;
+    }
+
+    let active = true;
+
+    loadHomePage()
+      .then(() => {
+        if (active) {
+          setHomeCodeReady(true);
+        }
+      })
+      .catch((error) => {
+        console.info(
+          "Home preload skipped:",
+          error
+        );
+
+        // Don't block the loading screen forever.
+        if (active) {
+          setHomeCodeReady(true);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
+
+  /* =========================================
+     PREFETCH ABOUT
+
+     About is downloaded in the background
+     so navigation is faster later.
+
+     It is NOT mounted here.
+  ========================================= */
+
+  useEffect(() => {
+    if (
+      !pageReady ||
+      pathname === "/about"
+    ) {
+      return;
+    }
 
     const timer = window.setTimeout(() => {
       void loadAboutPage().catch((error) => {
-        // Failed prefetch is non-fatal: React.lazy will retry on navigation.
-        console.info("About prefetch skipped:", error);
+        console.info(
+          "About prefetch skipped:",
+          error
+        );
       });
     }, 1000);
 
-    return () => window.clearTimeout(timer);
-  }, [pageReady]);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [pageReady, pathname]);
+
+  /* =========================================
+     RENDER
+  ========================================= */
 
   return (
     <>
-      {/* Mount the real page behind the intro to warm up route + images. */}
-      <AppRoutes onReady={handlePageReady} />
+      <AppRoutes
+        onReady={handlePageReady}
+        introDone={introDone}
+      />
+
       <SoundButton />
 
       {!introDone && (
         <LoadingOverlay
-          pageReady={pageReady}
+          pageReady={
+            pageReady && homeCodeReady
+          }
           onFinish={handleIntroFinish}
         />
       )}
     </>
   );
 }
+
+/* =========================================
+   APP
+========================================= */
 
 export default function App() {
   return (
