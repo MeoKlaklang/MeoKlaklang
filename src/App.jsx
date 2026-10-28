@@ -1,81 +1,61 @@
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
-import { useEffect, useRef, useState } from "react";
-
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-
-// Audio
-import {
-  AudioProvider,
-  useAudio,
-} from "./context/AudioContext";
-
-// Pages
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Projects from "./pages/Projects";
-
-// Components
+import { AudioProvider, useAudio } from "./context/AudioContext";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import SoundButton from "./components/SoundButton/SoundButton";
 
-// Loading settings
-const LOADING_DURATION = 6500;
-const FADE_DURATION = 850;
+// Split routes into separate JavaScript chunks.
+// Only the current page needs to be loaded initially.
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Projects = lazy(() => import("./pages/Projects"));
 
-/* ====================================
-   WEBSITE ROUTES
-==================================== */
+// Shorter intro, while preserving the original loading screen and fade.
+// Raise LOADING_DURATION if you prefer a longer, cinematic introduction.
+const LOADING_DURATION = 3000;
+const FADE_DURATION = 550;
 
-function AppRoutes() {
+function RouteFallback() {
+  const { pathname } = useLocation();
+  const dark = pathname === "/about";
+
   return (
-    <Routes>
-      {/* Homepage with interactive CD gallery */}
-      <Route
-        path="/"
-        element={<Home />}
-      />
-
-      {/* Projects overview — all five projects */}
-      <Route
-        path="/projects"
-        element={<Projects />}
-      />
-
-      {/* About Me */}
-      <Route
-        path="/about"
-        element={<About />}
-      />
-
-
-    </Routes>
+    <div
+      aria-hidden="true"
+      style={{
+        minHeight: "100svh",
+        backgroundColor: dark ? "#131416" : "#ffffff",
+      }}
+    />
   );
 }
 
-/* ====================================
-   MAIN APP CONTENT
-==================================== */
+function AppRoutes() {
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Suspense>
+  );
+}
 
-function AppContent() {
+/**
+ * Loading has its own state, separate from the real page.
+ * Updating the progress bar therefore does not rerender Home,
+ * the CD gallery, projects or the sound button.
+ */
+function LoadingOverlay() {
   const [progress, setProgress] = useState(0);
   const [paused, setPaused] = useState(false);
   const [exiting, setExiting] = useState(false);
   const [finished, setFinished] = useState(false);
-
   const elapsedRef = useRef(0);
 
-  const {
-    pausePlayback,
-    resumePlayback,
-  } = useAudio();
-
-  /* ====================================
-     PAUSE / RESUME LOADING
-  ==================================== */
+  const { pausePlayback, resumePlayback } = useAudio();
 
   function togglePause() {
     if (exiting || finished) return;
@@ -89,34 +69,27 @@ function AppContent() {
     }
   }
 
-  /* ====================================
-     LOADING PROGRESS
-  ==================================== */
-
   useEffect(() => {
     if (paused || exiting || finished) return;
 
-    let animationFrame;
+    let frame = null;
     let previousTime = null;
 
     function animate(time) {
       if (previousTime !== null) {
-        elapsedRef.current += Math.min(
-          time - previousTime,
-          100
-        );
+        elapsedRef.current += Math.min(time - previousTime, 100);
       }
-
       previousTime = time;
 
       const nextProgress = Math.min(
         100,
-        Math.round(
-          (elapsedRef.current / LOADING_DURATION) * 100
-        )
+        Math.round((elapsedRef.current / LOADING_DURATION) * 100)
       );
 
-      setProgress(nextProgress);
+      // React skips the update when the integer percentage is unchanged.
+      setProgress((current) =>
+        current === nextProgress ? current : nextProgress
+      );
 
       if (elapsedRef.current >= LOADING_DURATION) {
         setProgress(100);
@@ -124,62 +97,67 @@ function AppContent() {
         return;
       }
 
-      animationFrame = requestAnimationFrame(animate);
+      frame = requestAnimationFrame(animate);
     }
 
-    animationFrame = requestAnimationFrame(animate);
+    frame = requestAnimationFrame(animate);
 
     return () => {
-      cancelAnimationFrame(animationFrame);
+      if (frame !== null) cancelAnimationFrame(frame);
     };
   }, [paused, exiting, finished]);
-
-  /* ====================================
-     FADE OUT AFTER LOADING
-  ==================================== */
 
   useEffect(() => {
     if (!exiting) return;
 
-    const timer = setTimeout(() => {
-      setFinished(true);
-    }, FADE_DURATION);
-
+    const timer = setTimeout(() => setFinished(true), FADE_DURATION);
     return () => clearTimeout(timer);
   }, [exiting]);
 
-  /* ====================================
-     LOADING SCREEN
-  ==================================== */
+  // Prevent accidental scrolling behind the introduction.
+  useEffect(() => {
+    if (finished) return;
 
-  if (!finished) {
-    return (
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [finished]);
+
+  if (finished) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 2147483000,
+        overflow: "hidden",
+        background: "#ffffff",
+      }}
+    >
       <LoadingScreen
         progress={progress}
         paused={paused}
         exiting={exiting}
         onTogglePause={togglePause}
       />
-    );
-  }
-
-  /* ====================================
-     PORTFOLIO + GLOBAL SOUND BUTTON
-  ==================================== */
-
-  return (
-    <>
-      <AppRoutes />
-
-      {/* Always visible on portfolio pages */}
-      <SoundButton />
-    </>
+    </div>
   );
 }
 
-/* ====================================
-   APP PROVIDERS
-==================================== */
+function AppContent() {
+  return (
+    <>
+      {/* The real page now mounts immediately behind the intro. */}
+      <AppRoutes />
+      <SoundButton />
+      <LoadingOverlay />
+    </>
+  );
+}
 
 export default function App() {
   return (
