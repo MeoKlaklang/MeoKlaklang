@@ -1,0 +1,20 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- HOMEPAGE -->
+  <url>
+    <loc>https://meoklaklang.com/</loc>
+  </url>
+
+  <!-- PROJECTS -->
+  <url>
+    <loc>https://meoklaklang.com/projects</loc>
+  </url>
+
+  <!-- ABOUT -->
+  <url>
+    <loc>https://meoklaklang.com/about</loc>
+  </url>
+
+</urlset>
